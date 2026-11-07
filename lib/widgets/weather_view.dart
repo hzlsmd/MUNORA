@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/link.dart';
 import '../models/weather_snapshot.dart';
 import '../services/weather_service.dart';
