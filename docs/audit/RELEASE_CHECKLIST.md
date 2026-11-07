@@ -6,8 +6,9 @@
   current code does not revoke it; this audit did not test or reuse that key.
 - Keep `munora-weather-hzlsmd` on Spark unless the project owner explicitly
   chooses paid infrastructure. This audit activates no billing and deploys nothing.
-- The app still needs a weather endpoint. The proposed direct Open-Meteo/FCM
-  migration and predictive model are separate, not implemented by this audit.
+- The app now defaults to direct Open-Meteo for the non-commercial prototype.
+  Review its current terms/rate limits and attribution before distribution.
+  Push notifications and a predictive model remain separate work.
 
 ## Dormant paid backend
 

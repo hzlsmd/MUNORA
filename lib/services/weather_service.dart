@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data/supported_cities.dart';
 import '../models/weather_snapshot.dart';
+import 'open_meteo.dart';
 
 class WeatherException implements Exception {
   final String message;
@@ -24,11 +25,16 @@ class WeatherService {
 
   WeatherService(
       {http.Client? client,
-      this.endpoint = const String.fromEnvironment('WEATHER_API_URL'),
+      this.endpoint = const String.fromEnvironment('WEATHER_API_URL',
+          defaultValue: openMeteoEndpoint),
       this.requestTimeout = const Duration(seconds: 25),
       DateTime Function()? now})
       : _client = client ?? http.Client(),
         _now = now ?? DateTime.now;
+
+  bool get _openMeteo => endpoint == openMeteoEndpoint;
+  String _cacheKey(String city) =>
+      _openMeteo ? 'weather.openmeteo.v1.$city' : 'weather.v1.$city';
 
   Future<WeatherSnapshot> fetch(String city, {bool force = false}) {
     final uri = Uri.tryParse(endpoint);
@@ -87,23 +93,29 @@ class WeatherService {
     final abort = Completer<void>();
     _aborts.add(abort);
     try {
-      final raw =
-          await _read(uri.replace(queryParameters: {'city': city}), abort)
-              .timeout(requestTimeout, onTimeout: () {
+      final raw = await _read(
+              _openMeteo
+                  ? openMeteoRequest(city)
+                  : uri.replace(queryParameters: {'city': city}),
+              abort)
+          .timeout(requestTimeout, onTimeout: () {
         if (!abort.isCompleted) abort.complete();
         throw const WeatherException(
             'Weather update timed out. Please try again.');
       });
       if (_disposed) throw const WeatherException('Weather is unavailable.');
-      final snapshot =
-          WeatherSnapshot.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final normalized = _openMeteo
+          ? normalizeOpenMeteo(decoded, city, _now().toUtc())
+          : decoded;
+      final snapshot = WeatherSnapshot.fromJson(normalized);
       if (snapshot.city != city || !snapshot.isUsable(_now())) {
         throw const FormatException('Stale or mismatched weather');
       }
       _memory[city] = snapshot;
       try {
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('weather.v1.$city', raw);
+        await prefs.setString(_cacheKey(city), jsonEncode(normalized));
       } catch (_) {/* A successful update remains usable if storage fails. */}
       return snapshot;
     } on WeatherException {
@@ -121,7 +133,7 @@ class WeatherService {
     if (!supportedCities.contains(city)) return null;
     try {
       final prefs = await SharedPreferences.getInstance();
-      final raw = prefs.getString('weather.v1.$city');
+      final raw = prefs.getString(_cacheKey(city));
       if (raw == null ||
           raw.length > maxResponseBytes ||
           utf8.encode(raw).length > maxResponseBytes) {
@@ -129,7 +141,8 @@ class WeatherService {
       }
       final snapshot =
           WeatherSnapshot.fromJson(jsonDecode(raw) as Map<String, dynamic>);
-      if (snapshot.city != city ||
+      if ((_openMeteo && snapshot.source != 'Open-Meteo') ||
+          snapshot.city != city ||
           !snapshot.isUsable(_now(), offline: true) ||
           snapshot.updatedAt.isAfter(_now().toUtc())) {
         return null;

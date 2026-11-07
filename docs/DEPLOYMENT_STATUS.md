@@ -1,4 +1,8 @@
-# MUNORA Firebase setup
+# MUNORA deployment status
+
+The Flutter app now defaults to direct Open-Meteo without a key or Firebase.
+See [weather setup](WEATHER_SETUP.md). The Firebase status below describes the
+dormant alternative backend, which remains blocked from deployment.
 
 Verified on 7 November 2026:
 
@@ -9,16 +13,15 @@ Verified on 7 November 2026:
 
 Console: <https://console.firebase.google.com/project/munora-weather-hzlsmd/overview>
 
-## Remaining deployment requirements
+## Dormant Firebase option
 
 The weather function is **not deployed**. Firebase rejected function deployment
-because the project is on the Spark plan. Upgrade to Blaze using:
-<https://console.firebase.google.com/project/munora-weather-hzlsmd/usage/details>
+because the project is on the Spark plan. Keep the project on Spark for this
+non-commercial pilot; direct Open-Meteo does not require billing or a function.
 
 The previously committed OpenWeatherMap key must be revoked in the provider's
-account. Configure its replacement as `OPENWEATHER_API_KEY` in Secret Manager;
-do not put it in source or chat. See [Weather setup](WEATHER_SETUP.md) for commands.
+account. No replacement provider key is needed for the default Open-Meteo flow.
 
-After billing and the replacement secret are ready, deploy the weather function,
-verify a live response, and build Flutter with the returned HTTPS function URL
-as `WEATHER_API_URL`. There is no live weather endpoint yet.
+Do not deploy or enable the alternative backend until a separate reviewed
+App Check client integration lands and the owner approves its infrastructure
+costs. Setting WEATHER_API_URL alone does not meet those requirements.

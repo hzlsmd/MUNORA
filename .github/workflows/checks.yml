@@ -32,4 +32,4 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze
       - run: flutter test
-      - run: flutter build web --no-web-resources-cdn --dart-define=WEATHER_API_URL=https://weather.example.invalid/weather
+      - run: flutter build web --no-web-resources-cdn

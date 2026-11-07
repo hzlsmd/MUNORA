@@ -11,11 +11,40 @@ import 'package:munora/screens/ai_screen.dart';
 import 'package:munora/screens/splash_screen.dart';
 import 'package:munora/services/weather_service.dart';
 import 'weather_fixture.dart';
+import 'open_meteo_test.dart' show openMeteoFixture;
 
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     GoogleFonts.config.allowRuntimeFetching = false;
+  });
+  testWidgets('model attribution and timestamps fit at 320px with large text',
+      (tester) async {
+    tester.view.physicalSize = const Size(320, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final service = WeatherService(
+        client: MockClient((_) async => http.Response.bytes(
+            utf8.encode(jsonEncode(openMeteoFixture(DateTime.now().toUtc()))),
+            200)));
+    addTearDown(service.dispose);
+    addTearDown(() => tester.pumpWidget(const SizedBox.shrink()));
+    await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+            body: MediaQuery(
+                data: const MediaQueryData(
+                    size: Size(320, 900), textScaler: TextScaler.linear(2)),
+                child: HomeScreen(
+                    navigate: (_) {},
+                    onCityChange: (_) {},
+                    city: 'Muntinlupa',
+                    service: service)))));
+    await tester.pumpAndSettle();
+    expect(find.text('Weather data by Open-Meteo'), findsOneWidget);
+    expect(find.textContaining('Model estimate'), findsOneWidget);
+    expect(find.text('CC BY 4.0'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
   testWidgets('splash does not impose a cosmetic three-second startup delay',
       (tester) async {
