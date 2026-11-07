@@ -65,4 +65,4 @@ Files: deterministic performance probes, `docs/audit/2026-11-07-security-perform
 - [x] Build and inspect mobile/desktop fixture workflows, failed updates and large text; measure web assets and browser startup with network/provider costs excluded.
 - [x] Report each finding, severity, trigger, mitigation, source location, state and unresolved owner action; include dependency and rules-check evidence.
 - [x] Request one fresh whole-change review, address important issues with regression tests, run final verification and record residual risk.
-- [ ] Publish a reviewable draft branch/PR if permitted by tools; never merge or deploy without the applicable authorization.
+- [x] Publish a reviewable draft branch/PR if permitted by tools; never merge or deploy without the applicable authorization. Draft PR: https://github.com/hzlsmd/MUNORA/pull/2.
