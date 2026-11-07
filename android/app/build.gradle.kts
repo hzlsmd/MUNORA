@@ -37,8 +37,8 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            if (releaseSigningReady) {
+        if (releaseSigningReady) {
+            create("release") {
                 storeFile = file(releaseStore!!)
                 storePassword = releaseStorePassword
                 keyAlias = releaseAlias
@@ -49,20 +49,20 @@ android {
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = if (releaseSigningReady) signingConfigs.getByName("release") else null
         }
     }
 }
 
-tasks.configureEach {
-    if (name.contains("Release") &&
-        (name.startsWith("package") || name.startsWith("bundle") || name.startsWith("assemble"))) {
-        doFirst {
-            check(releaseSigningReady) {
-                "Release signing is required. Configure the four MUNORA_KEY* environment variables documented in docs/audit/RELEASE_CHECKLIST.md."
-            }
-        }
+// Gate variants before AGP creates any release artifacts or tasks, including flavors.
+androidComponents {
+    beforeVariants(selector().withBuildType("release")) { variant ->
+        variant.enable = releaseSigningReady
     }
+}
+
+if (!releaseSigningReady) {
+    logger.warn("Release variants disabled: configure all four signing environment variables in docs/audit/RELEASE_CHECKLIST.md. Debug builds remain available.")
 }
 
 kotlin {

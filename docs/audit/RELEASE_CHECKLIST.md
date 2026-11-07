@@ -11,6 +11,12 @@
 
 ## Dormant paid backend
 
+**No backend deployment is supported by this PR.** A separate reviewed Flutter
+App Check integration must land first; the complete acceptance criteria are in
+the [backend policy](../WEATHER_SETUP.md#backend-policy). This audit PR is not a
+deployable production-backend release. No enabling, deployment or billing steps
+are offered as a current setup path.
+
 `WEATHER_BACKEND_ENABLED` defaults to false and rejects before database work.
 Enabling it requires a compatible client that sends `X-Firebase-AppCheck` and a
 configured App Check provider. The current Flutter app has no App Check SDK yet.
@@ -35,10 +41,24 @@ on the trusted build machine, keeping the keystore outside the repository:
 - `MUNORA_KEYSTORE_PASSWORD`: store password.
 - `MUNORA_KEY_PASSWORD`: key password.
 
-Missing values fail packaging/assembly rather than silently producing a
-debug-signed release. Debug builds use the ordinary development configuration.
+If any value is missing/blank, AGP disables all `release` build-type variants in
+`beforeVariants`, including flavored variants, before generating their tasks.
+No incomplete release signing config is created. Release APK/AAB invocations
+then fail because the release variant/task is unavailable, not because a
+task-name hook happens to match. Gradle logs the reason without credential values.
+Debug builds keep their ordinary development signing and remain available.
 Native release compilation/signing requires Android SDK and must be verified
 on the team's build machine; this cloud audit does not claim that validation.
+
+On that machine, verify the following before merging the signing change:
+
+- With all four variables unset, and with each one individually missing or blank:
+  debug APK builds work; release APK/AAB builds fail; `:app:tasks --all` exposes
+  no app release variants. Repeat for every flavor if flavors are later added.
+- With all four variables set to a disposable test keystore: release APK/AAB
+  builds work and `apksigner verify --print-certs` / `jarsigner -verify` confirms
+  the intended certificate. Invalid paths/passwords must fail signing.
+- Never use production signing credentials in public logs or committed fixtures.
 
 ## Distribution and operations
 

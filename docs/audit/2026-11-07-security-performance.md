@@ -75,8 +75,8 @@ Local preferences are not encrypted and must not be extended to credentials.
 | ID | Severity | Finding / trigger | Mitigation and residual state |
 | --- | --- | --- | --- |
 | SEC-01 | High | Provider API key is present in public Git history (`1244f8c`, `lib/services/weather_service.dart`). | Current source contains no literal provider credential. **Owner action remains:** revoke the old key; deleting source does not revoke it. History rewrite was not authorized or performed. |
-| SEC-02 | High if deployed | Anonymous valid requests could cause function invocations and Firestore transactions even after IP/provider limits. CORS and `maxInstances` are not spending caps. | Production backend now defaults disabled; enabled requests must verify App Check before database work. Current Flutter has no App Check SDK, so this is an explicit release gate, not a working legacy-client integration. Invocation costs, replayed valid tokens and distributed abuse are not fully eliminated. |
-| SEC-03 | High release risk | Android release build used the standard debug signing config. | Removed fallback; external release keystore configuration is required and packaging/assembly fails without it. Native SDK/signing tests remain mandatory. No signing key was generated. |
+| SEC-02 | High if deployed | Anonymous valid requests could cause function invocations and Firestore transactions even after IP/provider limits. CORS and `maxInstances` are not spending caps. | Backend defaults disabled; enabled requests must verify App Check before database work. No backend deployment is supported by this PR: separate client integration and owner cost approval must land first. Setup no longer offers an incomplete deployment path. Invocation costs, replayed valid tokens and distributed abuse are not fully eliminated. |
+| SEC-03 | High release risk | Android release build used debug signing; the initial replacement relied on task-name heuristics. | Removed fallback and task-name hooks. Release signing config is created only with complete credentials; AGP disables release variants before task creation otherwise. Debug stays available by configuration. Native SDK/variant/signing verification remains a merge gate; this environment cannot run it. No signing key was generated. |
 | SEC-04 | Moderate | npm initially reported nine affected packages through an obsolete `uuid` dependency chain. | Updated Firebase Admin/Functions and a targeted rimraf override; final scan reported zero known advisories. Major SDK/utility changes passed Node 22 tests and export smoke checks; deployed compatibility remains unverified. |
 | SEC-05 | Moderate | Both client and provider paths buffered unbounded JSON and accepted oversized forecasts/conditions. | Streamed 128 KiB caps, at most 40 samples, condition length 120, cancellation and bounded cache decoding. Oversized input cannot replace a good saved snapshot. |
 | SEC-06 | Moderate | Humidity/wind/pressure, timestamp age, forecast ordering and range consistency could be invalid yet display as successful weather. | Finite plausible measurements, explicit timestamp-zone parsing, live age/skew checks, future forecast coverage, offline limits, sorting and duplicate rejection. Forecast expiry is rechecked over time. Provider data is still a third-party estimate, not a validated local sensor reading. |
@@ -229,6 +229,11 @@ the [implementation ledger](implementation-ledger.md).
 See [release checklist](RELEASE_CHECKLIST.md), the
 [implementation plan](../superpowers/plans/2026-11-07-security-performance.md),
 and [design scope](../superpowers/specs/2026-11-07-security-performance-design.md).
+The subsequent user review found an ambiguous backend deployment path and a
+task-name-dependent Android signing guard. Documentation now explicitly prohibits
+backend deployment until a separate client integration lands, and Android uses
+AGP's pre-variant gate instead of task-name matching. The native validation matrix
+is in the release checklist; it has not been executed in this environment.
 Advisory sources were npm's audit feed, including
 [uuid bounds](https://github.com/advisories/GHSA-w5hq-g745-h8pq),
 [glob cancellation](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4), and
