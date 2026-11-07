@@ -1,0 +1,15 @@
+{
+  "score": 5,
+  "summary": "Current deny-all client rules are appropriate for the existing server-only weatherInternal architecture. No client create/update/read bypass or self-assigned authority exists. This is source inspection, not an IAM or deployed penetration-test certification.",
+  "findings": [],
+  "checks": {
+    "updateBypass": "Denied for create and update alike",
+    "authoritySource": "No client-provided identity/role is trusted",
+    "businessLogic": "Flutter calls HTTPS; only server Admin SDK accesses Firestore",
+    "storageAbuse": "Direct client writes are denied; server abuse must be controlled outside rules",
+    "typeSafety": "No client input can reach a permitted write",
+    "fieldVsIdentity": "No field-only authorization grants exist"
+  },
+  "residualRisk": "Admin SDK and privileged credentials bypass these rules. IAM, server validation and quotas remain necessary. Proposed public insights require a new rules review before any change.",
+  "scope": "firestore.rules at the audited branch; unchanged by this work; no emulator or live unauthorized-write probes performed"
+}

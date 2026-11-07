@@ -14,7 +14,7 @@ const List<_NavItem> _items = [
   _NavItem(AppScreen.home, 'Home', Icons.home_rounded),
   _NavItem(AppScreen.forecast, 'Forecast', Icons.calendar_month_rounded),
   _NavItem(AppScreen.alerts, 'Alerts', Icons.warning_amber_rounded),
-  _NavItem(AppScreen.ai, 'AI', Icons.auto_awesome_rounded),
+  _NavItem(AppScreen.ai, 'Tips', Icons.tips_and_updates_outlined),
 ];
 
 class BottomNav extends StatelessWidget {

@@ -1,123 +1,143 @@
-# Live weather without accounts
+# Weather setup
 
-Home and Forecast call a public Firebase HTTPS Function. Users do not sign in.
-The function reads `OPENWEATHER_API_KEY` from Secret Manager, fetches current
-weather and the five-day / three-hour forecast, and returns only weather fields.
-The Flutter app contains no provider credential. Firebase Auth is not required.
+## Default: direct Open-Meteo
 
-## 1. Replace the exposed credential
-
-Revoke the old key in your OpenWeatherMap account and create a replacement with
-access to the Current Weather and 5 Day / 3 Hour Forecast APIs. Removing the key
-from the latest source does not remove it from Git history or invalidate it.
-Never put the replacement in Dart, a committed file, or a chat message.
-
-## 2. Create Firebase infrastructure
-
-1. Create a project at <https://console.firebase.google.com/> and note its project ID.
-2. Enable billing (Blaze is required for deployed Cloud Functions). Set billing alerts.
-3. Create the default Cloud Firestore database in production mode, preferably in
-   Singapore near the function's `asia-southeast1` region.
-4. Install Node.js 22 and the Firebase CLI, then authenticate from your own terminal:
+Run `flutter pub get` and `flutter run` with an Android device/emulator connected.
+No login, API key, Firebase project or WEATHER_API_URL define is needed. For a
+Codespaces browser preview, run:
 
 ```sh
-npm install -g firebase-tools
-firebase login
+flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8080
 ```
 
-No Firebase client app registration or `google-services.json` is needed for this
-milestone: the Flutter app calls HTTPS and does not use a Firebase client SDK.
+Open port 8080 in the Ports panel. For an Android debug APK, use
+`flutter build apk --debug` after the Android SDK setup.
 
-## 3. Configure and deploy the backend
+The app requests Open-Meteo directly for the selected city's fixed coordinates.
+The provider sees your network IP and city coordinates; the app does not request
+GPS access or send login credentials. Current conditions are model estimates,
+not station observations or official warnings. The visible model timestamp and
+local fetch/update time are distinct.
 
-From the repository root, replace `YOUR_PROJECT_ID` with the actual project ID:
+The adapter validates units, WMO codes, hourly array alignment/order, measurements
+and age. Six days of hourly data supply at most 40 upcoming three-hour samples;
+the UI groups the first five Philippine calendar dates. Daily ranges are sampled
+temperature ranges, not full daily extrema. Ten-minute fresh reuse and concurrent
+request sharing reduce traffic; manual refresh forces a request. Offline data is
+labeled and expires after 24 hours. Provider caches use separate namespaces.
 
-```sh
-npm --prefix functions ci
-npm --prefix functions test
-firebase functions:secrets:set OPENWEATHER_API_KEY --project YOUR_PROJECT_ID
-firebase deploy --only functions:weather,firestore:rules --project YOUR_PROJECT_ID
-```
+### Terms, attribution and scale
 
-The secret command prompts for the replacement key. Use the HTTPS function URL
-printed by deployment; do not guess the URL. Deployment does not validate the
-provider subscription: test a real response before distributing the app.
+Checked 7 November 2026: the free endpoint is for non-commercial use, with limits
+below 600 calls/minute, 5,000/hour, 10,000/day and a stated 300,000/month allowance.
+Limits apply by IP/application; shared networks can reach them earlier. Review
+the current [terms](https://open-meteo.com/en/terms) and
+[pricing](https://open-meteo.com/en/pricing) before adding ads, subscriptions or
+broad distribution. No paid plan is enabled.
 
-```sh
-curl --get 'PASTE_DEPLOYED_HTTPS_FUNCTION_URL' --data-urlencode 'city=Muntinlupa'
-```
+Weather data is provided under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+The app links to Open-Meteo and the license. Data is adapted into descriptions,
+rounded display values and three-hour samples. These are third-party estimates
+without an availability/accuracy guarantee. See the
+[forecast API documentation](https://open-meteo.com/en/docs).
 
-This endpoint accepts `GET ?city=<supported NCR city>` and requires no user token.
-An unknown city or extra query parameter returns 400. Provider failures return a
-generic error without including upstream request URLs or credentials.
+An explicit WEATHER_API_URL overrides the default for a compatible normalized
+backend or fixture. Remove old placeholder defines from run configurations to
+use Open-Meteo. This override does not integrate Firebase App Check.
 
-For Flutter Web, create the ignored file `functions/.env.YOUR_PROJECT_ID` with:
+## Backend policy
 
-```dotenv
-ALLOWED_WEB_ORIGINS=https://your-web-app.example,http://localhost:8080
-WEATHER_DAILY_FETCH_LIMIT=1000
-```
+**No backend deployment is supported by this PR.** The optional Firebase backend
+is reference/hardening code, not a deployable product milestone. It must stay
+disabled (`WEATHER_BACKEND_ENABLED=false`) until a separate reviewed client
+integration lands and the project owner explicitly approves any infrastructure
+costs. The current no-paid-services pilot must not enable billing or deploy this
+backend. There is no supported live Firebase path with the current Flutter client.
 
-Use exact origins with scheme and port, no trailing slash or path. Redeploy the
-function after changing parameters. Android/iOS requests do not need a web origin.
-CORS is a browser policy, not authentication or protection against non-browser clients.
+Do not treat setting `WEATHER_API_URL` or enabling the backend parameter as a
+workaround. Do not remove, bypass or make App Check optional to unblock the app.
+App Check is app attestation, not resident login; no resident accounts are needed.
+Firestore remains deny-all for direct client access.
 
-## 4. Run and build Flutter
+### Requirements for a separate integration PR
+
+- Register the actual Firebase apps for each supported platform and supply public
+  app configuration through the platform's supported setup. The old statement
+  that no Firebase client registration was needed no longer applies.
+- Initialize Firebase and activate a production App Check provider on each
+  supported platform before weather requests. Define unsupported-platform behavior
+  explicitly; do not silently send unauthenticated requests.
+- Retrieve a current App Check token and send it in `X-Firebase-AppCheck` on every
+  weather request. Let the SDK manage token renewal. Handle missing, expired or
+  rejected attestation without an anonymous fallback or an infinite retry loop.
+- Keep attestation tokens out of preferences, committed files, URLs and logs.
+  Keep provider keys in server secrets, not Dart or Firebase public configuration.
+  Debug App Check tokens are local development credentials, never production defaults.
+- Test verified success, missing/invalid/expired tokens, initialization failure,
+  offline fallback, city changes and Web CORS on real supported platforms. Verify
+  disabled/unauthorized requests do no database/provider work.
+- Update deployment/run documentation only after this client/server path works.
+  Owner approval of a paid architecture, IAM, TTL, cost controls and provider
+  subscription remains a separate gate; client integration does not grant approval.
+
+See [Release checklist](audit/RELEASE_CHECKLIST.md). The direct Open-Meteo default
+above is independent of this dormant Firebase option.
+
+## Local development and checks
+
+UI development does not need Firebase credentials or a paid project:
 
 ```sh
 flutter pub get
-flutter analyze
-flutter test
-flutter run --dart-define=WEATHER_API_URL=PASTE_DEPLOYED_HTTPS_FUNCTION_URL
-flutter build apk --dart-define=WEATHER_API_URL=PASTE_DEPLOYED_HTTPS_FUNCTION_URL
+flutter run
 ```
 
-For Web, use `flutter run -d chrome --web-port=8080` with the same dart define and
-enable `http://localhost:8080` in `ALLOWED_WEB_ORIGINS`. The endpoint must use HTTPS.
-For a release web build, add `--no-web-resources-cdn` to bundle the rendering
-engine locally rather than depending on a separate rendering CDN at startup.
-`WEATHER_API_URL` is a public endpoint address, not a secret. A missing endpoint
-shows an unavailable/retry state and does not substitute mock weather.
+The default build requests Open-Meteo. Existing tests inject fixture data and
+consume no provider credentials:
 
-## Behavior and limits
+```sh
+npm --prefix functions ci --ignore-scripts
+npm --prefix functions test
+flutter analyze
+flutter test
+flutter build web --no-web-resources-cdn
+```
 
-- Supported locations: the 17 NCR cities/municipality in `supported_cities.dart`.
-  The server uses matching coordinates rather than accepting arbitrary URLs or locations.
-- Home shows temperature, feels-like, humidity, pressure, wind and upcoming three-hour points.
-  The selected city is saved locally and shared with Forecast and Alerts.
-- Forecast uses five calendar dates of available three-hour samples in Philippine
-  time (UTC+8). Daily ranges are aggregated sample ranges, not a separate daily
-  forecast product. The first day can be partial. UV is not supplied by these APIs
-  and is not fabricated.
-- Successful responses are cached in Firestore for ten minutes. Requests on one
-  function instance share an in-flight fetch. Different instances can refresh the
-  same city concurrently; all refreshes reserve the shared provider budget.
-- The default global cap is 1,000 refresh attempts per UTC day (up to 2,000 provider
-  calls). Failed attempts count. Fresh cached responses remain available at the cap.
-  Tune this to your provider plan and traffic; it can pause updates before midnight.
-- Each address is limited to 30 requests per minute using Firestore transactions.
-  Shared networks share a limit. Only a keyed hash is stored, not the raw address.
-  Rotating the provider key also resets address hashes. Platform request logs may
-  still retain network metadata under your cloud logging settings.
-- Configure a Firestore TTL policy on `weatherInternal.expiresAt` to clean up rate
-  and budget documents. TTL deletion is asynchronous; rate windows reset in code.
-  Direct client Firestore access is denied; the function accesses it using its service account.
-- On failure, previously fetched weather up to 24 hours old can remain visible,
-  labeled as saved weather with its observation time. It is not a current advisory.
-- Poppins fonts and their license are bundled. No font-provider download is needed
-  to display saved weather.
-- Rate limits and the provider cap do not cap Cloud Function/Firestore billing.
-  Before broad release, monitor usage and add App Check/platform abuse controls
-  if traffic requires them. This does not require user accounts.
+`WEATHER_API_URL`, when explicitly supplied, is a public HTTPS endpoint address,
+not a credential, and does not provision or enable a backend.
 
-## Remaining milestones
+## Existing backend contract (inactive)
 
-Alerts and AI are visibly labeled demos. Official warnings, push notifications,
-and real AI requests are not connected. Do not present the sample warnings as
-current conditions. Connect an authoritative advisory source before enabling
-alert notifications; put any future AI provider credentials behind the backend.
+- Fixed provider URLs and coordinates cover the 17 supported NCR cities. The
+  normalized DTO includes observation/update times, current measurements and at
+  most 40 three-hour samples. Provider keys never appear in that DTO.
+- An enabled backend requires valid `X-Firebase-AppCheck` attestation before
+  database work. Supported GET requests receive 503 while disabled and 403 for
+  missing/rejected attestation when enabled. Invalid methods/cities/origins may
+  be rejected earlier. CORS is not authentication.
+- Validated weather is cached for ten minutes. Refresh leases fence writers
+  across instances; shared escalating provider backoff allows one recovery probe.
+- The default cap is 1,000 refresh attempts per UTC day, up to two provider calls
+  per attempt. Failures count. This cannot sustain all 17 cities continuously
+  every ten minutes (2,448 refreshes/day).
+- Rate accounting permits 30 requests per minute per keyed platform-IP hash.
+  Shared networks share a limit. Raw IPs are not stored by this application, but
+  infrastructure logs may retain network metadata. Key rotation resets the hashes.
+- Provider/rate limits do not cap function/Firestore billing. A TTL policy must
+  explicitly be configured for `weatherInternal.expiresAt`; the field alone does
+  not delete documents. Admin SDK access still needs least-privilege IAM review.
+- Saved weather can remain visible for up to 24 hours, labeled with its age and
+  source. It is not a current advisory. Forecast ranges use Philippine calendar
+  dates and available three-hour samples, not a separate daily forecast product.
 
-Before release, verify the real provider response, key rotation, offline/retry
-behavior, city changes, release Android networking, and the Web CORS origin.
-Do not deploy the supplied deny-all Firestore rules over an existing database
-that serves other apps without reviewing their rules.
+## Credential ownership and remaining milestones
+
+Revoke the historical OpenWeatherMap key exposed in commit `1244f8c`. Removing it
+from current source does not invalidate it. Revocation is owner action; never
+paste a replacement into Dart, Git or chat. No replacement is needed for fixtures.
+
+Alerts remains a demo. Tips uses live weather with documented rules; it does not
+run a trained AI model. Official warnings, push delivery, trained predictions
+and real accuracy/latency evaluation are not connected. This app must not be used
+as the sole source of emergency warnings. Do not deploy deny-all Firestore rules
+over a database shared by other apps without reviewing their access needs.

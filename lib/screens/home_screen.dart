@@ -82,7 +82,8 @@ class _HomeScreenState extends State<HomeScreen> {
         BottomNav(active: AppScreen.home, onNavigate: widget.navigate),
       ]),
       if (showPicker)
-        _CityPickerModal(
+        Positioned.fill(
+            child: _CityPickerModal(
           selectedIdx: supportedCities.indexOf(widget.city),
           onSelect: (i) {
             setState(() {
@@ -92,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
             widget.onCityChange(supportedCities[i]);
           },
           onClose: () => setState(() => showPicker = false),
-        ),
+        )),
     ]);
   }
 }
@@ -192,6 +193,7 @@ class _HourlyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scale = MediaQuery.textScalerOf(context).scale(13) / 13;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 10),
       decoration: cardDecoration(),
@@ -201,26 +203,23 @@ class _HourlyCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('3-Hour Forecast',
-                  style: TextStyle(
-                      color: AppColors.textDark,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700)),
-              TextButton(
+              const Expanded(
+                  child: Text('3-Hour Forecast',
+                      style: TextStyle(
+                          color: AppColors.textDark,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700))),
+              IconButton(
                 onPressed: onViewMore,
-                style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero, minimumSize: const Size(0, 0)),
-                child: const Text('View more ›',
-                    style: TextStyle(
-                        color: AppColors.skyBlueTop,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600)),
+                tooltip: 'View forecast',
+                icon: const Icon(Icons.arrow_forward,
+                    color: AppColors.skyBlueTop),
               ),
             ],
           ),
           const SizedBox(height: 14),
           SizedBox(
-            height: 166,
+            height: 166 * scale,
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: points.length,
@@ -232,7 +231,7 @@ class _HourlyCard extends StatelessWidget {
                   onTap: () => onSelect(i),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    width: 90,
+                    width: 90 * scale,
                     padding:
                         const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                     decoration: BoxDecoration(
@@ -330,141 +329,62 @@ class _CityPickerModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onClose,
-      child: Container(
+      child: ColoredBox(
         color: const Color(0x73142850),
-        padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
-        child: GestureDetector(
-          onTap: () {}, // swallow taps inside the sheet
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: Container(
-              constraints: const BoxConstraints(maxHeight: 560),
+        child: SafeArea(
+            child: Center(
+                child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440, maxHeight: 560),
+            child: Material(
               color: Colors.white,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
+              borderRadius: BorderRadius.circular(8),
+              clipBehavior: Clip.antiAlias,
+              child: GestureDetector(
+                onTap: () {},
+                child: Column(mainAxisSize: MainAxisSize.min, children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+                    padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+                    child: Row(children: [
+                      const Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                             Text('Choose City',
                                 style: TextStyle(
-                                    color: AppColors.textDark,
-                                    fontSize: 17,
-                                    fontWeight: FontWeight.w700)),
+                                    fontSize: 17, fontWeight: FontWeight.w700)),
                             SizedBox(height: 2),
                             Text('National Capital Region (NCR)',
-                                style: TextStyle(
-                                    color: AppColors.textGray, fontSize: 11)),
-                          ],
-                        ),
-                        InkWell(
-                          onTap: onClose,
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            width: 32,
-                            height: 32,
-                            decoration: const BoxDecoration(
-                                color: AppColors.divider,
-                                shape: BoxShape.circle),
-                            child: const Icon(Icons.close,
-                                size: 16, color: Color(0xFF555555)),
-                          ),
-                        ),
-                      ],
-                    ),
+                                style: TextStyle(fontSize: 11)),
+                          ])),
+                      IconButton(
+                          onPressed: onClose,
+                          tooltip: 'Close city picker',
+                          icon: const Icon(Icons.close)),
+                    ]),
                   ),
-                  const Divider(height: 1, color: AppColors.divider),
+                  const Divider(height: 1),
                   Flexible(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: supportedCities.length,
-                      itemBuilder: (context, i) {
-                        final c = supportedCities[i];
-                        final sel = i == selectedIdx;
-                        return InkWell(
-                          onTap: () => onSelect(i),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 13),
-                            decoration: BoxDecoration(
-                              color: sel
-                                  ? const Color(0xFFEEF6FF)
-                                  : Colors.transparent,
-                              border: const Border(
-                                  bottom: BorderSide(color: Color(0xFFF5F7FA))),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 36,
-                                      height: 36,
-                                      decoration: BoxDecoration(
-                                        color: sel
-                                            ? const Color(0xFFDBEEFF)
-                                            : AppColors.divider,
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: const Icon(
-                                          Icons.location_on_outlined,
-                                          size: 22),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(c,
-                                            style: TextStyle(
-                                                color: AppColors.textDark,
-                                                fontSize: 14,
-                                                fontWeight: sel
-                                                    ? FontWeight.w700
-                                                    : FontWeight.w500)),
-                                        const Text('NCR, Philippines',
-                                            style: TextStyle(
-                                                color: AppColors.textGray,
-                                                fontSize: 11)),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    if (sel) ...[
-                                      const SizedBox(width: 8),
-                                      Container(
-                                        width: 18,
-                                        height: 18,
-                                        decoration: const BoxDecoration(
-                                            color: AppColors.skyBlueTop,
-                                            shape: BoxShape.circle),
-                                        child: const Icon(Icons.check,
-                                            size: 12, color: Colors.white),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
+                      child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: supportedCities.length,
+                    itemBuilder: (context, i) => ListTile(
+                      selected: i == selectedIdx,
+                      leading: const Icon(Icons.location_on_outlined),
+                      title: Text(supportedCities[i]),
+                      subtitle: const Text('NCR, Philippines'),
+                      trailing: i == selectedIdx
+                          ? const Icon(Icons.check_circle)
+                          : null,
+                      onTap: () => onSelect(i),
                     ),
-                  ),
-                ],
+                  )),
+                ]),
               ),
             ),
           ),
-        ),
+        ))),
       ),
     );
   }
