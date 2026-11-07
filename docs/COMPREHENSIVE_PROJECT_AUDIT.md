@@ -135,8 +135,8 @@ The existing audit records 22 backend tests on Node 22, 25 Flutter tests, Flutte
 - GitHub reports merge commit `914f27e6c11301b180f1e7e8b450b5893b6742fb`, with the expected first and second parents.
 - PR diff contained 64 files, 3,876 additions and 1,724 deletions.
 - After merge, the feature branch was 0 commits ahead and 5 behind master.
-- The integration session's GitHub workflow-run lookup returned no associated pull-request-triggered workflow runs for the merge commit; combined status returned no status records. This is **not a passing CI result** and does not establish that checks ran.
-- No local shell was available in this session; Flutter/Node test commands, web build and native builds were not rerun.
+- The merge commit itself returned no associated pull-request-triggered workflow runs and no combined status records. A subsequent push-triggered GitHub Actions run on the final documentation head `b7f94c27dda679bc8e3f29cb8a03ddd6837b4cbb` completed successfully: backend install, npm audit and backend tests passed; Flutter dependency resolution, analysis, tests and web build passed. [Run #42387683306](https://github.com/hzlsmd/MUNORA/actions/runs/42387683306).
+- The integration session did not have a local shell/worktree, so commands were not run interactively by the assistant. The successful GitHub Actions workflow provides exact-head automated verification. Native Android/iOS builds and device checks remain unverified.
 
 ## 7. Release readiness decision
 
