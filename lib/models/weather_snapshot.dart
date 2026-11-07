@@ -34,7 +34,17 @@ String weatherTime(DateTime time) {
   return '${t.day}/${t.month} $hour:${t.minute.toString().padLeft(2, '0')} ${t.hour < 12 ? 'AM' : 'PM'} PHT';
 }
 
+class ForecastReading {
+  final DateTime at;
+  final String condition;
+  const ForecastReading(this.at, this.condition);
+}
+
 class WeatherSnapshot {
+  final double temperature;
+  final double feelsLike;
+  final double windSpeed;
+  final List<ForecastReading> readings;
   final String city;
   final String source;
   final DateTime updatedAt;
@@ -44,19 +54,25 @@ class WeatherSnapshot {
   final List<HourlyPoint> hourly;
   final List<DailyPoint> daily;
 
-  const WeatherSnapshot(
-      {required this.city,
-      this.source = 'OpenWeatherMap',
-      required this.updatedAt,
-      required this.observedAt,
-      required this.forecastUntil,
-      required this.current,
-      required this.hourly,
-      required this.daily});
+  const WeatherSnapshot({
+    required this.city,
+    required this.temperature,
+    required this.feelsLike,
+    required this.windSpeed,
+    required this.readings,
+    this.source = 'OpenWeatherMap',
+    required this.updatedAt,
+    required this.observedAt,
+    required this.forecastUntil,
+    required this.current,
+    required this.hourly,
+    required this.daily,
+  });
 
   bool isUsable(DateTime now, {bool offline = false}) {
-    final maxAge =
-        offline ? const Duration(hours: 24) : const Duration(hours: 3);
+    final maxAge = offline
+        ? const Duration(hours: 24)
+        : const Duration(hours: 3);
     final updateAge = now.toUtc().difference(updatedAt);
     final observationAge = now.toUtc().difference(observedAt);
     return updateAge >= const Duration(minutes: -5) &&
@@ -82,25 +98,27 @@ class WeatherSnapshot {
     }
     final updatedAt = _time(json['updatedAt']);
     final observedAt = _time(json['observedAt']);
-    final entries = raw.map((item) {
-      if (item is! Map<String, dynamic>) {
-        throw const FormatException('Invalid forecast entry');
-      }
-      final time = _time(item['at']);
-      final age = time.difference(updatedAt);
-      if (age < const Duration(hours: -12) || age > const Duration(days: 6)) {
-        throw const FormatException('Invalid forecast horizon');
-      }
-      final low = _number(item['low'], -100, 70);
-      final high = _number(item['high'], -100, 70);
-      final temperature = _number(item['temperature'], -100, 70);
-      if (low > temperature || temperature > high) {
-        throw const FormatException('Invalid temperature range');
-      }
-      _condition(item['condition']);
-      return {...item, 'at': time.toIso8601String()};
-    }).toList()
-      ..sort((a, b) => (a['at'] as String).compareTo(b['at'] as String));
+    final entries =
+        raw.map((item) {
+            if (item is! Map<String, dynamic>) {
+              throw const FormatException('Invalid forecast entry');
+            }
+            final time = _time(item['at']);
+            final age = time.difference(updatedAt);
+            if (age < const Duration(hours: -12) ||
+                age > const Duration(days: 6)) {
+              throw const FormatException('Invalid forecast horizon');
+            }
+            final low = _number(item['low'], -100, 70);
+            final high = _number(item['high'], -100, 70);
+            final temperature = _number(item['temperature'], -100, 70);
+            if (low > temperature || temperature > high) {
+              throw const FormatException('Invalid temperature range');
+            }
+            _condition(item['condition']);
+            return {...item, 'at': time.toIso8601String()};
+          }).toList()
+          ..sort((a, b) => (a['at'] as String).compareTo(b['at'] as String));
     if (entries.map((item) => item['at']).toSet().length != entries.length) {
       throw const FormatException('Duplicate forecast timestamps');
     }
@@ -118,6 +136,15 @@ class WeatherSnapshot {
       groups.putIfAbsent(key, () => []).add(item);
     }
     return WeatherSnapshot(
+      temperature: (current['temperature'] as num).toDouble(),
+      feelsLike: (current['feelsLike'] as num).toDouble(),
+      windSpeed: (current['wind'] as num).toDouble(),
+      readings: List.unmodifiable(
+        entries.map(
+          (item) =>
+              ForecastReading(_time(item['at']), item['condition'] as String),
+        ),
+      ),
       source: source as String,
       city: city,
       updatedAt: updatedAt,
@@ -141,10 +168,11 @@ class WeatherSnapshot {
         final at = manilaTime(DateTime.parse(item['at'] as String));
         final hour = at.hour % 12 == 0 ? 12 : at.hour % 12;
         return HourlyPoint(
-            time:
-                '${_weekdays[at.weekday - 1]} ${at.day}/${at.month}\n$hour ${at.hour < 12 ? 'AM' : 'PM'}',
-            condition: item['condition'] as String,
-            temp: degrees(item['temperature']));
+          time:
+              '${_weekdays[at.weekday - 1]} ${at.day}/${at.month}\n$hour ${at.hour < 12 ? 'AM' : 'PM'}',
+          condition: item['condition'] as String,
+          temp: degrees(item['temperature']),
+        );
       }).toList(),
       daily: groups.values.take(5).map((items) {
         final at = manilaTime(DateTime.parse(items.first['at'] as String));
@@ -155,10 +183,11 @@ class WeatherSnapshot {
             .map((v) => (v['low'] as num).toDouble())
             .reduce((a, b) => a < b ? a : b);
         return DailyPoint(
-            day: '${_weekdays[at.weekday - 1]} ${at.day}/${at.month}',
-            cond: items[items.length ~/ 2]['condition'] as String,
-            hi: degrees(high),
-            lo: degrees(low));
+          day: '${_weekdays[at.weekday - 1]} ${at.day}/${at.month}',
+          cond: items[items.length ~/ 2]['condition'] as String,
+          hi: degrees(high),
+          lo: degrees(low),
+        );
       }).toList(),
     );
   }

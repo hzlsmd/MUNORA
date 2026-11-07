@@ -71,7 +71,8 @@ On that machine, verify the following before merging the signing change:
   hosting layer. A local Python preview does not demonstrate production headers.
 - Weather cache and city preference data are local, unencrypted preferences.
   Store no tokens, credentials, exact location history or sensitive user data there.
-- Keep alerts and AI marked as demos until real validated sources/models exist.
+- Keep alerts marked as a demo. Label Tips as rule-based guidance, never as a
+  trained predictor or an official advisory; show the trigger and data timestamp.
 - Review dependency updates and the targeted rimraf override before SDK upgrades.
 - Do not publish service-account keys, Firebase CLI authorization material, signing
   files, `.env` files, or raw exception/request URLs containing provider keys.
