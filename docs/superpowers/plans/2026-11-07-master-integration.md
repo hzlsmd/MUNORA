@@ -4,9 +4,9 @@
 
 **Goal:** Integrate the cumulative MUNORA development history into `master`, verify the resulting tree, and publish a current project audit and prioritized implementation plan.
 
-**Architecture:** Preserve Git history with a two-parent merge commit whose first parent is the current `master` and second parent is `codex/weather-without-login`. The branch comparison indicates the master-side change since the common ancestor is only the existing PR #1 merge commit, whose tree is already represented by the feature branch ancestry; verify the tree and parent SHAs immediately before creating the merge commit. After integration, create documentation commits on `master` and run GitHub-hosted checks where available.
+**Architecture:** Preserve history by merging `codex/weather-without-login` into `master` with a normal merge commit. Use a short-lived pull request solely as GitHub's merge mechanism, then merge it immediately after validating its exact head/base SHAs and conflict status; do not create an intermediate integration branch. The current master includes the approved design and plan documentation commits, so GitHub must construct the combined tree rather than reusing the feature tree alone. After integration, add the requested audit and implementation documents.
 
-**Tech Stack:** GitHub REST Git database and Contents APIs; Flutter/Dart; Node.js 22; Firebase Functions source; GitHub Actions.
+**Tech Stack:** GitHub REST Pull Requests/Contents APIs; Flutter/Dart; Node.js 22; Firebase Functions source; GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-11-07-master-integration-design.md`
 
@@ -17,13 +17,13 @@
 - Keep the public-weather/no-login prototype model.
 - Do not claim AI forecasting, official warnings, push notifications, native device validation, or cloud production readiness without evidence.
 - Report inherited verification separately from checks newly run during this work.
-- Stop if the current branch tips or merge-tree assumptions differ from the inspected SHAs.
+- Stop if the current branch tips or mergeability differs from the inspected SHAs.
 
 ## Review Focus
 
 - The branch tip may move after inspection: re-fetch all refs and require exact expected SHAs before merge (Task 1).
-- The existing master-only merge commit may create a merge-tree difference: verify the feature tree is an appropriate merge result; if not, stop rather than fabricate a tree (Task 1).
-- GitHub Actions may be absent, pending, or failing for the target head: record exact workflow/run evidence and don't treat no run as a pass (Task 2).
+- Master gained the design and plan documentation commits after the original branch comparison: rely on GitHub's real merge calculation and stop on conflicts rather than substituting a tree (Task 1).
+- GitHub Actions may be absent, pending, or failing for the merge head: record exact workflow/run evidence and don't treat no run as a pass (Task 2).
 - Prior audit measurements may refer to a different commit/environment: label them as inherited evidence, not fresh verification (Task 3).
 - API/provider, Firebase, and Android signing/device constraints are not testable by source inspection alone: preserve as release gates (Tasks 2–4).
 
@@ -32,21 +32,22 @@
 ### Task 1: Verify refs and integrate cumulative branch
 
 **Files:**
-- No source files modified in this task.
 - Git refs: `master`, `codex/weather-without-login`, recovery branch.
+- Pull request: temporary direct merge from cumulative feature branch to master.
 
 **Interfaces:**
-- Inputs: expected master SHA `4af276d35dc99aedcfcc394ef77902f2d908c968`; expected feature SHA `0dff89abe0e570c45b188345b9de73d9fabb6f16`.
-- Output: a two-parent merge commit with master as first parent and cumulative feature as second parent; update `master` only if its current SHA still matches the expected master SHA.
+- Inputs at plan creation: master SHA `f364d0a9a02a26f66eb5837978b13ec1133b6f56`; feature SHA `0dff89abe0e570c45b188345b9de73d9fabb6f16`; recovery SHA `4af276d35dc99aedcfcc394ef77902f2d908c968`.
+- Output: a GitHub merge commit with master as first parent and cumulative feature as second parent.
 
 - [ ] Re-fetch master, feature, and recovery refs and verify the expected SHAs.
-- [ ] Compare master to feature and verify the shared ancestor and file tree relationship.
-- [ ] Fetch the feature commit tree SHA and verify that the resulting tree includes the PR #1 tree and all cumulative branch changes.
-- [ ] Create a merge commit with parent order [master, feature], using the verified feature tree only if the merge is clean and equivalent.
-- [ ] Update `refs/heads/master` with a non-forced ref update and expected old SHA.
-- [ ] Re-fetch master and verify its new commit has the exact two parents and expected tree.
+- [ ] Compare master to feature and inspect changed paths plus the current PR history.
+- [ ] Confirm the recovery ref is unchanged and master still contains the approved design/plan documents.
+- [ ] Create a pull request from `codex/weather-without-login` to `master` as the direct merge mechanism.
+- [ ] Fetch the created PR and verify exact base/head SHAs, mergeable state, and expected changes. Stop if conflicts or unexpected file changes appear.
+- [ ] Merge with GitHub's `merge` method and expected head SHA.
+- [ ] Re-fetch master and verify the merge commit's parents, tree, and preserved recovery ref.
 
-**Stop condition:** If a ref changed, merge tree differs, conflict is reported, or non-forced update rejects, stop and report; do not force or improvise.
+**Stop condition:** If a ref changed, PR reports conflicts, the diff is unexpected, or merge rejects, stop and report; do not force or improvise.
 
 ### Task 2: Verify integrated source and automation evidence
 
