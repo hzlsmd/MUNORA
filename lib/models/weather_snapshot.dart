@@ -1,5 +1,30 @@
 import 'city_weather.dart';
 
+double _number(dynamic value, double min, double max) {
+  if (value is! num || !value.isFinite || value < min || value > max) {
+    throw const FormatException('Invalid weather measurement');
+  }
+  return value.toDouble();
+}
+
+String _condition(dynamic value) {
+  if (value is! String ||
+      value.trim().isEmpty ||
+      value.length > 120 ||
+      RegExp(r'[\x00-\x1f\x7f]').hasMatch(value)) {
+    throw const FormatException('Invalid weather condition');
+  }
+  return value;
+}
+
+DateTime _time(dynamic value) {
+  if (value is! String ||
+      !RegExp(r'^\d{4}-\d{2}-\d{2}T.*(?:Z|[+-]\d{2}:\d{2})$').hasMatch(value)) {
+    throw const FormatException('Invalid weather timestamp');
+  }
+  return DateTime.parse(value).toUtc();
+}
+
 DateTime manilaTime(DateTime time) =>
     time.toUtc().add(const Duration(hours: 8));
 const _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
@@ -13,6 +38,7 @@ class WeatherSnapshot {
   final String city;
   final DateTime updatedAt;
   final DateTime observedAt;
+  final DateTime forecastUntil;
   final CityWeather current;
   final List<HourlyPoint> hourly;
   final List<DailyPoint> daily;
@@ -21,15 +47,63 @@ class WeatherSnapshot {
       {required this.city,
       required this.updatedAt,
       required this.observedAt,
+      required this.forecastUntil,
       required this.current,
       required this.hourly,
       required this.daily});
 
+  bool isUsable(DateTime now, {bool offline = false}) {
+    final maxAge =
+        offline ? const Duration(hours: 24) : const Duration(hours: 3);
+    final updateAge = now.toUtc().difference(updatedAt);
+    final observationAge = now.toUtc().difference(observedAt);
+    return updateAge >= const Duration(minutes: -5) &&
+        observationAge >= const Duration(minutes: -5) &&
+        updateAge <= (offline ? maxAge : const Duration(minutes: 30)) &&
+        observationAge <= maxAge &&
+        (offline || forecastUntil.isAfter(now.toUtc()));
+  }
+
   factory WeatherSnapshot.fromJson(Map<String, dynamic> json) {
-    final city = json['city'] as String;
+    final city = json['city'];
+    if (city is! String || city.isEmpty || city.length > 60) {
+      throw const FormatException('Invalid city');
+    }
     final current = json['current'] as Map<String, dynamic>;
-    final entries = (json['hourly'] as List).cast<Map<String, dynamic>>();
-    if (entries.isEmpty) throw const FormatException('Forecast is empty');
+    final raw = json['hourly'];
+    if (raw is! List || raw.isEmpty || raw.length > 40) {
+      throw const FormatException('Invalid forecast size');
+    }
+    final updatedAt = _time(json['updatedAt']);
+    final observedAt = _time(json['observedAt']);
+    final entries = raw.map((item) {
+      if (item is! Map<String, dynamic>) {
+        throw const FormatException('Invalid forecast entry');
+      }
+      final time = _time(item['at']);
+      final age = time.difference(updatedAt);
+      if (age < const Duration(hours: -12) || age > const Duration(days: 6)) {
+        throw const FormatException('Invalid forecast horizon');
+      }
+      final low = _number(item['low'], -100, 70);
+      final high = _number(item['high'], -100, 70);
+      final temperature = _number(item['temperature'], -100, 70);
+      if (low > temperature || temperature > high) {
+        throw const FormatException('Invalid temperature range');
+      }
+      _condition(item['condition']);
+      return {...item, 'at': time.toIso8601String()};
+    }).toList()
+      ..sort((a, b) => (a['at'] as String).compareTo(b['at'] as String));
+    if (entries.map((item) => item['at']).toSet().length != entries.length) {
+      throw const FormatException('Duplicate forecast timestamps');
+    }
+    _number(current['temperature'], -100, 70);
+    _number(current['feelsLike'], -120, 100);
+    _number(current['humidity'], 0, 100);
+    _number(current['pressure'], 500, 1200);
+    _number(current['wind'], 0, 150);
+    _condition(current['condition']);
     String degrees(dynamic value) => '${(value as num).round()}\u00b0C';
     final groups = <String, List<Map<String, dynamic>>>{};
     for (final item in entries) {
@@ -39,8 +113,9 @@ class WeatherSnapshot {
     }
     return WeatherSnapshot(
       city: city,
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      observedAt: DateTime.parse(json['observedAt'] as String),
+      updatedAt: updatedAt,
+      observedAt: observedAt,
+      forecastUntil: _time(entries.last['at']),
       current: CityWeather(
         city: city,
         temp: (current['temperature'] as num).round().toString(),

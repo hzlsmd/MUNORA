@@ -151,8 +151,8 @@ class _HourlyTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      height: 71,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      constraints: const BoxConstraints(minHeight: 71),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: cardDecoration(),
       child: Row(
         children: [

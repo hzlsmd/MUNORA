@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/weather_snapshot.dart';
 import '../services/weather_service.dart';
@@ -16,16 +17,41 @@ class WeatherView extends StatefulWidget {
   State<WeatherView> createState() => _WeatherViewState();
 }
 
-class _WeatherViewState extends State<WeatherView> {
+class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
   WeatherSnapshot? data;
   String? error;
   bool loading = true;
   int request = 0;
+  bool saved = false;
+  Timer? expiry;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    expiry = Timer.periodic(const Duration(minutes: 1), (_) {
+      if (data != null && !data!.isUsable(DateTime.now(), offline: true)) {
+        setState(() {
+          data = null;
+          error = 'Saved weather has expired. Please refresh.';
+        });
+      } else if (data != null && !data!.isUsable(DateTime.now()) && !saved) {
+        setState(() => saved = true);
+      }
+    });
     load();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && !loading) load();
+  }
+
+  @override
+  void dispose() {
+    expiry?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 
   @override
@@ -37,21 +63,41 @@ class _WeatherViewState extends State<WeatherView> {
     }
   }
 
-  Future<void> load() async {
+  Future<void> load({bool force = false}) async {
     final id = ++request;
     final city = widget.city;
     setState(() {
       loading = true;
       error = null;
+      if (data != null && !data!.isUsable(DateTime.now(), offline: true)) {
+        data = null;
+      }
     });
-    final cached = await widget.service.cached(city);
-    if (!mounted || id != request) return;
-    if (cached != null) setState(() => data = cached);
+    WeatherSnapshot? cached;
     try {
-      final result = await widget.service.fetch(city);
-      if (mounted && id == request) setState(() => data = result);
-    } on WeatherException catch (e) {
-      if (mounted && id == request) setState(() => error = e.message);
+      cached = await widget.service.cached(city);
+    } catch (_) {/* Continue to the network if local storage fails. */}
+    if (!mounted || id != request) return;
+    if (cached != null && cached.isUsable(DateTime.now(), offline: true)) {
+      setState(() {
+        data = cached;
+        saved = true;
+      });
+    }
+    try {
+      final result = await widget.service.fetch(city, force: force);
+      if (mounted && id == request) {
+        setState(() {
+          data = result;
+          saved = false;
+        });
+      }
+    } catch (e) {
+      if (mounted && id == request) {
+        setState(() => error = e is WeatherException
+            ? e.message
+            : 'Weather is temporarily unavailable.');
+      }
     } finally {
       if (mounted && id == request) setState(() => loading = false);
     }
@@ -76,7 +122,7 @@ class _WeatherViewState extends State<WeatherView> {
                         textAlign: TextAlign.center),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
-                        onPressed: load,
+                        onPressed: () => load(force: true),
                         icon: const Icon(Icons.refresh),
                         label: const Text('Retry')),
                   ],
@@ -94,7 +140,7 @@ class _WeatherViewState extends State<WeatherView> {
               child: Row(children: [
                 Expanded(
                     child: Text(
-                  '${error == null ? '' : 'Saved weather. $error\n'}OpenWeatherMap\nObserved ${weatherTime(data!.observedAt)}',
+                  '${saved || error != null ? 'Saved weather. ${error ?? ''}\n' : ''}OpenWeatherMap\nObserved ${weatherTime(data!.observedAt)}',
                   style: const TextStyle(fontSize: 11),
                 )),
                 if (loading)
@@ -106,7 +152,7 @@ class _WeatherViewState extends State<WeatherView> {
                           child: CircularProgressIndicator(strokeWidth: 2)))
                 else
                   IconButton(
-                      onPressed: load,
+                      onPressed: () => load(force: true),
                       tooltip: 'Refresh weather',
                       icon: const Icon(Icons.refresh)),
               ]),

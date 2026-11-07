@@ -1,5 +1,12 @@
 # Live weather without accounts
 
+**Audit release gate:** this optional Cloud Functions backend is not the agreed
+zero-paid-services architecture. It remains disabled by default through
+`WEATHER_BACKEND_ENABLED=false`. Enabling it also requires App Check verification
+before database work. The current Flutter client has no App Check integration;
+setting a URL alone is insufficient. See [Release checklist](audit/RELEASE_CHECKLIST.md).
+Do not enable billing as part of the no-cost pilot.
+
 Home and Forecast call a public Firebase HTTPS Function. Users do not sign in.
 The function reads `OPENWEATHER_API_KEY` from Secret Manager, fetches current
 weather and the five-day / three-hour forecast, and returns only weather fields.
@@ -47,7 +54,10 @@ provider subscription: test a real response before distributing the app.
 curl --get 'PASTE_DEPLOYED_HTTPS_FUNCTION_URL' --data-urlencode 'city=Muntinlupa'
 ```
 
-This endpoint accepts `GET ?city=<supported NCR city>` and requires no user token.
+This endpoint accepts `GET ?city=<supported NCR city>` and requires no resident
+login, but an enabled backend requires a valid `X-Firebase-AppCheck` token.
+The unmodified curl example above is a negative-access check: expect 503 when
+disabled or 403 without attestation. It is not a successful live-weather test.
 An unknown city or extra query parameter returns 400. Provider failures return a
 generic error without including upstream request URLs or credentials.
 
