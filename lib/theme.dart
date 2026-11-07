@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// Color + gradient constants ported 1:1 from the original design's hex values.
 class AppColors {
