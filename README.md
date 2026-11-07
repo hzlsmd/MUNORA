@@ -20,6 +20,9 @@ with that backend. See the [backend policy](docs/WEATHER_SETUP.md#backend-policy
 
 ## Setup
 
+For Android builds in GitHub Codespaces, follow
+[Android SDK setup](docs/CODESPACES_ANDROID.md).
+
 See [Weather integration status](docs/WEATHER_SETUP.md) for the blocked backend
 policy, client integration prerequisites and local fixture checks. For UI
 development without live weather:
