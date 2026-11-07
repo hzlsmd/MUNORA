@@ -16,6 +16,9 @@ Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
 - Tips provides rule-based rain, heat, wind and thunderstorm guidance from live
   weather, with a reason for each tip. [Rules and limits](docs/WEATHER_RECOMMENDATIONS.md).
 - Alerts remains a labeled demo, pending an authoritative advisory integration.
+- Android weather-tip notifications can be enabled from Tips, with a test
+  notification and approximate hourly background checks. Native phone validation
+  is still required. See [notifications](docs/NOTIFICATIONS.md).
 
 ## Setup
 

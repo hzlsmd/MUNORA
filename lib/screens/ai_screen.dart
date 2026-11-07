@@ -6,6 +6,7 @@ import '../services/weather_service.dart';
 import '../theme.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/weather_view.dart';
+import '../widgets/notification_settings.dart';
 
 class AIScreen extends StatelessWidget {
   final ValueChanged<AppScreen> navigate;
@@ -69,6 +70,10 @@ class AIScreen extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: NotificationSettings(),
           ),
           Expanded(
             child: WeatherView(
