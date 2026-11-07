@@ -8,8 +8,8 @@
 - [x] Review and exclude the revert-only ef5f410/6ff447d delta, which restores demo AI instead of the requested live rule-based tips. Leave those branches intact.
 - [x] Record fresh initial-candidate tests, security scan, performance baseline and native/formatting limitations in the audit addendum.
 - [x] Verify final candidate after master dependency migration: 36 tests, clean analysis, successful production web build and repeat npm audit with zero known vulnerabilities.
-- [ ] Publish using a non-forced expected-head update.
-- [ ] Verify remote master tree and retained branch ancestry after publication.
+- [x] Publish using a non-forced expected-head update: integration commit 6db9d456cd1dc6bdb49aac42711c4de7e007e4ac.
+- [x] Verify remote master tree matches the tested local tree exactly (41f78c86cf831b0e9d5dfd8dfa2c38b704f1386d), with ad61ec2 and 9097e65 as parents. Only the documented revert delta remains unmerged.
 - [ ] Owner: revoke historical provider key; verify native release signing and install on a physical phone.
 
 Superpowers execution rulings: preserve concurrent master work; retain the requested rule-based product behavior; do not merge the incompatible demo revert. No production deployment, paid service or credential change is authorized by this integration. Final review is self-review, not an independent reviewer. Earlier checklist evidence below remains historical unless updated by the addendum.
