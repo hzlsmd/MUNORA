@@ -1,4 +1,7 @@
 import { createHmac } from 'node:crypto';
+import { HttpError } from './errors.js';
+import { boundedJson, number, validateWeather } from './validation.js';
+export { HttpError } from './errors.js';
 
 // Coordinates keep requests inside the supported NCR area and avoid ambiguous names.
 export const cities = Object.freeze({
@@ -12,10 +15,6 @@ export const cities = Object.freeze({
   Paranaque: [14.4793, 121.0198], 'San Juan': [14.6019, 121.0355],
   Pateros: [14.5445, 121.0680],
 });
-
-export class HttpError extends Error {
-  constructor(status, message) { super(message); this.status = status; }
-}
 
 const numeric = value => {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
@@ -36,40 +35,50 @@ export async function fetchWeather(city, key, fetchImpl = fetch, now = Date.now)
     } catch {
       throw new HttpError(502, 'Weather provider is temporarily unavailable.');
     }
-    if (!response.ok) throw new HttpError(502, 'Weather provider is temporarily unavailable.');
-    try { return await response.json(); }
+    if (!response.ok) throw new HttpError(502, 'Weather provider is temporarily unavailable.',
+      [401, 403, 429].includes(response.status) ? 300 : 60);
+    try {
+      const body = await boundedJson(response);
+      if (!body || typeof body !== 'object' || Array.isArray(body)) throw new Error('Invalid body');
+      return body;
+    }
     catch { throw new HttpError(502, 'Weather data is temporarily unavailable.'); }
   };
   const [current, forecast] = await Promise.all([request('weather'), request('forecast')]);
-  const condition = item => {
+  const description = item => {
     const value = item.weather?.[0]?.description;
     if (typeof value !== 'string' || value.length > 120) {
       throw new HttpError(502, 'Weather data is temporarily unavailable.');
     }
     return value;
   };
-  if (!Array.isArray(forecast.list) || forecast.list.length === 0) {
+  if (!Array.isArray(forecast.list) || forecast.list.length === 0 || forecast.list.length > 40) {
     throw new HttpError(502, 'Weather data is temporarily unavailable.');
   }
-  return {
-    city,
-    updatedAt: new Date(now()).toISOString(),
-    observedAt: new Date(numeric(current.dt) * 1000).toISOString(),
-    current: {
-      temperature: numeric(current.main?.temp), feelsLike: numeric(current.main?.feels_like),
-      humidity: numeric(current.main?.humidity), pressure: numeric(current.main?.pressure),
-      wind: numeric(current.wind?.speed), condition: condition(current),
-    },
-    hourly: forecast.list.slice(0, 40).map(item => ({
-      at: new Date(numeric(item.dt) * 1000).toISOString(),
-      temperature: numeric(item.main?.temp), low: numeric(item.main?.temp_min),
-      high: numeric(item.main?.temp_max), condition: condition(item),
-    })),
-  };
+  try {
+    const result = {
+      city,
+      updatedAt: new Date(now()).toISOString(),
+      observedAt: new Date(numeric(current.dt) * 1000).toISOString(),
+      current: {
+        temperature: numeric(current.main?.temp), feelsLike: numeric(current.main?.feels_like),
+        humidity: numeric(current.main?.humidity), pressure: numeric(current.main?.pressure),
+        wind: numeric(current.wind?.speed), condition: description(current),
+      },
+      hourly: forecast.list.map(item => ({
+        at: new Date(numeric(item.dt) * 1000).toISOString(),
+        temperature: numeric(item.main?.temp), low: numeric(item.main?.temp_min),
+        high: numeric(item.main?.temp_max), condition: description(item),
+      })),
+    };
+    return validateWeather(result, city, now());
+  } catch {
+    throw new HttpError(502, 'Weather data is temporarily unavailable.');
+  }
 }
 
 export function createWeatherHandler({ store, getKey, allowedOrigins = () => [],
-  dailyLimit = () => 1000, fetchImpl = fetch, now = Date.now }) {
+  dailyLimit = () => 1000, enabled = () => true, authorize = async () => {}, fetchImpl = fetch, now = Date.now }) {
   const pending = new Map();
   return async (req, res) => {
     res.set('Cache-Control', 'no-store');
@@ -81,6 +90,7 @@ export function createWeatherHandler({ store, getKey, allowedOrigins = () => [],
     if (origin) res.set('Access-Control-Allow-Origin', origin);
     if (req.method === 'OPTIONS') {
       res.set('Access-Control-Allow-Methods', 'GET');
+      res.set('Access-Control-Allow-Headers', 'X-Firebase-AppCheck');
       return res.status(204).send('');
     }
     if (req.method !== 'GET') {
@@ -93,6 +103,9 @@ export function createWeatherHandler({ store, getKey, allowedOrigins = () => [],
       return res.status(400).json({ error: 'Choose a supported NCR city.' });
     }
     try {
+      if (!enabled()) throw new HttpError(503, 'Weather service is temporarily unavailable.');
+      try { await authorize(req); }
+      catch { throw new HttpError(403, 'App verification is required.'); }
       const key = getKey();
       if (!key) throw new HttpError(503, 'Weather service is not configured.');
       // Never store raw IP addresses. The platform supplies req.ip; ignore client headers.
@@ -100,13 +113,24 @@ export function createWeatherHandler({ store, getKey, allowedOrigins = () => [],
       await store.rateLimit(identity, now());
       const cached = await store.get(city);
       if (cached && now() - Date.parse(cached.updatedAt) < 600000 &&
-          Date.parse(cached.updatedAt) <= now()) return res.status(200).json(cached);
+          Date.parse(cached.updatedAt) <= now()) {
+        try { validateWeather(cached, city, now()); return res.status(200).json(cached); }
+        catch { /* Refresh invalid privileged/migration cache data. */ }
+      }
       if (!pending.has(city)) {
         const work = (async () => {
-          await store.reserve(now(), dailyLimit());
-          const data = await fetchWeather(city, key, fetchImpl, now);
-          await store.put(city, data);
-          return data;
+          const owner = await store.acquire?.(city, now());
+          try {
+            number(dailyLimit(), 1, 100000);
+            await store.reserve(now(), dailyLimit());
+            const data = await fetchWeather(city, key, fetchImpl, now);
+            const published = await store.put(city, data, owner, now()) || data;
+            return validateWeather(published, city, now());
+          } catch (error) {
+            const delay = await store.release?.(city, owner, now(), error.retryAfter || 60, error.status === 502);
+            if (error instanceof HttpError) error.retryAfter = Math.max(error.retryAfter || 0, delay || 0);
+            throw error;
+          }
         })();
         pending.set(city, work);
         work.finally(() => pending.delete(city)).catch(() => {});
@@ -114,7 +138,7 @@ export function createWeatherHandler({ store, getKey, allowedOrigins = () => [],
       return res.status(200).json(await pending.get(city));
     } catch (error) {
       const status = error instanceof HttpError ? error.status : 503;
-      if (status === 429) res.set('Retry-After', '60');
+      if ([429, 502, 503].includes(status)) res.set('Retry-After', String(error.retryAfter || 60));
       // Provider errors can include request URLs. Do not return or log the original error.
       return res.status(status).json({ error: error instanceof HttpError
         ? error.message : 'Weather service is temporarily unavailable.' });

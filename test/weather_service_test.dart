@@ -75,7 +75,8 @@ void main() {
   });
 
   test('groups forecast by Philippine date, including UTC day rollover', () {
-    final snapshot = WeatherSnapshot.fromJson(weatherFixture());
+    final snapshot = WeatherSnapshot.fromJson(
+        weatherFixture(updatedAt: DateTime.utc(2026, 11, 6, 15)));
     expect(snapshot.daily.length, 2);
     expect(snapshot.daily[0].day, 'Fri 6/11');
     expect(snapshot.daily[1].day, 'Sat 7/11');

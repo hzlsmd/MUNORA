@@ -2,6 +2,11 @@
 
 MUNORA is a weather app for Metro Manila. Everyone can use it without signing in.
 
+The optional Cloud Functions backend is disabled by default after security
+hardening. Enabling it requires App Check integration that is not yet present in
+the Flutter client. No backend has been deployed. See the
+[release gates](docs/audit/RELEASE_CHECKLIST.md) before attempting deployment.
+
 ## Current status
 
 - Home and Forecast load live weather through a Firebase HTTPS backend.

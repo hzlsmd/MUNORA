@@ -53,3 +53,14 @@ functions/.env*
 functions/.secret.local
 .firebase/
 firebase-debug.log*
+
+# Local signing material and cloud credentials
+.env*
+key.properties
+*.jks
+*.keystore
+*.p12
+*service-account*.json
+*serviceAccount*.json
+application_default_credentials.json
+.superpowers/

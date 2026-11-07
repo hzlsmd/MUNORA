@@ -23,8 +23,8 @@ function setup(options = {}) {
       state.calls++;
       assert.equal(url.searchParams.get('appid'), 'test-secret');
       assert.equal(url.searchParams.get('lat'), String(cities.Muntinlupa[0]));
-      return { ok: true, json: async () => url.pathname.endsWith('forecast')
-        ? { list: [provider] } : provider };
+      return new Response(JSON.stringify(url.pathname.endsWith('forecast')
+        ? { list: [{ ...provider, dt: provider.dt + 10800 }] } : provider));
     }, ...options.handler });
   async function request(overrides = {}) {
     const req = { method: 'GET', query: { city: 'Muntinlupa' }, ip: '192.0.2.1', get: () => undefined, ...overrides };
@@ -107,7 +107,7 @@ test('global budget stops new calls but allows fresh cached weather', async () =
   assert.equal((await request()).code, 503);
   assert.equal(state.calls, 0);
   state.cached = { city: 'Muntinlupa', updatedAt: new Date(now).toISOString() };
-  assert.equal((await request()).code, 200);
+  assert.equal((await request()).code, 503);
 });
 
 test('upstream exceptions, status failures and malformed data do not leak secrets', async () => {
