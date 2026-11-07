@@ -73,3 +73,17 @@ const List<WeatherAlert> otherAlerts = [
     severityBg: 0xFFEEF6FF,
   ),
 ];
+
+const List<Map<String, String>> aiRecommendations = [
+  {'emoji': '☂️', 'title': 'Bring an Umbrella', 'desc': 'Rain may occur later today.'},
+  {'emoji': '🚗', 'title': 'Travel Advisory', 'desc': 'Allow extra travel time due to possible heavy rainfall.'},
+  {'emoji': '💧', 'title': 'Stay Hydrated', 'desc': 'Temperatures may reach 32°C this afternoon.'},
+  {'emoji': '🏠', 'title': 'Stay Alert', 'desc': 'Monitor weather alerts if rainfall becomes heavier.'},
+];
+
+const List<String> aiResponses = [
+  'Based on current data, expect rain around 3–5 PM. Carry an umbrella and avoid low-lying areas.',
+  'Temperatures will peak at 32°C midday. Stay hydrated and limit outdoor activity between 11 AM and 2 PM.',
+  'Wind speeds are moderate at 0.9 m/s. Travel should be fine but allow extra time during afternoon showers.',
+  'UV Index is Very High. Apply sunscreen SPF 50+ if going out before noon.',
+];

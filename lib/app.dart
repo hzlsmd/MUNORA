@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'data/supported_cities.dart';
 import 'services/weather_service.dart';
 
@@ -56,9 +55,7 @@ class _RootScreenState extends State<_RootScreen> {
       if (mounted && supportedCities.contains(saved)) {
         setState(() => selectedCity = saved!);
       }
-    } catch (_) {
-      /* Keep the default when storage is unavailable. */
-    }
+    } catch (_) {/* Keep the default when storage is unavailable. */}
   }
 
   Future<void> selectCity(String city) async {
@@ -66,9 +63,7 @@ class _RootScreenState extends State<_RootScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('selectedCity', city);
-    } catch (_) {
-      /* Selection still works without persistent storage. */
-    }
+    } catch (_) {/* Selection still works without persistent storage. */}
   }
 
   @override
@@ -96,23 +91,19 @@ class _RootScreenState extends State<_RootScreen> {
         break;
       case AppScreen.forecast:
         body = ForecastScreen(
-          navigate: navigate,
-          city: selectedCity,
-          service: weatherService,
-        );
+            navigate: navigate, city: selectedCity, service: weatherService);
         break;
       case AppScreen.alerts:
         body = DemoNotice(
-          message: 'Demo alerts only. These are sample warnings, not current official advisories.',
-          child: AlertsScreen(navigate: navigate, city: selectedCity),
-        );
+            message:
+                'Demo alerts only. These are sample warnings, not current official advisories.',
+            child: AlertsScreen(navigate: navigate, city: selectedCity));
         break;
       case AppScreen.ai:
-        body = AIScreen(
-          navigate: navigate,
-          city: selectedCity,
-          service: weatherService,
-        );
+        body = DemoNotice(
+            message:
+                'AI demo. Responses are prewritten examples and do not use live weather.',
+            child: AIScreen(navigate: navigate));
         break;
     }
 

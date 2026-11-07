@@ -136,8 +136,7 @@ Revoke the historical OpenWeatherMap key exposed in commit `1244f8c`. Removing i
 from current source does not invalidate it. Revocation is owner action; never
 paste a replacement into Dart, Git or chat. No replacement is needed for fixtures.
 
-Alerts remains a demo. Tips uses live weather with documented rules; it does not
-run a trained AI model. Official warnings, push delivery, trained predictions
+Alerts and AI remain demos. Official warnings, push delivery, trained predictions
 and real accuracy/latency evaluation are not connected. This app must not be used
 as the sole source of emergency warnings. Do not deploy deny-all Firestore rules
 over a database shared by other apps without reviewing their access needs.
