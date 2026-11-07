@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/link.dart';
 import '../models/weather_snapshot.dart';
 import '../services/weather_service.dart';
 
@@ -139,9 +140,45 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
               padding: const EdgeInsets.only(left: 16, top: 4, bottom: 4),
               child: Row(children: [
                 Expanded(
-                    child: Text(
-                  '${saved || error != null ? 'Saved weather. ${error ?? ''}\n' : ''}OpenWeatherMap\nObserved ${weatherTime(data!.observedAt)}',
-                  style: const TextStyle(fontSize: 11),
+                    child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (saved || error != null)
+                      Text('Saved weather. ${error ?? ''}',
+                          style: const TextStyle(fontSize: 11)),
+                    if (data!.source == 'Open-Meteo')
+                      Wrap(spacing: 8, children: [
+                        Link(
+                            uri: Uri.parse('https://open-meteo.com/'),
+                            target: LinkTarget.blank,
+                            builder: (context, follow) => InkWell(
+                                onTap: follow,
+                                child: const Text('Weather data by Open-Meteo',
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        decoration:
+                                            TextDecoration.underline)))),
+                        Link(
+                            uri: Uri.parse(
+                                'https://creativecommons.org/licenses/by/4.0/'),
+                            target: LinkTarget.blank,
+                            builder: (context, follow) => InkWell(
+                                onTap: follow,
+                                child: const Text('CC BY 4.0',
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        decoration:
+                                            TextDecoration.underline)))),
+                      ])
+                    else
+                      const Text('OpenWeatherMap',
+                          style: TextStyle(fontSize: 11)),
+                    Text(
+                        '${data!.source == 'Open-Meteo' ? 'Model estimate' : 'Observed'} ${weatherTime(data!.observedAt)}',
+                        style: const TextStyle(fontSize: 11)),
+                    Text('Updated ${weatherTime(data!.updatedAt)}',
+                        style: const TextStyle(fontSize: 11)),
+                  ],
                 )),
                 if (loading)
                   const Padding(

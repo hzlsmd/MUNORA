@@ -36,6 +36,7 @@ String weatherTime(DateTime time) {
 
 class WeatherSnapshot {
   final String city;
+  final String source;
   final DateTime updatedAt;
   final DateTime observedAt;
   final DateTime forecastUntil;
@@ -45,6 +46,7 @@ class WeatherSnapshot {
 
   const WeatherSnapshot(
       {required this.city,
+      this.source = 'OpenWeatherMap',
       required this.updatedAt,
       required this.observedAt,
       required this.forecastUntil,
@@ -65,6 +67,10 @@ class WeatherSnapshot {
   }
 
   factory WeatherSnapshot.fromJson(Map<String, dynamic> json) {
+    final source = json['source'] ?? 'OpenWeatherMap';
+    if (source != 'Open-Meteo' && source != 'OpenWeatherMap') {
+      throw const FormatException('Invalid weather source');
+    }
     final city = json['city'];
     if (city is! String || city.isEmpty || city.length > 60) {
       throw const FormatException('Invalid city');
@@ -112,6 +118,7 @@ class WeatherSnapshot {
       groups.putIfAbsent(key, () => []).add(item);
     }
     return WeatherSnapshot(
+      source: source as String,
       city: city,
       updatedAt: updatedAt,
       observedAt: observedAt,

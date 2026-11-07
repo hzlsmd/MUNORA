@@ -44,7 +44,7 @@ void main() {
 
   test('ignores corrupted, future, old and wrong-city offline snapshots',
       () async {
-    final service = WeatherService();
+    final service = WeatherService(endpoint: 'https://weather.example');
     addTearDown(service.dispose);
     for (final raw in [
       'not json',
