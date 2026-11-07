@@ -41,3 +41,40 @@ in the [release checklist](audit/RELEASE_CHECKLIST.md#android-signing).
 
 Missing Chrome/Linux-desktop tools in `flutter doctor` do not block Android
 builds. Installing this SDK does not configure MUNORA's live-weather endpoint.
+
+## Gradle daemon disappears
+
+The repository bounds Gradle to a 2 GiB heap, 512 MiB class metadata and one
+worker, and compiles Kotlin in the Gradle process. The previous 8 GiB heap /
+4 GiB metadata limits could exceed a small Codespace's memory. These limits
+reduce pressure but are not proof that a particular crash was caused by memory.
+
+Stop a running web preview before retrying the Android build. From the project
+root, stop previous Gradle daemons and retry:
+
+```bash
+cd android
+./gradlew --stop
+cd ..
+flutter build apk --debug
+```
+
+Already installed NDK/platform packages do not need to be deleted. Java native
+access warnings alone do not establish a build failure; do not change JDKs merely
+to hide them.
+
+If the daemon disappears again, capture container limits and memory events
+before and after the failed build:
+
+```bash
+free -h
+cat /sys/fs/cgroup/memory.max
+cat /sys/fs/cgroup/memory.events
+df -h .
+```
+
+An increasing `oom_kill` count supports a container out-of-memory diagnosis.
+Otherwise inspect the newest Gradle daemon log and any JVM `hs_err_pid*.log`
+crash file. The generic disappeared-daemon error also occurs after interruptions
+or JVM crashes. Share the failure's final lines and these diagnostics rather
+than assuming the memory adjustment proves the cause.
