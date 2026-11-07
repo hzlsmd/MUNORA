@@ -1,29 +1,81 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:munora/app.dart';
+import 'package:munora/models/weather_snapshot.dart';
+import 'package:munora/services/weather_service.dart';
+import 'package:munora/widgets/weather_view.dart';
+import 'weather_fixture.dart';
+
+class FakeWeatherService extends WeatherService {
+  final requests = <String, Completer<WeatherSnapshot>>{};
+  WeatherSnapshot? saved;
+  @override
+  Future<WeatherSnapshot?> cached(String city) async =>
+      saved?.city == city ? saved : null;
+  @override
+  Future<WeatherSnapshot> fetch(String city) =>
+      (requests[city] = Completer<WeatherSnapshot>()).future;
+}
+
+Widget view(FakeWeatherService service, String city) => MaterialApp(
+        home: Scaffold(
+      body: WeatherView(
+          city: city,
+          service: service,
+          builder: (snapshot) =>
+              Center(child: Text('Weather for ${snapshot.city}'))),
+    ));
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MunoraApp());
-
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
-
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('loading, failure and retry work without sign-in',
+      (tester) async {
+    final service = FakeWeatherService();
+    addTearDown(service.dispose);
+    await tester.pumpWidget(view(service, 'Muntinlupa'));
     await tester.pump();
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    service.requests['Muntinlupa']!
+        .completeError(const WeatherException('Check your connection.'));
+    await tester.pumpAndSettle();
+    expect(find.text('Check your connection.'), findsOneWidget);
+    await tester.tap(find.text('Retry'));
+    await tester.pump();
+    service.requests['Muntinlupa']!
+        .complete(WeatherSnapshot.fromJson(weatherFixture()));
+    await tester.pumpAndSettle();
+    expect(find.text('Weather for Muntinlupa'), findsOneWidget);
+  });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('saved weather remains visible after an update fails',
+      (tester) async {
+    final service = FakeWeatherService()
+      ..saved = WeatherSnapshot.fromJson(weatherFixture());
+    addTearDown(service.dispose);
+    await tester.pumpWidget(view(service, 'Muntinlupa'));
+    await tester.pump();
+    service.requests['Muntinlupa']!
+        .completeError(const WeatherException('Connection unavailable.'));
+    await tester.pumpAndSettle();
+    expect(find.text('Weather for Muntinlupa'), findsOneWidget);
+    expect(find.textContaining('Saved weather.'), findsOneWidget);
+    expect(find.textContaining('Observed'), findsOneWidget);
+  });
+
+  testWidgets('late responses cannot replace a newly selected city',
+      (tester) async {
+    final service = FakeWeatherService();
+    addTearDown(service.dispose);
+    await tester.pumpWidget(view(service, 'Muntinlupa'));
+    await tester.pump();
+    await tester.pumpWidget(view(service, 'Manila'));
+    await tester.pump();
+    service.requests['Manila']!
+        .complete(WeatherSnapshot.fromJson(weatherFixture(city: 'Manila')));
+    await tester.pumpAndSettle();
+    service.requests['Muntinlupa']!
+        .complete(WeatherSnapshot.fromJson(weatherFixture()));
+    await tester.pumpAndSettle();
+    expect(find.text('Weather for Manila'), findsOneWidget);
+    expect(find.text('Weather for Muntinlupa'), findsNothing);
   });
 }
