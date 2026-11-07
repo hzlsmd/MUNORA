@@ -166,3 +166,52 @@ Release gates before a broader public mobile release:
 - [Codespaces Android setup](CODESPACES_ANDROID.md)
 - [Master integration design](superpowers/specs/2026-11-07-master-integration-design.md)
 - [Master integration execution plan](superpowers/plans/2026-11-07-master-integration.md)
+
+## 9. Follow-up Integration Review (8 November 2026, Asia/Manila)
+
+This addendum preserves the earlier report and distinguishes fresh local evidence from its repository-only evidence. During verification, master advanced to `ad61ec29d1cc053a4503c6b6ee843943b5d77c2b`. The final integration was rebuilt on that head, retaining all newer documentation, dependency updates, material_ui migration and CI changes. No concurrent user work was overwritten.
+
+### Complete Branch Disposition
+
+Thirteen development branches were accessible at the final inventory, plus the recovery reference. Fourteen PRs were inspected; all were closed/merged. No main branch existed.
+
+| Branch | Head reviewed | Disposition |
+| --- | --- | --- |
+| master | ad61ec2 | Authoritative base, includes PRs 8-13 |
+| codex/security-performance-audit | bf5b06d | Already integrated; validation, abuse controls, signing and CI retained |
+| codex/codespaces-android-sdk | 91bb221 | Already integrated; checksummed installer retained |
+| codex/open-meteo-weather | 083a857 | Already integrated; no-login default retained |
+| codex/weather-recommendations | dc71ba7 | Already integrated; rule-based tips retained |
+| codex/android-build-memory | 9097e65 | Merge history and preserve user null guard plus dictionary entry; exclude invalid gitlink |
+| codex/weather-without-login | 6ff447d | Earlier history through 0dff89a already integrated; exclude latest revert-only delta |
+| revert-6-codex/weather-recommendations | ef5f410 | Excluded: deletes working rules/tests and restores fixed AI demo, conflicting with the requested rule-based feature |
+| dependabot/github_actions/actions/checkout-7.0.1 | f2c000c | Already merged in PR9; SHA pin retained |
+| dependabot/github_actions/actions/setup-node-7.1.0 | f6eac21 | Already merged in PR10; Node22 job retained |
+| dependabot/pub/cupertino_icons-2.0.0 | 5ffb8bf | Already merged in PR11; retained |
+| dependabot/pub/flutter_lints-6.0.0 | be0bd19 | Already merged in PR12; retained |
+| dependabot/pub/google_fonts-9.0.0 | 008aca4 | Already merged in PR13; material_ui imports, SDK floors and lockfile migration retained |
+
+The revert branches are left untouched, not undone or deleted. A stale local Codespace tracking ref at initial-upload commit 1244f8c has no additional changes and is absent from the live remote inventory. The recovery branch remains at 4af276d. Git history is retained through merge parents; the only new source delta beyond ad61ec2 is the user's explicit null check and editor dictionary entry. No textual conflict occurred.
+
+### Additional Findings and Verification Limits
+
+| ID | Severity | Likelihood / impact and scenario | Remediation / verification |
+| --- | --- | --- | --- |
+| MUN-15 | Low | Commit 9097e65 adds a mode-160000 MUNORA entry pointing to the old repository without .gitmodules; recursive checkouts may fail or confuse dependency ownership | Exclude that accidental entry only; preserve the user commit and its useful changes. Verified final tracked tree and diff |
+| MUN-16 | Low | Existing Dart formatting drift makes automated style gates fail, despite clean analysis | Reported, not suppressed. Format dry-run flags 13 files in the initial combined tree; formatting-only cleanup deferred |
+
+No account login/password/session/JWT/RBAC, upload endpoints, SQL queries or user-owned server resources are implemented in the default app; related password, SQL injection, upload, session-CSRF and IDOR tests are not applicable to that path. Runtime source review found no arbitrary shell execution or HTML evaluation path. Weather text is rendered by Flutter. This does not constitute a general proof against injection or XSS in future features.
+
+Current-tree targeted private-key/provider-key pattern scan returned no matches; history metadata confirms the earlier key-removal commits. This limited scan is not a comprehensive secret detector. No secret value was printed or reused. Deployed IAM, TLS/security headers, real App Check replay behavior, Firestore contention/TTL and infrastructure logs remain unverified. There is no production database query plan to measure locally; backend uses fixed document reads and transactions, not SQL joins.
+
+### Fresh Local Evidence
+
+The first combined candidate passed 36 Flutter tests, 22 Node22 tests, Flutter analysis and release web build. Coverage was 652/683 instrumented Dart lines (95.46%, not whole-repository coverage). npm ci --ignore-scripts installed 224 dependencies with lockfile integrity; npm audit reported zero known vulnerabilities. Installation used host Node24 with an engine warning; backend tests separately used Node22. SDK installer bash syntax and git diff --check passed.
+
+Fixture browser checks at 390x844 and 1366x900 passed with one weather request across Home/Tips and no JavaScript errors. Backend fixture baseline on Node24: cold 49.66 ms; 1,000 warm requests p50 0.0746 ms/p95 0.1471 ms; 100 concurrent cold requests 2.09 ms with two provider calls and one cache write; response 3,773 bytes. These exclude provider/Firestore latency. Initial web build took 57.0 seconds and main.dart.js was 2,232,005 raw bytes. No new speedup is claimed; later dependency changes make that bundle measurement historical, not final.
+
+Initial sandbox attempts could not bind Flutter test sockets; approved-network reruns passed. A dependency attempt hit an approval-service usage limit, and a later cache-path failure was resolved using a writable npm cache. Tests were not weakened. Android release was attempted but failed downloading absent Flutter Android artifacts under restricted networking; common local Android SDK paths were absent and private signing material was unavailable. Native release/signatures, hardware behavior, comprehensive Dart/native advisory scanning and production penetration/load tests remain unverified.
+
+Final review used the Superpowers reviewer checklist in a separate self-review pass; no independent subagent reviewer was available. Native release limitations and owner credential revocation remain release gates. The retained master dependency migration requires fresh final-candidate checks rather than relying on the earlier candidate's measurements.
+
+Final candidate after retaining ad61ec2: dependency resolution succeeded without lockfile changes; all 36 Flutter tests passed again, analysis reported no issues, and production web compilation succeeded in 106.8 seconds. A repeat npm audit returned zero known vulnerabilities. Backend source/lockfile are unchanged from the 22-test Node22 run. Build timing differences are not evidence of an optimization or regression because concurrent compiler load differed. The final merge preserves ad61ec2 and 9097e65 as parents and excludes only the incompatible revert delta and accidental gitlink.

@@ -53,8 +53,8 @@ class _RootScreenState extends State<_RootScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final saved = prefs.getString('selectedCity');
-      if (mounted && supportedCities.contains(saved)) {
-        setState(() => selectedCity = saved!);
+      if (mounted && saved != null && supportedCities.contains(saved)) {
+        setState(() => selectedCity = saved);
       }
     } catch (_) {
       /* Keep the default when storage is unavailable. */

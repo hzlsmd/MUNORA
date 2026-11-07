@@ -1,5 +1,19 @@
 # MUNORA Implementation Plan
 
+## Integration Completion Addendum (8 November 2026)
+
+- [x] Reinventory all 13 accessible development branches plus recovery and all 14 PRs after concurrent updates.
+- [x] Preserve latest master ad61ec2, dependency migrations, existing reports and meaningful Git history.
+- [x] Integrate the outstanding user null guard/editor change from 9097e65, excluding only its accidental self-referencing gitlink.
+- [x] Review and exclude the revert-only ef5f410/6ff447d delta, which restores demo AI instead of the requested live rule-based tips. Leave those branches intact.
+- [x] Record fresh initial-candidate tests, security scan, performance baseline and native/formatting limitations in the audit addendum.
+- [x] Verify final candidate after master dependency migration: 36 tests, clean analysis, successful production web build and repeat npm audit with zero known vulnerabilities.
+- [ ] Publish using a non-forced expected-head update.
+- [ ] Verify remote master tree and retained branch ancestry after publication.
+- [ ] Owner: revoke historical provider key; verify native release signing and install on a physical phone.
+
+Superpowers execution rulings: preserve concurrent master work; retain the requested rule-based product behavior; do not merge the incompatible demo revert. No production deployment, paid service or credential change is authorized by this integration. Final review is self-review, not an independent reviewer. Earlier checklist evidence below remains historical unless updated by the addendum.
+
 **Date:** 7 November 2026  
 **Target branch:** `master`  
 **Baseline:** integrated commit `914f27e6c11301b180f1e7e8b450b5893b6742fb`  
