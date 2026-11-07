@@ -2,14 +2,16 @@
 
 MUNORA is a weather app for Metro Manila. Everyone can use it without signing in.
 
-The optional Cloud Functions backend is disabled by default after security
-hardening. Enabling it requires App Check integration that is not yet present in
-the Flutter client. No backend has been deployed. See the
-[release gates](docs/audit/RELEASE_CHECKLIST.md) before attempting deployment.
+**No backend deployment is supported by this PR.** The optional Cloud Functions
+backend stays disabled until a separate, reviewed Flutter App Check integration
+lands and the owner explicitly approves its infrastructure costs. No backend has
+been deployed. Setting an endpoint URL alone does not make this client compatible
+with that backend. See the [backend policy](docs/WEATHER_SETUP.md#backend-policy).
 
 ## Current status
 
-- Home and Forecast load live weather through a Firebase HTTPS backend.
+- Home and Forecast implement the HTTPS weather contract; live weather is not
+  configured. Firebase integration is blocked by the backend policy above.
 - Provider credentials stay on the server.
 - The city picker supports all 17 NCR cities/municipality and saves the selection locally.
 - Loading, retry, refresh and saved-weather fallback are implemented.
@@ -18,18 +20,19 @@ the Flutter client. No backend has been deployed. See the
 
 ## Setup
 
-See [Live weather setup](docs/WEATHER_SETUP.md) for Firebase project creation,
-replacement API-key configuration, deployment, request limits and release checks.
-
-After deploying the backend:
+See [Weather integration status](docs/WEATHER_SETUP.md) for the blocked backend
+policy, client integration prerequisites and local fixture checks. For UI
+development without live weather:
 
 ```sh
 flutter pub get
-flutter run --dart-define=WEATHER_API_URL=PASTE_DEPLOYED_HTTPS_FUNCTION_URL
+flutter run
 ```
 
 The app does not need Firebase Auth or a login screen. Local preferences and
 cached weather are stored on the device using shared_preferences.
+Without a configured compatible endpoint, weather shows its unavailable state;
+the app does not substitute fabricated live data.
 
 ## Checks
 
