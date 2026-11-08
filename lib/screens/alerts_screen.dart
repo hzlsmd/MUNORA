@@ -1,309 +1,147 @@
 import 'package:material_ui/material_ui.dart';
-import '../data/mock_data.dart';
+import 'package:url_launcher/link.dart';
+
+import '../services/weather_service.dart';
+import '../services/weather_alerts.dart';
 import '../theme.dart';
+import '../widgets/atmosphere.dart';
 import '../widgets/bottom_nav.dart';
-import '../widgets/weather_icon.dart';
+import '../widgets/guidance_card.dart';
+import '../widgets/weather_view.dart';
+import '../widgets/notification_settings.dart';
 
 class AlertsScreen extends StatelessWidget {
   final ValueChanged<AppScreen> navigate;
   final String city;
-  const AlertsScreen({super.key, required this.navigate, required this.city});
+  final WeatherService service;
+  const AlertsScreen({
+    super.key,
+    required this.navigate,
+    required this.city,
+    required this.service,
+  });
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: AppColors.bg,
-      child: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+  Widget build(BuildContext context) => AtmosphereScreen(
+    title: city,
+    actions: const [NotificationSettingsButton()],
+    subtitle: 'Forecast-based alerts',
+    active: AppScreen.alerts,
+    onNavigate: navigate,
+    child: WeatherView(
+      city: city,
+      service: service,
+      builder: (weather) {
+        final alerts = weatherAlerts(weather, DateTime.now());
+        final stale = alerts.any((a) => a.id == 'stale');
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+          children: [
+            const GlassCard(
+              padding: EdgeInsets.all(14),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
-                    decoration:
-                        const BoxDecoration(gradient: AppColors.skyGradient),
-                    child: SafeArea(
-                      bottom: false,
-                      child: Row(
-                        children: [
-                          InkWell(
-                            onTap: () => navigate(AppScreen.home),
-                            borderRadius: BorderRadius.circular(18),
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: const Color(0x33FFFFFF),
-                                shape: BoxShape.circle,
-                                border:
-                                    Border.all(color: const Color(0x4DFFFFFF)),
-                              ),
-                              child: const Icon(Icons.arrow_back,
-                                  color: Colors.white, size: 18),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Weather Alerts',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w700)),
-                              const SizedBox(height: 2),
-                              Row(
-                                children: [
-                                  const Icon(Icons.location_on,
-                                      color: Colors.white, size: 12),
-                                  const SizedBox(width: 4),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(city,
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600)),
-                                      const Text('NCR, Philippines',
-                                          style: TextStyle(
-                                              color: Color(0xB3FFFFFF),
-                                              fontSize: 11)),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
+                  DesignIcon('2b112'),
+                  SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      'App-generated notices from weather estimates. These are not official warnings.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        height: 1.5,
+                        color: AppColors.textBody,
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                    child: Column(
-                      children: [
-                        // Primary alert
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(18),
-                          decoration: cardDecoration(
-                            color: const Color(0xFFFFFDF0),
-                            border: Border.all(
-                                color: const Color(0xFFFCD34D), width: 2),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                    color: const Color(0xFFFEF3C7),
-                                    borderRadius: BorderRadius.circular(14)),
-                                alignment: Alignment.center,
-                                child: const Text('⚠️',
-                                    style: TextStyle(fontSize: 22)),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Expanded(
-                                          child: Text('Heavy Rain Warning',
-                                              style: TextStyle(
-                                                  color: AppColors.textDark,
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w700)),
-                                        ),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 8, vertical: 2),
-                                          decoration: BoxDecoration(
-                                              color: AppColors.amber,
-                                              borderRadius:
-                                                  BorderRadius.circular(99)),
-                                          child: const Text('ACTIVE',
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 10,
-                                                  fontWeight: FontWeight.w700)),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 6),
-                                    const Text(
-                                        'Moderate to heavy rainfall is expected in your area.',
-                                        style: TextStyle(
-                                            color: AppColors.textBody,
-                                            fontSize: 12,
-                                            height: 1.5)),
-                                    const SizedBox(height: 10),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12, vertical: 10),
-                                      decoration: BoxDecoration(
-                                          color: const Color(0xFFFEF3C7),
-                                          borderRadius:
-                                              BorderRadius.circular(12)),
-                                      child: const Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text('Expected',
-                                                  style: TextStyle(
-                                                      color: AppColors.textGray,
-                                                      fontSize: 10)),
-                                              Text('3:00 PM – 7:00 PM',
-                                                  style: TextStyle(
-                                                      color: AppColors.textDark,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w700)),
-                                            ],
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.end,
-                                            children: [
-                                              Text('Severity',
-                                                  style: TextStyle(
-                                                      color: AppColors.textGray,
-                                                      fontSize: 10)),
-                                              Text('Moderate',
-                                                  style: TextStyle(
-                                                      color: AppColors.amber,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w700)),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        // Other alerts
-                        ...otherAlerts.map((a) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 14),
-                              decoration: cardDecoration(),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 44,
-                                    height: 44,
-                                    decoration: BoxDecoration(
-                                        color: Color(a.severityBg),
-                                        borderRadius:
-                                            BorderRadius.circular(14)),
-                                    alignment: Alignment.center,
-                                    child: WeatherIcon(
-                                        condition: a.condition, size: 28),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(a.title,
-                                            style: const TextStyle(
-                                                color: AppColors.textDark,
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w600)),
-                                        const SizedBox(height: 2),
-                                        Text(a.desc,
-                                            style: const TextStyle(
-                                                color: AppColors.textGray,
-                                                fontSize: 11)),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      color: Color(a.severityBg),
-                                      borderRadius: BorderRadius.circular(99),
-                                      border: Border.all(
-                                          color: Color(a.severityColor)
-                                              .withValues(alpha: 0.2)),
-                                    ),
-                                    child: Text(a.severity,
-                                        style: TextStyle(
-                                            color: Color(a.severityColor),
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w700)),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        }),
-                        // AI safety reminder
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: cardDecoration(
-                            color: const Color(0xFFF0F8FF),
-                            border: Border.all(color: const Color(0xFFDBEEFF)),
-                          ),
-                          child: const Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text('✨', style: TextStyle(fontSize: 16)),
-                                  SizedBox(width: 8),
-                                  Text('AI Safety Reminder',
-                                      style: TextStyle(
-                                          color: AppColors.skyBlueTop,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700)),
-                                ],
-                              ),
-                              SizedBox(height: 8),
-                              Text(
-                                  '"Stay indoors during heavy rainfall and avoid flooded roads."',
-                                  style: TextStyle(
-                                      color: AppColors.textBody,
-                                      fontSize: 13,
-                                      height: 1.5)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-          BottomNav(active: AppScreen.alerts, onNavigate: navigate),
-        ],
-      ),
-    );
-  }
+            const SizedBox(height: 20),
+            SectionTitle(
+              stale ? 'Update needed' : 'Current notices',
+              trailing: stale ? null : '${alerts.length} forecast triggers',
+            ),
+            if (alerts.isEmpty)
+              GlassCard(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 16),
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Center(child: DesignIcon('cdc8f')),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      'FORECAST CHECK',
+                      style: TextStyle(
+                        fontSize: 11,
+                        letterSpacing: .7,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.indigo,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'No forecast triggers detected',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'No rain, thunderstorm, heat or wind rule is triggered by the available readings. This is not an all-clear; local conditions can change.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        height: 1.6,
+                        color: AppColors.textBody,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    FilledButton.tonal(
+                      onPressed: () => navigate(AppScreen.forecast),
+                      child: const Text('View forecast'),
+                    ),
+                  ],
+                ),
+              ),
+            ...alerts.map(
+              (tip) => Padding(
+                padding: const EdgeInsets.only(bottom: 14),
+                child: GuidanceCard(tip: tip),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Link(
+              uri: Uri.parse('https://www.pagasa.dost.gov.ph/'),
+              target: LinkTarget.blank,
+              builder: (context, follow) => OutlinedButton.icon(
+                onPressed: follow,
+                icon: const Icon(Icons.open_in_new, size: 16),
+                label: const Text('Check official PAGASA advisories'),
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Rain and storm notices cover available next-six-hour samples. Heat and wind notices use current estimates.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 11,
+                height: 1.5,
+                color: AppColors.textBody,
+              ),
+            ),
+          ],
+        );
+      },
+    ),
+  );
 }

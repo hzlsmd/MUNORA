@@ -94,3 +94,44 @@ class _NotificationSettingsState extends State<NotificationSettings> {
     );
   }
 }
+
+/// Available even when weather requests fail.
+class NotificationSettingsButton extends StatelessWidget {
+  const NotificationSettingsButton({super.key});
+  @override
+  Widget build(BuildContext context) => IconButton(
+    tooltip: 'Notification settings',
+    icon: const Icon(Icons.notifications_none_rounded),
+    onPressed: () => showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Notification settings',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 16),
+              if (NotificationService.supported)
+                const NotificationSettings()
+              else
+                const Text(
+                  'Weather notifications are available in the Android app. You can still read Alerts and Tips here.',
+                ),
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Done'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+}

@@ -15,7 +15,7 @@ Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
 - Forecast shows five days of available three-hour samples in Philippine time.
 - Tips provides rule-based rain, heat, wind and thunderstorm guidance from live
   weather, with a reason for each tip. [Rules and limits](docs/WEATHER_RECOMMENDATIONS.md).
-- Alerts remains a labeled demo, pending an authoritative advisory integration.
+- Alerts derives app-generated rain, storm, heat and wind notices from the selected city. These are not official warnings; no triggers does not mean all-clear.
 - Android weather-tip notifications can be enabled from Tips, with a test
   notification and approximate hourly background checks. Native phone validation
   is still required. See [notifications](docs/NOTIFICATIONS.md).
@@ -60,5 +60,8 @@ Use a current Flutter stable SDK; this change was checked with Flutter 3.47.9.
 - `lib/widgets/weather_view.dart`: loading, saved data, errors and retries.
 - `functions/`: dormant alternative backend; not used by the default app and not cleared for deployment.
 - `firestore.rules`: denies direct client access to backend storage.
-- `lib/data/mock_data.dart`: remaining demo alerts, not live warnings.
+- `lib/services/weather_alerts.dart`: forecast notices from shared recommendation rules.
 - `lib/services/weather_recommendations.dart`: deterministic preparedness rules.
+
+
+The interface uses the supplied pastel gradients, sky imagery, bundled Inter and Abyssinica fonts, and rounded navigation. Tips includes category filters and expandable explanations. Alerts are app-generated forecast guidance.

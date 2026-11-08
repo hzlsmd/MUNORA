@@ -1,14 +1,15 @@
 import 'package:material_ui/material_ui.dart';
 
-import '../models/weather_snapshot.dart';
 import '../services/weather_recommendations.dart';
 import '../services/weather_service.dart';
 import '../theme.dart';
+import '../widgets/atmosphere.dart';
 import '../widgets/bottom_nav.dart';
+import '../widgets/guidance_card.dart';
 import '../widgets/weather_view.dart';
 import '../widgets/notification_settings.dart';
 
-class AIScreen extends StatelessWidget {
+class AIScreen extends StatefulWidget {
   final ValueChanged<AppScreen> navigate;
   final String city;
   final WeatherService service;
@@ -18,155 +19,130 @@ class AIScreen extends StatelessWidget {
     required this.city,
     required this.service,
   });
-
-  IconData _icon(String id) => switch (id) {
-    'storm' => Icons.thunderstorm_outlined,
-    'rain' => Icons.umbrella_outlined,
-    'heat' => Icons.water_drop_outlined,
-    'wind' => Icons.air,
-    'stale' => Icons.update,
-    _ => Icons.wb_cloudy_outlined,
-  };
-
   @override
-  Widget build(BuildContext context) {
-    return ColoredBox(
-      color: AppColors.bg,
-      child: Column(
-        children: [
-          SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(8, 8, 20, 12),
-              child: Row(
-                children: [
-                  IconButton(
-                    tooltip: 'Back to Home',
-                    onPressed: () => navigate(AppScreen.home),
-                    icon: const Icon(Icons.arrow_back),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Weather Tips',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        Text(
-                          city,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textGray,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: NotificationSettings(),
-          ),
-          Expanded(
-            child: WeatherView(
-              city: city,
-              service: service,
-              builder: (weather) {
-                final tips = weatherRecommendations(weather, DateTime.now());
-                return ListView(
-                  padding: const EdgeInsets.all(16),
-                  children: [
-                    const Text(
-                      'Rule-based weather guidance',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    const Text(
-                      'General preparedness advice, not an official warning. Check PAGASA and local advisories before making safety decisions.',
-                      style: TextStyle(fontSize: 12, color: AppColors.textGray),
-                    ),
-                    const SizedBox(height: 16),
-                    ...tips.map(
-                      (tip) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: AppColors.divider),
-                          ),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Icon(
-                                _icon(tip.id),
-                                color: AppColors.skyBlueTop,
-                                size: 26,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      tip.title,
-                                      style: const TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      tip.advice,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        height: 1.5,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      tip.reason,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: AppColors.textGray,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (weather.isUsable(DateTime.now()))
-                      Text(
-                        'Based on current conditions and available forecast samples through ${weatherTime(DateTime.now().add(const Duration(hours: 6)))}.',
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppColors.textGray,
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
-          ),
-          BottomNav(active: AppScreen.ai, onNavigate: navigate),
-        ],
-      ),
-    );
+  State<AIScreen> createState() => _AIScreenState();
+}
+
+class _AIScreenState extends State<AIScreen> {
+  String filter = 'All';
+  @override
+  void didUpdateWidget(covariant AIScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.city != widget.city) filter = 'All';
   }
+
+  bool matches(WeatherTip tip) =>
+      tip.id == 'stale' ||
+      switch (filter) {
+        'Rain' => tip.id == 'rain' || tip.id == 'storm',
+        'Heat' => tip.id == 'heat',
+        'Outdoor' => const {
+          'heat',
+          'wind',
+          'storm',
+          'routine',
+        }.contains(tip.id),
+        'Travel' => const {'rain', 'wind', 'storm'}.contains(tip.id),
+        _ => true,
+      };
+  @override
+  Widget build(BuildContext context) => AtmosphereScreen(
+    title: widget.city,
+    actions: const [NotificationSettingsButton()],
+    subtitle: 'Daily lifestyle tips',
+    active: AppScreen.ai,
+    onNavigate: widget.navigate,
+    child: WeatherView(
+      city: widget.city,
+      service: widget.service,
+      builder: (weather) {
+        final tips = weatherRecommendations(
+          weather,
+          DateTime.now(),
+        ).where(matches).toList();
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Rule-based weather guidance',
+                style: TextStyle(
+                  fontSize: 12,
+                  letterSpacing: .3,
+                  color: AppColors.indigo,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Practical suggestions for your day, based on the available weather. Check official advisories before making safety decisions.',
+                style: TextStyle(
+                  fontSize: 12,
+                  height: 1.5,
+                  color: AppColors.textBody,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: ['All', 'Rain', 'Heat', 'Outdoor', 'Travel']
+                    .map(
+                      (category) => ChoiceChip(
+                        label: Text(category),
+                        selected: filter == category,
+                        showCheckmark: false,
+                        selectedColor: AppColors.indigo,
+                        backgroundColor: const Color(0x99FFFFFF),
+                        labelStyle: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: filter == category
+                              ? Colors.white
+                              : AppColors.textBody,
+                        ),
+                        side: BorderSide.none,
+                        shape: const StadiumBorder(),
+                        onSelected: (_) => setState(() => filter = category),
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: 18),
+              if (tips.isEmpty)
+                const GlassCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'No tips in this category right now',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        'Try All to see the other suggestions for your city.',
+                        style: TextStyle(color: AppColors.textBody),
+                      ),
+                    ],
+                  ),
+                ),
+              for (var i = 0; i < tips.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: GuidanceCard(
+                    key: ValueKey('${widget.city}:${tips[i].id}'),
+                    tip: tips[i],
+                    featured: i == 0 && tips[i].id != 'stale',
+                  ),
+                ),
+            ],
+          ),
+        );
+      },
+    ),
+  );
 }

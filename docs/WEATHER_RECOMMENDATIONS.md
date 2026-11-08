@@ -35,7 +35,7 @@ retain still-fresh data and its original timestamps. WeatherView rechecks age on
 resume and periodically while visible.
 
 This is rule-based weather guidance, not a trained AI predictor, confidence score,
-official advisory or unrestricted chatbot. Alerts remain a demo. The thesis must
+official advisory or unrestricted chatbot. Alerts derives app-generated notices from the same rain, storm, heat and wind rules. Routine advice is not an alert. No triggers is not an all-clear. The thesis must
 describe this implementation accurately; it does not fulfill an independently
 trained predictive-model claim. Model training is intentionally excluded per the
 team's time constraint.

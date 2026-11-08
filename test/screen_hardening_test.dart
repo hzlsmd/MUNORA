@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:munora/screens/home_screen.dart';
 import 'package:munora/screens/forecast_screen.dart';
 import 'package:munora/screens/ai_screen.dart';
+import 'package:munora/screens/alerts_screen.dart';
 import 'package:munora/screens/splash_screen.dart';
 import 'package:munora/services/weather_service.dart';
 
@@ -73,7 +74,7 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     expect(readyOnFirstFrame, isTrue);
   });
-  for (final screen in ['home', 'forecast', 'ai']) {
+  for (final screen in ['home', 'forecast', 'ai', 'alerts']) {
     testWidgets('$screen supports 320px width and 2x accessibility text', (
       tester,
     ) async {
@@ -97,7 +98,13 @@ void main() {
                 size: Size(320, 900),
                 textScaler: TextScaler.linear(2),
               ),
-              child: screen == 'ai'
+              child: screen == 'alerts'
+                  ? AlertsScreen(
+                      navigate: (_) {},
+                      city: 'Muntinlupa',
+                      service: service,
+                    )
+                  : screen == 'ai'
                   ? AIScreen(
                       navigate: (_) {},
                       city: 'Muntinlupa',
@@ -126,7 +133,7 @@ void main() {
       } else if (screen == 'forecast') {
         await tester.tap(find.text('3-Hour'));
         await tester.pump();
-      } else {
+      } else if (screen == 'ai') {
         expect(find.text('Rule-based weather guidance'), findsOneWidget);
       }
       expect(tester.takeException(), isNull);
