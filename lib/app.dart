@@ -1,5 +1,5 @@
 import 'package:material_ui/material_ui.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/supported_cities.dart';
@@ -11,7 +11,6 @@ import 'screens/forecast_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'widgets/bottom_nav.dart';
-import 'widgets/demo_notice.dart';
 
 class MunoraApp extends StatelessWidget {
   const MunoraApp({super.key});
@@ -23,7 +22,8 @@ class MunoraApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        textTheme: GoogleFonts.poppinsTextTheme(),
+        fontFamily: 'Inter',
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4246AD)),
         scaffoldBackgroundColor: const Color(0xFFEEF4FB),
       ),
       home: const _RootScreen(),
@@ -102,9 +102,10 @@ class _RootScreenState extends State<_RootScreen> {
         );
         break;
       case AppScreen.alerts:
-        body = DemoNotice(
-          message: 'Demo alerts only. These are sample warnings, not current official advisories.',
-          child: AlertsScreen(navigate: navigate, city: selectedCity),
+        body = AlertsScreen(
+          navigate: navigate,
+          city: selectedCity,
+          service: weatherService,
         );
         break;
       case AppScreen.ai:

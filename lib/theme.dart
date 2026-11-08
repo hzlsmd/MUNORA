@@ -1,49 +1,44 @@
 import 'package:material_ui/material_ui.dart';
 
-/// Color + gradient constants ported 1:1 from the original design's hex values.
+/// Shared palette from the supplied MUNORA design.
 class AppColors {
   AppColors._();
-
-  static const Color skyBlueTop = Color(0xFF1A8FE3);
-  static const Color skyBlueMid = Color(0xFF3AABF0);
-  static const Color skyBlueBottom = Color(0xFF6EC6F5);
-
-  static const Color indigoTop = Color(0xFF6366F1);
-  static const Color indigoMid = Color(0xFF818CF8);
-  static const Color indigoBottom = Color(0xFFA5B4FC);
-
-  static const Color bg = Color(0xFFEEF4FB);
-  static const Color textDark = Color(0xFF1A1A2E);
-  static const Color textGray = Color(0xFF9CA3AF);
-  static const Color textBody = Color(0xFF4B5563);
-  static const Color divider = Color(0xFFF0F4F8);
-
-  static const Color red = Color(0xFFEF4444);
-  static const Color blue = Color(0xFF3B82F6);
-  static const Color amber = Color(0xFFF59E0B);
-  static const Color indigo = Color(0xFF6366F1);
-
-  static const LinearGradient skyGradient = LinearGradient(
-    begin: Alignment(0, -1),
-    end: Alignment(0.17, 1), // approximates the 175deg CSS gradient
-    colors: [skyBlueTop, skyBlueMid, skyBlueBottom],
+  static const skyBlueTop = Color(0xFF5B5FC7);
+  static const skyBlueMid = Color(0xFF9A8EE8);
+  static const skyBlueBottom = Color(0xFFE1E0FF);
+  static const indigoTop = Color(0xFF4246AD);
+  static const indigoMid = Color(0xFF6E68CE);
+  static const indigoBottom = Color(0xFFB9B4D5);
+  static const bg = Color(0xFFDFD7F9);
+  static const textDark = Color(0xFF191C1E);
+  static const textGray = Color(0xFF626171);
+  static const textBody = Color(0xFF464652);
+  static const divider = Color(0x33C7C5D4);
+  static const red = Color(0xFFBA1A1A);
+  static const blue = Color(0xFF5B5FC7);
+  static const amber = Color(0xFF805622);
+  static const indigo = Color(0xFF4246AD);
+  static const skyGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFBFE3FF), Color(0xFFDFD7F9), Color(0xFFFEDAC8)],
+    stops: [0, .55, 1],
   );
-
-  static const LinearGradient indigoGradient = LinearGradient(
-    begin: Alignment(0, -1),
-    end: Alignment(0.17, 1),
-    colors: [indigoTop, indigoMid, indigoBottom],
+  static const indigoGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [indigoTop, indigoMid, skyBlueMid],
   );
 }
 
-/// Shared card decoration matching `.card` in the original CSS.
-BoxDecoration cardDecoration({Color color = Colors.white, Border? border}) {
-  return BoxDecoration(
-    color: color,
-    borderRadius: BorderRadius.circular(20),
-    border: border,
-    boxShadow: const [
-      BoxShadow(color: Color(0x140050B4), blurRadius: 16, offset: Offset(0, 2)),
-    ],
-  );
-}
+BoxDecoration cardDecoration({
+  Color color = const Color(0xA6FFFFFF),
+  Border? border,
+}) => BoxDecoration(
+  color: color,
+  borderRadius: BorderRadius.circular(24),
+  border: border,
+  boxShadow: const [
+    BoxShadow(color: Color(0x126E64A0), blurRadius: 20, offset: Offset(0, 8)),
+  ],
+);
