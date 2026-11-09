@@ -1,3 +1,5 @@
+> Historical record: the Firebase backend and its performance probe were removed from the repository on 9 November 2026. This document describes the earlier implementation.
+
 # SDD ledger - plan: docs/superpowers/plans/2026-11-07-security-performance.md
 
 - Baseline: 10 Node tests and 8 Flutter tests pass; dependency scan reports 9 moderate affected npm packages in one transitive uuid chain. Dart audit metadata reports no affected locked packages in the returned set.

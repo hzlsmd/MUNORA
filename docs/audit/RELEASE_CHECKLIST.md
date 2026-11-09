@@ -10,27 +10,12 @@
   Review its current terms/rate limits and attribution before distribution.
   Push notifications and a predictive model remain separate work.
 
-## Dormant paid backend
+## Former Firebase backend
 
-**No backend deployment is supported by this PR.** A separate reviewed Flutter
-App Check integration must land first; the complete acceptance criteria are in
-the [backend policy](../WEATHER_SETUP.md#backend-policy). This audit PR is not a
-deployable production-backend release. No enabling, deployment or billing steps
-are offered as a current setup path.
-
-`WEATHER_BACKEND_ENABLED` defaults to false and rejects before database work.
-Enabling it requires a compatible client that sends `X-Firebase-AppCheck` and a
-configured App Check provider. The current Flutter app has no App Check SDK yet.
-There is deliberately no anonymous attestation bypass. App Check is not resident
-sign-in, cannot stop all abuse/token replay, and does not cap invocation charges.
-Do not deploy this backend as a workaround for the no-paid-services requirement.
-
-If the owner later chooses this backend: verify attestation on real devices,
-configure billing alerts and upstream rate controls, establish Firestore TTL on
-`weatherInternal.expiresAt`, review least-privilege IAM and logging retention,
-and tune the provider budget to actual traffic. A 1,000-refresh daily cap with a
-ten-minute cache cannot sustain all 17 cities continuously (about 2,448 refreshes
-per day before duplicate work/failures). Failures count toward that cap.
+The dormant backend and repository deployment configuration were removed on
+9 November 2026. No Firebase deployment is part of the app release. Cloud resources
+were not modified; historical backend audit findings describe the removed source.
+Any future hosted backend needs its own implementation and review.
 
 ## Android signing
 

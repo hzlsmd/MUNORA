@@ -2,8 +2,7 @@
 
 MUNORA is a weather app for Metro Manila. Everyone can use it without signing in.
 
-Home and Forecast use Open-Meteo directly, without an account, API key or Firebase
-deployment. This configuration is for the non-commercial school prototype, within
+Home and Forecast use Open-Meteo directly, without an account, API key or backend deployment. This configuration is for the non-commercial school prototype, within
 Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
 
 ## Current status
@@ -34,7 +33,7 @@ flutter pub get
 flutter run
 ```
 
-The app does not need Firebase Auth or a login screen. Local preferences and
+The app does not need an account or a login screen. Local preferences and
 cached weather are stored on the device using shared_preferences.
 No WEATHER_API_URL define is needed. In Codespaces, preview in the browser with
 `flutter run -d web-server --web-hostname=0.0.0.0 --web-port=8080` and open port 8080.
@@ -43,8 +42,6 @@ Provider failure shows retry/saved-weather states, never fabricated live data.
 ## Checks
 
 ```sh
-npm --prefix functions ci
-npm --prefix functions test
 flutter analyze
 flutter test
 flutter build web --no-web-resources-cdn
@@ -60,8 +57,6 @@ Use a current Flutter stable SDK; this change was checked with Flutter 3.47.9.
 - `lib/services/open_meteo.dart`: allowlisted coordinates, provider request and data normalization.
 - `lib/models/weather_snapshot.dart`: response parsing and Philippine-date grouping.
 - `lib/widgets/weather_view.dart`: loading, saved data, errors and retries.
-- `functions/`: dormant alternative backend; not used by the default app and not cleared for deployment.
-- `firestore.rules`: denies direct client access to backend storage.
 - `lib/services/weather_alerts.dart`: forecast notices derived from the shared tip rules.
 - `assets/design/`: original local imagery and SVGs from the supplied Figma Make export.
 - `lib/services/weather_recommendations.dart`: deterministic preparedness rules.
