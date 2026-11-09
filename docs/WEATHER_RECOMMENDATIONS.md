@@ -35,7 +35,9 @@ retain still-fresh data and its original timestamps. WeatherView rechecks age on
 resume and periodically while visible.
 
 This is rule-based weather guidance, not a trained AI predictor, confidence score,
-official advisory or unrestricted chatbot. Alerts remain a demo. The thesis must
+official advisory or unrestricted chatbot. Alerts now display the same rain,
+thunderstorm, heat and wind triggers as app-generated notices. Routine advice is
+not an alert, and the empty state does not claim conditions are safe. The thesis must
 describe this implementation accurately; it does not fulfill an independently
 trained predictive-model claim. Model training is intentionally excluded per the
 team's time constraint.
@@ -47,11 +49,38 @@ past/distant events, storm ordering, stale/future data, city changes, manual ref
 old offline snapshots and small-screen large-text layout. Existing service/widget
 regressions remain in the full Flutter suite. Native Android testing is separate.
 
-Verification completed: 36 Flutter tests passed, Flutter analysis reported no
-issues, and the release web build succeeded. Fixture browser checks at 390x844
-and 1366x900 exercised all four rule types, inspected scrolling/layout, and
-confirmed one shared provider request across Home and Tips with zero JavaScript
-errors. Screenshots were visually checked. The optional browser check is
-`node tools/check_weather_tips.cjs` with a local release server on port 8083;
-Playwright/Chromium are required. It uses fixtures and sends no weather-provider
-traffic. Native Android/device verification remains outstanding.
+The Flutter suite and `tools/check_weather_tips.cjs` cover the new interface.
+The browser check uses fixtures and sends no weather-provider traffic.
+Native Android/device verification remains separate.
+
+## Categories and explanations
+
+Tips supports All, Rain, Heat, Outdoor and Travel. Rain includes rain and storm
+rules; Heat includes heat; Outdoor includes heat, wind, storms and routine advice;
+Travel includes rain, wind and storms. The general hydration, UV, outdoor, travel and storm-safety cards are also
+filtered. The featured current recommendation remains visible. Changing cities
+resets the filter to All. Stale-data guidance is always visible regardless of filter.
+Every notice and tip can expand its actual triggering condition or measurement.
+No routine learning, forecast confidence, radar or traffic integration is claimed.
+
+
+## Figma Alerts and Tips parity
+
+Alerts includes Active Hazards/Calm Skies switching, notice counts, priority badges,
+time windows, calm illustration, wind/rain/UV metrics and return-to-hazards action.
+Calm previews preserve a warning when current notices exist. PAGASA opens the
+official source; app notices are not official warnings.
+
+Tips includes the microclimate header, expandable model comparison, featured
+recommendation and explanation, outdoor window with temperature/UV/humidity,
+five category filters, expandable general guidance, and helpful/not-helpful feedback.
+Feedback is stored on this device per city; it does not train a model.
+
+Optional Open-Meteo data is cached ten minutes and expires after thirty minutes.
+Three models (ECMWF IFS, GFS, ICON) are compared over six aligned forecast hours:
+the average majority share agreeing on wet/dry conditions (0.1 mm threshold).
+Agreement is not forecast accuracy or AI confidence. Missing comparisons show unavailable.
+Outdoor windows require three consecutive daytime hours within 36 hours, each at
+most 31 C, UV 5 and rain probability 30%. They are planning suggestions, not safety
+guarantees. Missing hourly data cannot generate a suggested window. These optional
+requests never block the existing weather feed or create background alerts.

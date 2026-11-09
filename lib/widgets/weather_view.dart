@@ -36,7 +36,7 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
           data = null;
           error = 'Saved weather has expired. Please refresh.';
         });
-      } else if (data != null && !data!.isUsable(DateTime.now()) && !saved) {
+      } else if (data != null && !data!.isUsable(DateTime.now())) {
         setState(() => saved = true);
       }
     });
@@ -133,7 +133,7 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
     return Column(children: [
       Material(
         color:
-            error == null ? const Color(0xFFF1F5F9) : const Color(0xFFFFF3CD),
+            error == null ? const Color(0x66FFFFFF) : const Color(0xFFFFF3CD),
         child: SafeArea(
             bottom: false,
             child: Padding(
