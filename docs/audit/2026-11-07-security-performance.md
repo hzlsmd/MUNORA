@@ -1,3 +1,5 @@
+> Historical record: the Firebase backend and its performance probe were removed from the repository on 9 November 2026. This document describes the earlier implementation.
+
 # MUNORA security and performance audit
 
 Date: 7 November 2026. Baseline: `47658457598b168688b8e19ee221364e63e4fcd0`.

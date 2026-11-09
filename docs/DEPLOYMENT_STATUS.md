@@ -1,27 +1,16 @@
 # MUNORA deployment status
 
-The Flutter app now defaults to direct Open-Meteo without a key or Firebase.
-See [weather setup](WEATHER_SETUP.md). The Firebase status below describes the
-dormant alternative backend, which remains blocked from deployment.
+The Flutter app requests Open-Meteo directly and stores preferences, feedback and
+cached weather on the device. Android weather notifications use local delivery
+and periodic background checks. No Firebase SDK or backend is required.
 
-Verified on 7 November 2026:
+The dormant Firebase backend, deployment configuration and backend CI job were
+removed from the repository on 9 November 2026. No cloud resources were deleted
+or changed. Previous records described the `munora-weather-hzlsmd` project on Spark
+with Firestore deny-all rules and no deployed weather function; that historical
+status has not been reverified against the live cloud project.
 
-- Project: `munora-weather-hzlsmd` (display name: MUNORA).
-- Default Firestore database: Standard edition, Native mode, `asia-southeast1` (Singapore).
-- Firestore rules deployed successfully. Direct client reads and writes are denied.
-- The app still requires no user sign-in. Firebase Auth is not enabled by this setup.
+The historical OpenWeatherMap credential still requires owner revocation if that
+has not already been done. The current Open-Meteo flow requires no replacement key.
 
-Console: <https://console.firebase.google.com/project/munora-weather-hzlsmd/overview>
-
-## Dormant Firebase option
-
-The weather function is **not deployed**. Firebase rejected function deployment
-because the project is on the Spark plan. Keep the project on Spark for this
-non-commercial pilot; direct Open-Meteo does not require billing or a function.
-
-The previously committed OpenWeatherMap key must be revoked in the provider's
-account. No replacement provider key is needed for the default Open-Meteo flow.
-
-Do not deploy or enable the alternative backend until a separate reviewed
-App Check client integration lands and the owner approves its infrastructure
-costs. Setting WEATHER_API_URL alone does not meet those requirements.
+See [weather setup](WEATHER_SETUP.md) for the current run and build instructions.
