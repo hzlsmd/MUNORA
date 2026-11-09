@@ -32,16 +32,16 @@ WeatherKind weatherKindFor(String condition) {
   if (c.contains('moon') || c.contains('night') || c.contains('clear night')) {
     return WeatherKind.moon;
   }
+  if (c.contains('drizzle') ||
+      c.contains('light rain') ||
+      c.contains('scattered rain')) {
+    return WeatherKind.drizzle;
+  }
   if (c.contains('heavy rain') ||
       c.contains('rain') ||
       c.contains('shower') ||
       c.contains('rainfall')) {
     return WeatherKind.rain;
-  }
-  if (c.contains('drizzle') ||
-      c.contains('light rain') ||
-      c.contains('scattered rain')) {
-    return WeatherKind.drizzle;
   }
   if (c.contains('partly') ||
       c.contains('partial') ||
