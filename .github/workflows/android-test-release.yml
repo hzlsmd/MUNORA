@@ -1,0 +1,37 @@
+name: Android test APK
+on:
+  push:
+    branches: [codex/apk-test-release]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: android-test-release
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2
+        with:
+          channel: stable
+          flutter-version: '3.47.9'
+          cache: true
+      - run: flutter pub get
+      - name: Build ARM64 test APK
+        run: flutter build apk --debug --target-platform android-arm64 --split-per-abi
+      - name: Verify and stage APK
+        run: |
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk release-assets/munora-arm64-v8a-debug.apk
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose release-assets/munora-arm64-v8a-debug.apk
+          cd release-assets
+          sha256sum munora-arm64-v8a-debug.apk > SHA256SUMS.txt
+      - name: Upload draft test release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.0.0-test-20261109 --draft --prerelease --target "$GITHUB_SHA" --title "MUNORA Android test build — 9 November 2026" --notes-file release-assets/TEST_RELEASE.md release-assets/munora-arm64-v8a-debug.apk release-assets/munora-download-qr.png release-assets/SHA256SUMS.txt
