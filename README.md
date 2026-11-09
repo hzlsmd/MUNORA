@@ -71,7 +71,7 @@ rain agreement; missing data is explicitly unavailable. Humidity, pressure, wind
 
 Alerts and Tips share the same weather client, refresh/caching and freshness checks.
 They do not introduce new background notification triggers or an official alert feed.
-The splash proceeds immediately instead of waiting for a cosmetic timer.
+The Flutter splash remains visible for 5 seconds after its first frame on startup.
 
 Browser regression check: serve `build/web` on port 8083 and run
 `node tools/check_weather_tips.cjs` with Playwright installed and Chromium available.

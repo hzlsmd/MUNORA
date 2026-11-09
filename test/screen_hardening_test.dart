@@ -62,17 +62,34 @@ void main() {
     expect(find.text('CC BY 4.0'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
-  testWidgets('splash does not impose a cosmetic three-second startup delay', (
+  testWidgets('splash remains visible for 5 seconds after its first frame', (
     tester,
   ) async {
-    var ready = false;
+    var calls = 0;
     await tester.pumpWidget(
-      MaterialApp(home: SplashScreen(onDone: () => ready = true)),
+      MaterialApp(
+        home: Scaffold(body: SplashScreen(onDone: () => calls++)),
+      ),
     );
-    final readyOnFirstFrame = ready;
+    expect(find.text('MUNORA'), findsOneWidget);
+    expect(calls, 0);
+    await tester.pump(const Duration(milliseconds: 4999));
+    expect(calls, 0);
+    await tester.pump(const Duration(milliseconds: 1));
+    expect(calls, 1);
     await tester.pump(const Duration(seconds: 3));
+    expect(calls, 1);
     await tester.pumpWidget(const SizedBox.shrink());
-    expect(readyOnFirstFrame, isTrue);
+  });
+  testWidgets('disposing splash cancels navigation', (tester) async {
+    var calls = 0;
+    await tester.pumpWidget(
+      MaterialApp(home: SplashScreen(onDone: () => calls++)),
+    );
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump(const Duration(seconds: 6));
+    expect(calls, 0);
+    expect(tester.takeException(), isNull);
   });
   for (final screen in ['home', 'forecast', 'ai', 'alerts']) {
     testWidgets('$screen supports 320px width and 2x accessibility text', (

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:material_ui/material_ui.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -8,12 +10,22 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  Timer? _transition;
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) widget.onDone();
+      if (!mounted) return;
+      _transition = Timer(const Duration(seconds: 5), () {
+        if (mounted) widget.onDone();
+      });
     });
+  }
+
+  @override
+  void dispose() {
+    _transition?.cancel();
+    super.dispose();
   }
 
   @override
