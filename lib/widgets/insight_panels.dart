@@ -236,7 +236,7 @@ class OutdoorPanel extends StatelessWidget {
           ),
         const SizedBox(height: 8),
         const Text(
-          'Three consecutive daytime hours: rain chance ≤30%, temperature ≤31°C and UV ≤5. This is planning guidance, not a safety guarantee.',
+          'Three consecutive daytime hours: rain chance ≤30%, temperature ≤31°C, UV ≤5, feels-like below 35°C and wind below 10 m/s; no forecast storm or precipitation code. This is planning guidance, not a safety guarantee.',
           style: TextStyle(
             fontSize: 11,
             height: 1.5,
@@ -257,6 +257,13 @@ class GuidanceFeedback extends StatefulWidget {
 
 class _GuidanceFeedbackState extends State<GuidanceFeedback> {
   int? value;
+  String? reason;
+  static const reasons = [
+    'Advice was useful',
+    'Timing did not fit',
+    'Conditions differed',
+    'Advice was unclear',
+  ];
   bool touched = false;
   Future<void> writes = Future.value();
   String get keyName => 'tips.feedback.${widget.city}';
@@ -269,14 +276,29 @@ class _GuidanceFeedbackState extends State<GuidanceFeedback> {
   Future<void> load() async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      if (mounted && !touched) setState(() => value = prefs.getInt(keyName));
+      if (mounted && !touched) {
+        setState(() {
+          value = prefs.getInt(keyName);
+          final saved = prefs.getString('tips.feedback.reason.${widget.city}');
+          reason = reasons.contains(saved) && value != null ? saved : null;
+        });
+      }
     } catch (_) {}
   }
 
   void choose(int choice) {
     touched = true;
-    setState(() => value = value == choice ? null : choice);
+    setState(() {
+      value = value == choice ? null : choice;
+      reason = null;
+    });
+    persist();
+  }
+
+  void persist() {
     final selected = value;
+    final selectedReason = reason;
+    final reasonKey = 'tips.feedback.reason.${widget.city}';
     final key = keyName;
     writes = writes.then((_) async {
       try {
@@ -285,6 +307,11 @@ class _GuidanceFeedbackState extends State<GuidanceFeedback> {
           await p.remove(key);
         } else {
           await p.setInt(key, selected);
+        }
+        if (selectedReason == null || selected == null) {
+          await p.remove(reasonKey);
+        } else {
+          await p.setString(reasonKey, selectedReason);
         }
       } catch (_) {
         if (mounted) {
@@ -308,9 +335,41 @@ class _GuidanceFeedbackState extends State<GuidanceFeedback> {
         ),
         const SizedBox(height: 4),
         const Text(
-          'Feedback stays on this device.',
+          'Feedback stays on this device. It does not automatically train a model.',
           style: TextStyle(fontSize: 12, color: AppColors.textBody),
         ),
+        if (value != null) ...[
+          const SizedBox(height: 8),
+          const Text('Why? (optional)', style: TextStyle(fontSize: 12)),
+          Wrap(
+            spacing: 6,
+            runSpacing: 6,
+            children: reasons
+                .map(
+                  (r) => ChoiceChip(
+                    label: Text(r),
+                    selected: reason == r,
+                    onSelected: (_) {
+                      touched = true;
+                      setState(() => reason = reason == r ? null : r);
+                      persist();
+                    },
+                  ),
+                )
+                .toList(),
+          ),
+          TextButton(
+            onPressed: () {
+              touched = true;
+              setState(() {
+                value = null;
+                reason = null;
+              });
+              persist();
+            },
+            child: const Text('Clear feedback'),
+          ),
+        ],
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [

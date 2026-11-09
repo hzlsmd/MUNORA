@@ -5,6 +5,7 @@ import '../services/weather_service.dart';
 import '../services/weather_insights.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
+import '../widgets/activity_planner_card.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/guidance_card.dart';
 import '../widgets/insight_panels.dart';
@@ -115,6 +116,12 @@ class _AIScreenState extends State<AIScreen> {
                     trailing: 'Metro Manila Basin',
                   ),
                   ModelAgreementPanel(insights: insight),
+                  const SizedBox(height: 16),
+                  ActivityPlannerCard(
+                    key: ValueKey('planner:${widget.city}'),
+                    city: widget.city,
+                    insights: insight,
+                  ),
                   const SizedBox(height: 16),
                   GuidanceCard(
                     key: ValueKey(
