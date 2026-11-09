@@ -103,3 +103,10 @@ forecast assessments. Routines do not schedule notifications. Feedback accepts a
 optional reason and can be cleared. Feedback does not automatically train a model.
 A future trained model requires consented labeled data, held-out evaluation and
 comparison with this rule-based baseline before claiming improved accuracy.
+
+The Tips UI exposes **Model Prediction Confidence** as an agreement-based indicator:
+high at ≥90%, moderate at ≥75%, and low below 75%. Its visible explanation states
+that this is three-model agreement, not measured forecast accuracy. Missing model
+comparisons show unavailable. **AI Personalization Insights** contains the activity
+planner, saved routines and outdoor forecast insights; recommendations use the
+existing deterministic rules rather than a trained personal model.

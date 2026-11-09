@@ -117,11 +117,6 @@ class _AIScreenState extends State<AIScreen> {
                   ),
                   ModelAgreementPanel(insights: insight),
                   const SizedBox(height: 16),
-                  ActivityPlannerCard(
-                    key: ValueKey('planner:${widget.city}'),
-                    city: widget.city,
-                    insights: insight,
-                  ),
                   const SizedBox(height: 16),
                   GuidanceCard(
                     key: ValueKey(
@@ -132,7 +127,18 @@ class _AIScreenState extends State<AIScreen> {
                     window: stale ? null : 'Current / next 6 hours',
                   ),
                   const SizedBox(height: 20),
-                  const SectionTitle('Forecast-based insights'),
+                  const SectionTitle('AI Personalization Insights'),
+                  const Text(
+                    'Personalize forecast-based guidance with your activity and an optional daily routine.',
+                    style: TextStyle(fontSize: 12, color: AppColors.textBody),
+                  ),
+                  const SizedBox(height: 12),
+                  ActivityPlannerCard(
+                    key: ValueKey('planner:${widget.city}'),
+                    city: widget.city,
+                    insights: insight,
+                  ),
+                  const SizedBox(height: 16),
                   OutdoorPanel(insights: insight),
                   const SizedBox(height: 16),
                   const Text(

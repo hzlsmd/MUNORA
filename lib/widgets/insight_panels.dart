@@ -138,14 +138,28 @@ class ModelAgreementPanel extends StatelessWidget {
     child: ExpansionTile(
       tilePadding: EdgeInsets.zero,
       title: const Text(
-        'Model agreement',
+        'Model Prediction Confidence',
         style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
       ),
-      subtitle: Text(
-        insights?.agreementPercent == null
-            ? 'Unavailable — no complete comparison'
-            : '${insights!.agreementPercent}% agreement · 3 models',
-        style: const TextStyle(fontSize: 12, color: AppColors.indigo),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            insights?.agreementPercent == null
+                ? 'Unavailable — no complete comparison'
+                : '${insights!.agreementPercent! >= 90
+                      ? 'High'
+                      : insights!.agreementPercent! >= 75
+                      ? 'Moderate'
+                      : 'Low'} · ${insights!.agreementPercent}% model agreement',
+            style: const TextStyle(fontSize: 12, color: AppColors.indigo),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Agreement-based confidence indicator across 3 models; not measured forecast accuracy. High ≥90%, moderate ≥75%, low <75%.',
+            style: TextStyle(fontSize: 11, color: AppColors.textBody),
+          ),
+        ],
       ),
       children: const [
         Padding(
