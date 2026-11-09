@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="launch_background">#A9CBE4</color>
+    <!-- Midpoint of the Flutter splash gradient (50% between the 0.38 and 0.72 stops). -->
+    <color name="launch_background">#C9BBD4</color>
 </resources>

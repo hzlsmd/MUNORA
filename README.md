@@ -72,8 +72,10 @@ rain agreement; missing data is explicitly unavailable. Humidity, pressure, wind
 Alerts and Tips share the same weather client, refresh/caching and freshness checks.
 They do not introduce new background notification triggers or an official alert feed.
 The Flutter splash remains visible for 5 seconds after its first frame on startup.
-Android 12+ uses a plain sky-colored startup surface with a transparent icon;
+Android 12+ uses a solid lavender startup surface matching the midpoint of the
+Flutter splash gradient, with a transparent icon and no icon animation;
 its required system startup surface may briefly appear before Flutter renders.
+The system controls this duration; the app does not add a native startup delay.
 
 Browser regression check: serve `build/web` on port 8083 and run
 `node tools/check_weather_tips.cjs` with Playwright installed and Chromium available.
