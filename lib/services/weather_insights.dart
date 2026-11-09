@@ -6,11 +6,13 @@ import 'package:http/http.dart' as http;
 
 import '../data/supported_cities.dart';
 import '../models/weather_snapshot.dart';
+import '../models/planning_hour.dart';
 import 'open_meteo.dart';
 
 const insightModels = ['ecmwf_ifs025', 'gfs_seamless', 'icon_seamless'];
 
 class WeatherInsights {
+  final List<PlanningHour> hours;
   final double? rainProbability,
       uvIndex,
       outdoorTemperature,
@@ -21,6 +23,7 @@ class WeatherInsights {
   final DateTime fetchedAt;
   const WeatherInsights({
     required this.fetchedAt,
+    this.hours = const [],
     this.rainProbability,
     this.uvIndex,
     this.outdoorTemperature,
@@ -82,6 +85,53 @@ class WeatherInsights {
     }
 
     final hours = times(detail);
+    const knownCodes = {
+      0,
+      1,
+      2,
+      3,
+      45,
+      48,
+      51,
+      53,
+      55,
+      56,
+      57,
+      61,
+      63,
+      65,
+      66,
+      67,
+      71,
+      73,
+      75,
+      77,
+      80,
+      81,
+      82,
+      85,
+      86,
+      95,
+      96,
+      99,
+    };
+    final planning = List<PlanningHour>.generate(hours.length, (i) {
+      final code = value(detail, 'weather_code', i, 0, 99, 'wmo code');
+      return PlanningHour(
+        at: hours[i],
+        temperature: value(detail, 'temperature_2m', i, -100, 70, '°C'),
+        feelsLike: value(detail, 'apparent_temperature', i, -100, 80, '°C'),
+        rain: value(detail, 'precipitation_probability', i, 0, 100, '%'),
+        uv: value(detail, 'uv_index', i, 0, 30, ''),
+        wind: value(detail, 'wind_speed_10m', i, 0, 150, 'm/s'),
+        code:
+            code != null &&
+                code == code.roundToDouble() &&
+                knownCodes.contains(code.toInt())
+            ? code.toInt()
+            : null,
+      );
+    });
     final hour = DateTime.utc(now.year, now.month, now.day, now.hour);
     final current = hours.indexOf(hour);
     final rain = value(
@@ -114,7 +164,12 @@ class WeatherInsights {
             p == null ||
             t > 31 ||
             u > 5 ||
-            p > 30) {
+            p > 30 ||
+            !planning[j].complete ||
+            planning[j].storm ||
+            planning[j].wind! >= 10 ||
+            planning[j].feelsLike! >= 35 ||
+            (planning[j].code! >= 51 && planning[j].code! <= 86)) {
           eligible = false;
           break;
         }
@@ -149,6 +204,7 @@ class WeatherInsights {
     }
     return WeatherInsights(
       fetchedAt: now,
+      hours: List.unmodifiable(planning),
       rainProbability: rain,
       uvIndex: uv,
       agreementPercent: complete ? (consensus / 6 * 100).round() : null,
@@ -247,7 +303,8 @@ class WeatherInsightsService {
         Uri.parse(openMeteoEndpoint).replace(
           queryParameters: {
             ...base,
-            'hourly': 'temperature_2m,relative_humidity_2m,precipitation_probability,uv_index',
+            'hourly': 'temperature_2m,relative_humidity_2m,precipitation_probability,uv_index,apparent_temperature,wind_speed_10m,weather_code',
+            'wind_speed_unit': 'ms',
           },
         ),
       ),

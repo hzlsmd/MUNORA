@@ -26,10 +26,10 @@ const path = require('node:path');
         if (!query.has('current')) {
           const hourly = {time: Array.from({length:72}, (_,i)=>(start+i*3600000)/1000)};
           const hourly_units = {time:'unixtime'};
-          const fields = query.has('models') ? ['precipitation_ecmwf_ifs025','precipitation_gfs_seamless','precipitation_icon_seamless'] : ['temperature_2m','relative_humidity_2m','precipitation_probability','uv_index'];
+          const fields = query.has('models') ? ['precipitation_ecmwf_ifs025','precipitation_gfs_seamless','precipitation_icon_seamless'] : ['temperature_2m','relative_humidity_2m','precipitation_probability','uv_index','apparent_temperature','wind_speed_10m','weather_code'];
           for (const key of fields) {
-            hourly[key] = Array(72).fill(key==='temperature_2m'?27:key==='relative_humidity_2m'?70:key==='precipitation_probability'?10:key==='uv_index'?3:0);
-            hourly_units[key] = key==='temperature_2m'?'°C':key==='uv_index'?'':key.startsWith('precipitation_')&&key!=='precipitation_probability'?'mm':'%';
+            hourly[key] = Array(72).fill(key==='temperature_2m'||key==='apparent_temperature'?27:key==='wind_speed_10m'?2:key==='relative_humidity_2m'?70:key==='precipitation_probability'?10:key==='uv_index'?3:0);
+            hourly_units[key] = key==='temperature_2m'||key==='apparent_temperature'?'°C':key==='wind_speed_10m'?'m/s':key==='weather_code'?'wmo code':key==='uv_index'?'':key.startsWith('precipitation_')&&key!=='precipitation_probability'?'mm':'%';
           }
           return route.fulfill({json:{hourly,hourly_units}});
         }
@@ -67,6 +67,14 @@ const path = require('node:path');
 
       await page.getByText('Tips', { exact: true }).click();
       await page.getByText('Daily lifestyle tips', { exact: true }).waitFor();
+      await page.getByRole('button', {name:/Plan My Activity/}).click();
+      await page.getByRole('checkbox', {name:'Exercise',exact:true}).click();
+      await page.getByText('Check this plan', {exact:true}).click();
+      await page.getByText('Fewer forecast concerns', {exact:true}).waitFor();
+      await page.getByText('Save daily routine', {exact:true}).click();
+      await page.getByText('Remove routine', {exact:true}).waitFor();
+      await page.getByText('Remove routine', {exact:true}).click();
+      await page.getByRole('button', {name:/Plan My Activity/}).click();
       await page.getByRole('checkbox', { name: 'Heat', exact: true }).click();
       await page.getByText('Stay Hydrated', { exact: false }).waitFor();
       await page.getByText('Take breaks from the heat', { exact: false }).waitFor();

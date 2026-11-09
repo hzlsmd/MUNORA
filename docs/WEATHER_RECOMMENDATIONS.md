@@ -84,3 +84,22 @@ Outdoor windows require three consecutive daytime hours within 36 hours, each at
 most 31 C, UV 5 and rain probability 30%. They are planning suggestions, not safety
 guarantees. Missing hourly data cannot generate a suggested window. These optional
 requests never block the existing weather feed or create background alerts.
+
+## Plan My Activity
+
+Tips now assesses commuting, walking, exercise or outdoor work for a selected
+1–3-hour window within 36 hours. Every hour needs rain, temperature, feels-like,
+UV, wind and a recognized condition code. Missing or stale inputs produce an
+insufficient-data result. Known thunderstorms, wind ≥15 m/s or feels-like ≥41°C
+recommend postponing exposed activity, including when other inputs are missing.
+Activity-specific precautions use the thresholds documented in
+`docs/superpowers/specs/2026-11-09-activity-planner-design.md`; these are app planning
+heuristics. Better windows require complete data and fewer concerns throughout
+the duration, between 06:00 and 18:00 Philippine time.
+
+Daily routines and previous same-plan assessments are stored per city on this
+device. Opening Tips checks the next routine occurrence and can highlight changed
+forecast assessments. Routines do not schedule notifications. Feedback accepts an
+optional reason and can be cleared. Feedback does not automatically train a model.
+A future trained model requires consented labeled data, held-out evaluation and
+comparison with this rule-based baseline before claiming improved accuracy.
