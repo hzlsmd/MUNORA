@@ -102,10 +102,10 @@ class WeatherMetrics extends StatelessWidget {
           ? constraints.maxWidth
           : (constraints.maxWidth - 12) / 2;
       final values = [
-        ('HUMIDITY', weather.humidity, 'Relative humidity', 'c303b'),
-        ('WIND', weather.wind, 'Current wind speed', '32de4'),
-        ('PRESSURE', weather.pressure, 'Mean sea-level pressure', 'pressure'),
-        ('FEELS LIKE', weather.feelsLike, 'Apparent temperature', '56e17'),
+        ('HUMIDITY', weather.humidity, 'Relative humidity', '73038'),
+        ('WIND', weather.wind, 'Current wind speed', 'e1569'),
+        ('PRESSURE', weather.pressure, 'Mean sea-level pressure', '1b317'),
+        ('FEELS LIKE', weather.feelsLike, 'Apparent temperature', 'f4ad0'),
       ];
       return Wrap(
         spacing: 12,
@@ -121,13 +121,7 @@ class WeatherMetrics extends StatelessWidget {
                     children: [
                       Row(
                         children: [
-                          v.$4 == 'pressure'
-                              ? const Icon(
-                                  Icons.speed_outlined,
-                                  size: 16,
-                                  color: AppColors.indigo,
-                                )
-                              : DesignIcon(v.$4),
+                          DesignIcon(v.$4),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(

@@ -14,8 +14,10 @@ Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
 - Loading, retry, refresh and saved-weather fallback are implemented.
 - Forecast shows five days of available three-hour samples in Philippine time.
 - Tips provides rule-based rain, heat, wind and thunderstorm guidance from live
-  weather, with a reason for each tip. [Rules and limits](docs/WEATHER_RECOMMENDATIONS.md).
-- Alerts derives app-generated rain, storm, heat and wind notices from the selected city. These are not official warnings; no triggers does not mean all-clear.
+  weather, with category filters and an expandable reason for each tip. [Rules and limits](docs/WEATHER_RECOMMENDATIONS.md).
+- Alerts shows app-generated rain, thunderstorm, heat and wind notices from the
+  selected city's weather, with explanations and a link to official PAGASA advisories.
+  No forecast triggers is explicitly not an all-clear.
 - Android weather-tip notifications can be enabled from Tips, with a test
   notification and approximate hourly background checks. Native phone validation
   is still required. See [notifications](docs/NOTIFICATIONS.md).
@@ -60,8 +62,23 @@ Use a current Flutter stable SDK; this change was checked with Flutter 3.47.9.
 - `lib/widgets/weather_view.dart`: loading, saved data, errors and retries.
 - `functions/`: dormant alternative backend; not used by the default app and not cleared for deployment.
 - `firestore.rules`: denies direct client access to backend storage.
-- `lib/services/weather_alerts.dart`: forecast notices from shared recommendation rules.
+- `lib/services/weather_alerts.dart`: forecast notices derived from the shared tip rules.
+- `assets/design/`: original local imagery and SVGs from the supplied Figma Make export.
 - `lib/services/weather_recommendations.dart`: deterministic preparedness rules.
 
+## Interface
 
-The interface uses the supplied pastel gradients, sky imagery, bundled Inter and Abyssinica fonts, and rounded navigation. Tips includes category filters and expandable explanations. Alerts are app-generated forecast guidance.
+The Flutter UI follows the supplied MUNORA Figma Make design: pastel sky gradients,
+translucent cards, bundled Inter/Abyssinica typography and a rounded navigation bar.
+Home and Forecast retain the existing five-day, three-hour forecast data. AQI, seven-day forecasts and fabricated AI confidence are not shown.
+Alerts/Tips optionally fetch hourly UV, precipitation probability and three-model
+rain agreement; missing data is explicitly unavailable. Humidity, pressure, wind and feels-like values use the existing provider.
+
+Alerts and Tips share the same weather client, refresh/caching and freshness checks.
+They do not introduce new background notification triggers or an official alert feed.
+The splash proceeds immediately instead of waiting for a cosmetic timer.
+
+Browser regression check: serve `build/web` on port 8083 and run
+`node tools/check_weather_tips.cjs` with Playwright installed and Chromium available.
+It checks the redesign with controlled weather fixtures; real Android notification
+validation still requires a device.

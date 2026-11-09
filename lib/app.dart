@@ -1,9 +1,9 @@
 import 'package:material_ui/material_ui.dart';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/supported_cities.dart';
 import 'services/weather_service.dart';
+import 'services/weather_insights.dart';
 
 import 'screens/ai_screen.dart';
 import 'screens/alerts_screen.dart';
@@ -11,6 +11,7 @@ import 'screens/forecast_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/splash_screen.dart';
 import 'widgets/bottom_nav.dart';
+import 'theme.dart';
 
 class MunoraApp extends StatelessWidget {
   const MunoraApp({super.key});
@@ -23,8 +24,8 @@ class MunoraApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: 'Inter',
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF4246AD)),
-        scaffoldBackgroundColor: const Color(0xFFEEF4FB),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.indigo),
+        scaffoldBackgroundColor: AppColors.bg,
       ),
       home: const _RootScreen(),
     );
@@ -42,6 +43,7 @@ class _RootScreenState extends State<_RootScreen> {
   AppScreen screen = AppScreen.splash;
   String selectedCity = 'Muntinlupa';
   final weatherService = WeatherService();
+  final insightsService = WeatherInsightsService();
 
   @override
   void initState() {
@@ -74,6 +76,7 @@ class _RootScreenState extends State<_RootScreen> {
   @override
   void dispose() {
     weatherService.dispose();
+    insightsService.dispose();
     super.dispose();
   }
 
@@ -106,6 +109,7 @@ class _RootScreenState extends State<_RootScreen> {
           navigate: navigate,
           city: selectedCity,
           service: weatherService,
+          insightsService: insightsService,
         );
         break;
       case AppScreen.ai:
@@ -113,10 +117,21 @@ class _RootScreenState extends State<_RootScreen> {
           navigate: navigate,
           city: selectedCity,
           service: weatherService,
+          insightsService: insightsService,
         );
         break;
     }
 
-    return Scaffold(body: ClipRRect(child: body));
+    return Scaffold(
+      body: DecoratedBox(
+        decoration: const BoxDecoration(gradient: AppColors.skyGradient),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 430),
+            child: ClipRRect(child: body),
+          ),
+        ),
+      ),
+    );
   }
 }

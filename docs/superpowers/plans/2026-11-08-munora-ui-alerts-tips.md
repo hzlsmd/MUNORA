@@ -26,26 +26,40 @@ Keep five-day forecasts and existing notification behavior. No AQI, seven-day ex
 
 Files: create lib/services/weather_alerts.dart and test/weather_alerts_test.dart; consume WeatherSnapshot and weatherRecommendations.
 Interface: List<WeatherTip> weatherAlerts(WeatherSnapshot weather, DateTime now). Return only storm, rain, heat and wind recommendations; return stale refresh guidance for unusable snapshots; do not return routine guidance as an alert.
-- [ ] Write tests for heat/wind boundaries, rain/storm, stale snapshots and benign conditions.
-- [ ] Run tests and observe missing behavior.
-- [ ] Implement the pure adapter and run alert and recommendation tests.
+- [x] Write tests for heat/wind boundaries, rain/storm, stale snapshots and benign conditions.
+- [x] Run tests and observe missing behavior.
+- [x] Implement the pure adapter and run alert and recommendation tests.
 
 ### Task 2: Shared styling and all screens
 
 Files: theme.dart, app.dart, widgets/bottom_nav.dart, widgets/weather_icon.dart, new widgets/atmosphere.dart, all five screens, pubspec.yaml and bundled assets.
 Interfaces: AtmosphereScreen(title, subtitle, active, onNavigate, child, actions); GlassCard(child, padding, color); retain public screen constructor dependencies and shared weather service.
-- [ ] Bundle exact static imagery/icons referenced by the supplied design, with local Inter and Abyssinica fonts; use Flutter SVG rendering.
-- [ ] Apply the gradient and glass design to all five screens. Preserve real weather values, five-day grouping and loading/error behavior.
-- [ ] Replace demo Alerts with WeatherView + weatherAlerts, explanation expansion, refresh guidance and official-advisory link. Do not add new notification delivery semantics.
-- [ ] Make Tips stateful with All/Rain/Heat/Outdoor/Travel filters and explanations. Keep NotificationSettings connected. Filters reset on city change and never hide stale-data guidance.
-- [ ] Write and run behavioral widget tests before implementing filters/alert wiring: benign/stale alerts, city change, category empty state and explanation expansion.
-- [ ] Run existing and new widget tests at narrow width and larger text; fix regressions.
+- [x] Bundle exact static imagery/icons referenced by the supplied design, with local Inter and Abyssinica fonts; use Flutter SVG rendering.
+- [x] Apply the gradient and glass design to all five screens. Preserve real weather values, five-day grouping and loading/error behavior.
+- [x] Replace demo Alerts with WeatherView + weatherAlerts, explanation expansion, refresh guidance and official-advisory link. Do not add new notification delivery semantics.
+- [x] Make Tips stateful with All/Rain/Heat/Outdoor/Travel filters and explanations. Keep NotificationSettings connected. Filters reset on city change and never hide stale-data guidance.
+- [x] Write and run behavioral widget tests before implementing filters/alert wiring: benign/stale alerts, city change, category filtering and explanation expansion.
+- [x] Run existing and new widget tests at narrow width and larger text; fix regressions.
 
 ### Task 3: Verification and delivery
 
 Files: README.md and docs/WEATHER_RECOMMENDATIONS.md.
-- [ ] Document notice thresholds, forecast scope and limitations; remove obsolete demo-alert documentation.
-- [ ] Run flutter analyze, flutter test and flutter build web --no-web-resources-cdn.
-- [ ] Render the original prototype and Flutter app in Chromium; compare all five screens and check navigation, city picker, filters, explanations and responsive layout.
-- [ ] Obtain a fresh whole-branch review, resolve significant findings and rerun affected checks.
-- [ ] Commit changes, create a draft PR and attach it to this chat. Do not merge or deploy.
+- [x] Document notice thresholds, forecast scope and limitations; remove obsolete demo-alert documentation.
+- [x] Run flutter analyze, flutter test and flutter build web --no-web-resources-cdn.
+- [x] Render the original prototype and Flutter app in Chromium; compare all five screens and check navigation, city picker, filters, explanations and responsive layout.
+- [x] Obtain a fresh whole-branch review, resolve significant findings and rerun affected checks.
+- [x] Commit changes, create a draft PR and attach it to this chat. Do not merge or deploy.
+
+
+### November 9 parity follow-up
+
+Implemented the requested full Alerts/Tips feature inventory from the supplied
+export: both alert views, badges/windows/metrics, model comparison explanation,
+featured guidance, outdoor window, five general guidance cards, filters and local
+feedback. Optional real UV/rain/model data preserves the approved free rule-based
+approach. Review findings fixed: hour-boundary expiry and failed-data retry.
+
+Validation: 63 Flutter tests, clean analyzer, release web build; Chromium fixture
+checks at 390px and 1366px with no runtime errors. Real Open-Meteo detail and model
+queries confirmed supported fields and units. Native notification delivery still
+requires Android-device testing.

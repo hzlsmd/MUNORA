@@ -43,7 +43,6 @@ WeatherKind weatherKindFor(String condition) {
       c.contains('rainfall')) {
     return WeatherKind.rain;
   }
-
   if (c.contains('partly') ||
       c.contains('partial') ||
       c.contains('mostly sunny') ||
@@ -59,6 +58,18 @@ WeatherKind weatherKindFor(String condition) {
   return WeatherKind.sunny; // sun / clear / hot / warm, and the default
 }
 
+/// Condition-specific assets from the supplied Figma design.
+const _assets = {
+  WeatherKind.sunny: 'c7269',
+  WeatherKind.partlyCloudy: '1acef',
+  WeatherKind.cloudy: '96cf4',
+  WeatherKind.rain: '7d6bd',
+  WeatherKind.drizzle: 'cdd32',
+  WeatherKind.thunderstorm: '5f9df',
+  WeatherKind.wind: '53672',
+  WeatherKind.nightRain: '7d6bd',
+};
+
 class WeatherIcon extends StatelessWidget {
   final String condition;
   final double size;
@@ -68,16 +79,7 @@ class WeatherIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final kind = weatherKindFor(condition);
-    final asset = switch (kind) {
-      WeatherKind.sunny => 'c7269',
-      WeatherKind.partlyCloudy => '1acef',
-      WeatherKind.cloudy => '96cf4',
-      WeatherKind.rain || WeatherKind.nightRain => '7d6bd',
-      WeatherKind.drizzle => '7d6bd',
-      WeatherKind.thunderstorm => '5f9df',
-      WeatherKind.wind => '53672',
-      _ => null,
-    };
+    final asset = _assets[kind];
     return Semantics(
       label: condition,
       child: SizedBox(
@@ -87,11 +89,11 @@ class WeatherIcon extends StatelessWidget {
           child: asset != null
               ? DesignIcon(asset)
               : Icon(
-                  kind == WeatherKind.snow
-                      ? Icons.ac_unit_rounded
-                      : kind == WeatherKind.moon
-                      ? Icons.nights_stay_outlined
-                      : Icons.blur_on_rounded,
+                  switch (kind) {
+                    WeatherKind.snow => Icons.ac_unit_rounded,
+                    WeatherKind.moon => Icons.nights_stay_outlined,
+                    _ => Icons.blur_on_rounded,
+                  },
                   size: size,
                   color: const Color(0xFF5B5FC7),
                 ),

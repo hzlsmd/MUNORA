@@ -95,7 +95,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
   }
 }
 
-/// Available even when weather requests fail.
+/// Notification management remains reachable even when weather cannot load.
 class NotificationSettingsButton extends StatelessWidget {
   const NotificationSettingsButton({super.key});
   @override
@@ -108,7 +108,7 @@ class NotificationSettingsButton extends StatelessWidget {
       showDragHandle: true,
       builder: (context) => SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,9 +124,13 @@ class NotificationSettingsButton extends StatelessWidget {
                 const Text(
                   'Weather notifications are available in the Android app. You can still read Alerts and Tips here.',
                 ),
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Done'),
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Done'),
+                ),
               ),
             ],
           ),

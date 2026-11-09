@@ -33,7 +33,7 @@ class GlassCard extends StatelessWidget {
   Widget build(BuildContext context) => Container(
     decoration: cardDecoration(color: color),
     padding: padding,
-    child: Material(color: Colors.transparent, child: child),
+    child: Material(type: MaterialType.transparency, child: child),
   );
 }
 

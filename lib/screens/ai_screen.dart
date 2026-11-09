@@ -2,10 +2,12 @@ import 'package:material_ui/material_ui.dart';
 
 import '../services/weather_recommendations.dart';
 import '../services/weather_service.dart';
+import '../services/weather_insights.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/guidance_card.dart';
+import '../widgets/insight_panels.dart';
 import '../widgets/weather_view.dart';
 import '../widgets/notification_settings.dart';
 
@@ -13,11 +15,13 @@ class AIScreen extends StatefulWidget {
   final ValueChanged<AppScreen> navigate;
   final String city;
   final WeatherService service;
+  final WeatherInsightsService? insightsService;
   const AIScreen({
     super.key,
     required this.navigate,
     required this.city,
     required this.service,
+    this.insightsService,
   });
   @override
   State<AIScreen> createState() => _AIScreenState();
@@ -31,116 +35,175 @@ class _AIScreenState extends State<AIScreen> {
     if (oldWidget.city != widget.city) filter = 'All';
   }
 
-  bool matches(WeatherTip tip) =>
-      tip.id == 'stale' ||
-      switch (filter) {
-        'Rain' => tip.id == 'rain' || tip.id == 'storm',
-        'Heat' => tip.id == 'heat',
-        'Outdoor' => const {
-          'heat',
-          'wind',
-          'storm',
-          'routine',
-        }.contains(tip.id),
-        'Travel' => const {'rain', 'wind', 'storm'}.contains(tip.id),
-        _ => true,
-      };
+  bool matches(String id) => switch (filter) {
+    'Rain' => {'rain', 'storm', 'storm_safety'}.contains(id),
+    'Heat' => {'heat', 'hydration', 'uv'}.contains(id),
+    'Outdoor' => {
+      'heat',
+      'wind',
+      'storm',
+      'routine',
+      'outdoor',
+      'uv',
+    }.contains(id),
+    'Travel' => {'rain', 'wind', 'storm', 'travel'}.contains(id),
+    _ => true,
+  };
   @override
   Widget build(BuildContext context) => AtmosphereScreen(
     title: widget.city,
-    actions: const [NotificationSettingsButton()],
     subtitle: 'Daily lifestyle tips',
+    actions: const [NotificationSettingsButton()],
     active: AppScreen.ai,
     onNavigate: widget.navigate,
     child: WeatherView(
       city: widget.city,
       service: widget.service,
       builder: (weather) {
-        final tips = weatherRecommendations(
-          weather,
-          DateTime.now(),
-        ).where(matches).toList();
-        return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Rule-based weather guidance',
-                style: TextStyle(
-                  fontSize: 12,
-                  letterSpacing: .3,
-                  color: AppColors.indigo,
-                  fontWeight: FontWeight.w700,
-                ),
+        final recommendations = weatherRecommendations(weather, DateTime.now());
+        final stale = recommendations.first.id == 'stale';
+        return InsightView(
+          key: ValueKey('${widget.city}:${weather.updatedAt}'),
+          city: widget.city,
+          service: widget.insightsService,
+          builder: (raw) {
+            final insight =
+                !stale && raw != null && raw.isFresh(DateTime.now().toUtc())
+                ? raw
+                : null;
+            final catalog = [
+              const WeatherTip(
+                'hydration',
+                'Stay Hydrated',
+                'Carry drinking water and take breaks in the shade during warm periods.',
+                'General heat preparedness. Drink regularly and follow any medical advice about fluid intake.',
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'Practical suggestions for your day, based on the available weather. Check official advisories before making safety decisions.',
-                style: TextStyle(
-                  fontSize: 12,
-                  height: 1.5,
-                  color: AppColors.textBody,
-                ),
+              WeatherTip(
+                'uv',
+                'Check the UV Index',
+                insight?.uvIndex == null
+                    ? 'UV data is unavailable. Check a current UV forecast before prolonged outdoor exposure.'
+                    : 'Current-hour UV index ${insight!.uvIndex!.toStringAsFixed(1)} (${uvCategory(insight.uvIndex)}). Use sun protection when outdoors.',
+                'Use sunscreen, clothing and shade for sun protection. The displayed UV value, when available, is an Open-Meteo hourly forecast, not a personal exposure measurement.',
               ),
-              const SizedBox(height: 16),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: ['All', 'Rain', 'Heat', 'Outdoor', 'Travel']
-                    .map(
-                      (category) => ChoiceChip(
-                        label: Text(category),
-                        selected: filter == category,
-                        showCheckmark: false,
-                        selectedColor: AppColors.indigo,
-                        backgroundColor: const Color(0x99FFFFFF),
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: filter == category
-                              ? Colors.white
-                              : AppColors.textBody,
-                        ),
-                        side: BorderSide.none,
-                        shape: const StadiumBorder(),
-                        onSelected: (_) => setState(() => filter = category),
-                      ),
-                    )
-                    .toList(),
+              const WeatherTip(
+                'outdoor',
+                'Plan Outdoor Activities',
+                'Review the suggested outdoor window and recheck the forecast before leaving.',
+                'General planning guidance. Avoid exposed activities during thunderstorms and adjust plans as conditions change.',
               ),
-              const SizedBox(height: 18),
-              if (tips.isEmpty)
-                const GlassCard(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'No tips in this category right now',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Try All to see the other suggestions for your city.',
-                        style: TextStyle(color: AppColors.textBody),
-                      ),
-                    ],
+              const WeatherTip(
+                'travel',
+                'Travel Prepared',
+                'Check your route and local road advisories. Carry rain protection and allow extra travel time when needed.',
+                'General travel preparedness. This app does not receive live traffic or road-flooding reports; check official local sources.',
+              ),
+              const WeatherTip(
+                'storm_safety',
+                'Thunderstorm Safety',
+                'When thunder roars, head indoors. Avoid open fields, water and isolated tall trees.',
+                'General storm safety. Use a substantial building or enclosed vehicle for shelter. Wait at least 30 minutes after the last thunder before resuming exposed outdoor activity.',
+              ),
+            ].where((tip) => matches(tip.id));
+            return SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SectionTitle(
+                    'LIVE MICROCLIMATE',
+                    trailing: 'Metro Manila Basin',
                   ),
-                ),
-              for (var i = 0; i < tips.length; i++)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 14),
-                  child: GuidanceCard(
-                    key: ValueKey('${widget.city}:${tips[i].id}'),
-                    tip: tips[i],
-                    featured: i == 0 && tips[i].id != 'stale',
+                  ModelAgreementPanel(insights: insight),
+                  const SizedBox(height: 16),
+                  GuidanceCard(
+                    key: ValueKey(
+                      '${widget.city}:featured:${recommendations.first.id}',
+                    ),
+                    tip: recommendations.first,
+                    featured: !stale,
+                    window: stale ? null : 'Current / next 6 hours',
                   ),
-                ),
-            ],
-          ),
+                  const SizedBox(height: 20),
+                  const SectionTitle('Forecast-based insights'),
+                  OutdoorPanel(insights: insight),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Rule-based weather guidance',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.indigo,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Forecast-based suggestions and general preparedness tips. Check official advisories before making safety decisions.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      height: 1.5,
+                      color: AppColors.textBody,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: ['All', 'Rain', 'Heat', 'Outdoor', 'Travel']
+                        .map(
+                          (c) => ChoiceChip(
+                            label: Text(c),
+                            selected: filter == c,
+                            showCheckmark: false,
+                            selectedColor: AppColors.indigo,
+                            backgroundColor: const Color(0x99FFFFFF),
+                            labelStyle: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: filter == c
+                                  ? Colors.white
+                                  : AppColors.textBody,
+                            ),
+                            side: BorderSide.none,
+                            shape: const StadiumBorder(),
+                            onSelected: (_) => setState(() => filter = c),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                  const SizedBox(height: 18),
+                  for (final tip
+                      in recommendations
+                          .skip(1)
+                          .where((tip) => matches(tip.id)))
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: GuidanceCard(
+                        key: ValueKey('${widget.city}:${tip.id}'),
+                        tip: tip,
+                        badge: 'Weather-triggered',
+                      ),
+                    ),
+                  for (final tip in catalog)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 14),
+                      child: GuidanceCard(
+                        key: ValueKey('guide:${tip.id}'),
+                        tip: tip,
+                        badge: tip.id == 'uv' && insight?.uvIndex != null
+                            ? uvCategory(insight!.uvIndex)
+                            : 'General guidance',
+                        detailsLabel: 'View guidance details',
+                      ),
+                    ),
+                  GuidanceFeedback(
+                    key: ValueKey('feedback:${widget.city}'),
+                    city: widget.city,
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     ),

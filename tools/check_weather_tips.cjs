@@ -1,11 +1,106 @@
-const {chromium}=require('playwright');
-const path=require('path'); const fs=require('fs');
-(async()=>{const b=await chromium.launch({executablePath:process.env.CHROMIUM_PATH || (process.platform === 'win32' ? 'C:/Program Files/Google/Chrome/Application/chrome.exe' : '/usr/bin/chromium'),headless:true});
-fs.mkdirSync(path.join(process.cwd(),'build','tips-check'),{recursive:true});
-for(const width of [390,1366]) {const p=await b.newPage({viewport:{width,height:900}});const errors=[];p.on('pageerror',e=>errors.push(e.message));
-await p.route('https://api.open-meteo.com/**',route=>{const now=new Date(),start=Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate(),now.getUTCHours());return route.fulfill({json:{current_units:{time:'unixtime',temperature_2m:'°C',apparent_temperature:'°C',relative_humidity_2m:'%',pressure_msl:'hPa',wind_speed_10m:'m/s',weather_code:'wmo code'},hourly_units:{time:'unixtime',temperature_2m:'°C',weather_code:'wmo code'},current:{time:Math.floor(+now/1000),temperature_2m:33,apparent_temperature:36,relative_humidity_2m:80,pressure_msl:1010,wind_speed_10m:12,weather_code:95},hourly:{time:Array.from({length:144},(_,i)=>(start+i*3600000)/1000),temperature_2m:Array(144).fill(30),weather_code:Array(144).fill(61)}}});});
-await p.goto(process.env.MUNORA_PREVIEW_URL || 'http://127.0.0.1:8083');await p.locator('flt-semantics-placeholder').evaluate(e=>e.click());await p.getByText('Weather data by Open-Meteo',{exact:true}).waitFor();
-await p.screenshot({path:path.join(process.cwd(),'build','tips-check',`home-${width}.png`)});
-for(const name of ['Forecast','Alerts','Tips']) {await p.getByText(name,{exact:true}).last().click();await p.waitForTimeout(400);await p.screenshot({path:path.join(process.cwd(),'build','tips-check',`${name.toLowerCase()}-${width}.png`)});}
-await p.getByRole('checkbox',{name:'Heat',exact:true}).click();await p.getByText('Plan indoor activities',{exact:true}).waitFor({state:'hidden'});await p.getByText('Take breaks from the heat',{exact:true}).waitFor();await p.getByText('Why this suggestion?',{exact:true}).click();await p.getByText('Temperature 33.0 C; feels like 36.0 C.',{exact:false}).waitFor();
-if(errors.length)throw Error(errors.join('\n')); console.log(`${width}: navigation, filter, explanation passed`);await p.close();} await b.close();})().catch(e=>{console.error(e);process.exit(1)});
+// Run after a release build, with build/web served on port 8083.
+const { chromium } = require('playwright');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+
+(async () => {
+  const browser = await chromium.launch({
+    executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium',
+    headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage'],
+  });
+  const output = path.join(process.cwd(), 'build', 'tips-check');
+  fs.mkdirSync(output, { recursive: true });
+  try {
+    for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 900 }]) {
+      const page = await browser.newPage({ viewport });
+      let calls = 0;
+      const errors = [];
+      page.on('pageerror', e => errors.push(e.message));
+      await page.route('https://api.open-meteo.com/**', route => {
+        calls++;
+        const manila = new URL(route.request().url()).searchParams.get('latitude') === '14.5995';
+        const now = new Date();
+        const start = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), now.getUTCHours());
+        const query = new URL(route.request().url()).searchParams;
+        if (!query.has('current')) {
+          const hourly = {time: Array.from({length:72}, (_,i)=>(start+i*3600000)/1000)};
+          const hourly_units = {time:'unixtime'};
+          const fields = query.has('models') ? ['precipitation_ecmwf_ifs025','precipitation_gfs_seamless','precipitation_icon_seamless'] : ['temperature_2m','relative_humidity_2m','precipitation_probability','uv_index'];
+          for (const key of fields) {
+            hourly[key] = Array(72).fill(key==='temperature_2m'?27:key==='relative_humidity_2m'?70:key==='precipitation_probability'?10:key==='uv_index'?3:0);
+            hourly_units[key] = key==='temperature_2m'?'°C':key==='uv_index'?'':key.startsWith('precipitation_')&&key!=='precipitation_probability'?'mm':'%';
+          }
+          return route.fulfill({json:{hourly,hourly_units}});
+        }
+        return route.fulfill({ json: {
+          current_units: { time: 'unixtime', temperature_2m: '\u00b0C', apparent_temperature: '\u00b0C',
+            relative_humidity_2m: '%', pressure_msl: 'hPa', wind_speed_10m: 'm/s', weather_code: 'wmo code' },
+          hourly_units: { time: 'unixtime', temperature_2m: '\u00b0C', weather_code: 'wmo code' },
+          current: { time: Math.floor(+now / 1000), temperature_2m: manila ? 28 : 33,
+            apparent_temperature: manila ? 30 : 36, relative_humidity_2m: 80,
+            pressure_msl: 1010, wind_speed_10m: manila ? 2 : 12, weather_code: manila ? 0 : 95 },
+          hourly: { time: Array.from({ length: 144 }, (_, i) => (start + i * 3600000) / 1000),
+            temperature_2m: Array(144).fill(30), weather_code: Array(144).fill(manila ? 0 : 61) },
+        } });
+      });
+      await page.goto(process.env.MUNORA_PREVIEW_URL || 'http://127.0.0.1:8083');
+      await page.locator('flt-semantics-placeholder').evaluate(e => e.click());
+      await page.getByText('Weather data by Open-Meteo', { exact: true }).waitFor();
+      await page.waitForLoadState('networkidle');
+      await page.screenshot({ path: path.join(output, `home-${viewport.width}.png`) });
+
+      await page.getByText('Forecast', { exact: true }).last().click();
+      await page.getByText('5-Day Forecast', { exact: true }).waitFor();
+      await page.screenshot({ path: path.join(output, `forecast-${viewport.width}.png`) });
+      await page.getByText('3-Hour', { exact: true }).click();
+      await page.getByText('Forecast outlook', { exact: true }).waitFor();
+
+      await page.getByText('Alerts', { exact: true }).click();
+      await page.getByText('App-generated notices from weather estimates. These are not official warnings.', { exact: true }).waitFor();
+      await page.getByText('Plan indoor activities', { exact: false }).waitFor();
+      await page.screenshot({ path: path.join(output, `alerts-${viewport.width}.png`) });
+      await page.getByRole('checkbox', {name:'Calm Skies',exact:true}).click();
+      await page.getByText('Preview only — current notices remain active', {exact:false}).waitFor();
+      await page.getByText('Return to Current Hazards', {exact:false}).click();
+      await page.getByText('Plan indoor activities', {exact:false}).waitFor();
+
+      await page.getByText('Tips', { exact: true }).click();
+      await page.getByText('Daily lifestyle tips', { exact: true }).waitFor();
+      await page.getByRole('checkbox', { name: 'Heat', exact: true }).click();
+      await page.getByText('Stay Hydrated', { exact: false }).waitFor();
+      await page.getByText('Take breaks from the heat', { exact: false }).waitFor();
+      await page.getByRole('button', { name: /Why this suggestion/ }).last().click();
+      await page.getByText('Temperature 33.0 C; feels like 36.0 C.', { exact: false }).waitFor();
+      await page.screenshot({ path: path.join(output, `tips-${viewport.width}.png`) });
+      await page.getByRole('button', {name:'Helpful',exact:true}).click();
+      await page.getByText('Feedback stays on this device.', {exact:false}).waitFor();
+      await page.mouse.move(viewport.width / 2, 500);
+      await page.mouse.wheel(0, 1500);
+      await page.waitForTimeout(400);
+      await page.screenshot({ path: path.join(output, `tips-feedback-${viewport.width}.png`) });
+      assert.equal(calls, 3, 'Screens should share the Home weather request');
+
+      await page.getByText('Home', { exact: true }).last().click();
+      await page.getByText('Muntinlupa', { exact: true }).click();
+      await Promise.all([
+        page.waitForResponse(response => response.url().includes('latitude=14.5995')),
+        page.getByText('Manila', { exact: true }).click(),
+      ]);
+      await page.getByText('Select location', { exact: true }).waitFor({ state: 'hidden' });
+      await page.getByText('Check forecast notices', { exact: false }).waitFor();
+      await page.getByText('Alerts', { exact: true }).click();
+      await page.getByRole('checkbox', { name: 'Calm Skies', exact: true }).click();
+      await page.getByText('No forecast triggers detected', { exact: false }).waitFor();
+      await page.getByText(/This is not an all-clear/).waitFor();
+      await page.screenshot({ path: path.join(output, `alerts-calm-${viewport.width}.png`) });
+      await page.getByText('Tips', { exact: true }).click();
+      await page.getByRole('checkbox', { name: 'Heat', exact: true }).click();
+      await page.getByText('Stay Hydrated', { exact: false }).waitFor();
+      assert.equal(calls, 6, 'Changing cities should request only that city');
+      assert.deepEqual(errors, []);
+      console.log(JSON.stringify({ viewport, providerCalls: calls, errors }));
+      await page.close();
+    }
+  } finally { await browser.close(); }
+})().catch(e => { console.error(e); process.exitCode = 1; });
