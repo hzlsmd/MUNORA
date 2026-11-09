@@ -12,6 +12,9 @@ Map<String, dynamic> detailFixture(DateTime now) => {
     'relative_humidity_2m': '%',
     'precipitation_probability': '%',
     'uv_index': '',
+    'apparent_temperature': '°C',
+    'wind_speed_10m': 'm/s',
+    'weather_code': 'wmo code',
   },
   'hourly': <String, dynamic>{
     'time': List.generate(
@@ -22,6 +25,9 @@ Map<String, dynamic> detailFixture(DateTime now) => {
     'relative_humidity_2m': List.filled(48, 70),
     'precipitation_probability': List.filled(48, 10),
     'uv_index': List.filled(48, 3),
+    'apparent_temperature': List.filled(48, 28),
+    'wind_speed_10m': List.filled(48, 2),
+    'weather_code': List.filled(48, 0),
   },
 };
 void main() {
@@ -96,6 +102,14 @@ void main() {
       expect(WeatherInsights.parse(null, j, now).agreementPercent, isNull);
     },
   );
+  test('outdoor windows reject storms and strong wind despite low rain', () {
+    final j = detailFixture(now);
+    j['hourly']['weather_code'] = List.filled(48, 95);
+    expect(WeatherInsights.parse(j, null, now).outdoorStart, isNull);
+    j['hourly']['weather_code'] = List.filled(48, 0);
+    j['hourly']['wind_speed_10m'] = List.filled(48, 15);
+    expect(WeatherInsights.parse(j, null, now).outdoorStart, isNull);
+  });
   test('hourly insight expires at the next forecast hour', () {
     final fetched = DateTime.utc(2026, 11, 9, 12, 59);
     final data = WeatherInsights(fetchedAt: fetched, uvIndex: 3);

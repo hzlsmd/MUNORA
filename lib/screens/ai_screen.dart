@@ -5,6 +5,7 @@ import '../services/weather_service.dart';
 import '../services/weather_insights.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
+import '../widgets/activity_planner_card.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/guidance_card.dart';
 import '../widgets/insight_panels.dart';
@@ -116,6 +117,7 @@ class _AIScreenState extends State<AIScreen> {
                   ),
                   ModelAgreementPanel(insights: insight),
                   const SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   GuidanceCard(
                     key: ValueKey(
                       '${widget.city}:featured:${recommendations.first.id}',
@@ -125,7 +127,18 @@ class _AIScreenState extends State<AIScreen> {
                     window: stale ? null : 'Current / next 6 hours',
                   ),
                   const SizedBox(height: 20),
-                  const SectionTitle('Forecast-based insights'),
+                  const SectionTitle('AI Personalization Insights'),
+                  const Text(
+                    'Personalize forecast-based guidance with your activity and an optional daily routine.',
+                    style: TextStyle(fontSize: 12, color: AppColors.textBody),
+                  ),
+                  const SizedBox(height: 12),
+                  ActivityPlannerCard(
+                    key: ValueKey('planner:${widget.city}'),
+                    city: widget.city,
+                    insights: insight,
+                  ),
+                  const SizedBox(height: 16),
                   OutdoorPanel(insights: insight),
                   const SizedBox(height: 16),
                   const Text(
