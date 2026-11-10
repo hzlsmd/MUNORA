@@ -122,6 +122,38 @@ class WeatherSnapshot {
     if (entries.map((item) => item['at']).toSet().length != entries.length) {
       throw const FormatException('Duplicate forecast timestamps');
     }
+    final conditionReadings = json['conditionReadings'];
+    final readings = <ForecastReading>[];
+    if (conditionReadings != null) {
+      if (conditionReadings is! List ||
+          conditionReadings.isEmpty ||
+          conditionReadings.length > 168) {
+        throw const FormatException('Invalid hazard readings');
+      }
+      DateTime? previous;
+      for (final item in conditionReadings) {
+        if (item is! Map<String, dynamic>) {
+          throw const FormatException('Invalid hazard reading');
+        }
+        final at = _time(item['at']);
+        final age = at.difference(updatedAt);
+        if (age < const Duration(hours: -1) ||
+            age > const Duration(days: 7) ||
+            (previous != null &&
+                at.difference(previous) != const Duration(hours: 1))) {
+          throw const FormatException('Invalid hazard reading time');
+        }
+        readings.add(ForecastReading(at, _condition(item['condition'])));
+        previous = at;
+      }
+    } else {
+      readings.addAll(
+        entries.map(
+          (item) =>
+              ForecastReading(_time(item['at']), item['condition'] as String),
+        ),
+      );
+    }
     _number(current['temperature'], -100, 70);
     _number(current['feelsLike'], -120, 100);
     _number(current['humidity'], 0, 100);
@@ -139,12 +171,7 @@ class WeatherSnapshot {
       temperature: (current['temperature'] as num).toDouble(),
       feelsLike: (current['feelsLike'] as num).toDouble(),
       windSpeed: (current['wind'] as num).toDouble(),
-      readings: List.unmodifiable(
-        entries.map(
-          (item) =>
-              ForecastReading(_time(item['at']), item['condition'] as String),
-        ),
-      ),
+      readings: List.unmodifiable(readings),
       source: source as String,
       city: city,
       updatedAt: updatedAt,

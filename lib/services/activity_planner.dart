@@ -125,7 +125,7 @@ ActivityAssessment assessActivity(
   };
   final precautions = <String>[];
   if (rain >= limits.$1 ||
-      selected.any((h) => h.code! >= 51 && h.code! <= 82)) {
+      selected.any((h) => h.code! >= 51 && h.code! <= 86)) {
     precautions.add(
       activity == Activity.commute
           ? 'Carry rain protection, allow extra travel time and check local road advisories.'

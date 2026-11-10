@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../data/supported_cities.dart';
 import '../models/weather_snapshot.dart';
 import 'open_meteo.dart';
@@ -23,18 +25,20 @@ class WeatherService {
   final _aborts = <Completer<void>>{};
   bool _disposed = false;
 
-  WeatherService(
-      {http.Client? client,
-      this.endpoint = const String.fromEnvironment('WEATHER_API_URL',
-          defaultValue: openMeteoEndpoint),
-      this.requestTimeout = const Duration(seconds: 25),
-      DateTime Function()? now})
-      : _client = client ?? http.Client(),
-        _now = now ?? DateTime.now;
+  WeatherService({
+    http.Client? client,
+    this.endpoint = const String.fromEnvironment(
+      'WEATHER_API_URL',
+      defaultValue: openMeteoEndpoint,
+    ),
+    this.requestTimeout = const Duration(seconds: 25),
+    DateTime Function()? now,
+  }) : _client = client ?? http.Client(),
+       _now = now ?? DateTime.now;
 
   bool get _openMeteo => endpoint == openMeteoEndpoint;
   String _cacheKey(String city) =>
-      _openMeteo ? 'weather.openmeteo.v1.$city' : 'weather.v1.$city';
+      _openMeteo ? 'weather.openmeteo.v2.$city' : 'weather.v1.$city';
 
   Future<WeatherSnapshot> fetch(String city, {bool force = false}) {
     final uri = Uri.tryParse(endpoint);
@@ -45,14 +49,18 @@ class WeatherService {
         uri.userInfo.isNotEmpty ||
         uri.fragment.isNotEmpty ||
         !supportedCities.contains(city)) {
-      return Future.error(const WeatherException(
-          'Weather is unavailable. Please try again later.'));
+      return Future.error(
+        const WeatherException(
+          'Weather is unavailable. Please try again later.',
+        ),
+      );
     }
     final pending = _pending[city];
     if (pending != null) return pending;
     final saved = _memory[city];
-    final age =
-        saved == null ? null : _now().toUtc().difference(saved.updatedAt);
+    final age = saved == null
+        ? null
+        : _now().toUtc().difference(saved.updatedAt);
     if (!force &&
         saved != null &&
         saved.isUsable(_now()) &&
@@ -67,22 +75,27 @@ class WeatherService {
   }
 
   Future<String> _read(Uri uri, Completer<void> abort) async {
-    final request =
-        http.AbortableRequest('GET', uri, abortTrigger: abort.future)
-          ..followRedirects = false;
+    final request = http.AbortableRequest(
+      'GET',
+      uri,
+      abortTrigger: abort.future,
+    )..followRedirects = false;
     final response = await _client.send(request);
     if (response.statusCode != 200 ||
         (response.contentLength ?? 0) > maxResponseBytes) {
       await response.stream.listen(null).cancel();
-      throw WeatherException(response.statusCode == 429
-          ? 'Too many updates. Please wait a minute and try again.'
-          : 'Weather is unavailable. Please try again later.');
+      throw WeatherException(
+        response.statusCode == 429
+            ? 'Too many updates. Please wait a minute and try again.'
+            : 'Weather is unavailable. Please try again later.',
+      );
     }
     final bytes = BytesBuilder(copy: false);
     await for (final chunk in response.stream) {
       if (bytes.length + chunk.length > maxResponseBytes) {
         throw const WeatherException(
-            'Weather data is temporarily unavailable.');
+          'Weather data is temporarily unavailable.',
+        );
       }
       bytes.add(chunk);
     }
@@ -93,16 +106,21 @@ class WeatherService {
     final abort = Completer<void>();
     _aborts.add(abort);
     try {
-      final raw = await _read(
-              _openMeteo
-                  ? openMeteoRequest(city)
-                  : uri.replace(queryParameters: {'city': city}),
-              abort)
-          .timeout(requestTimeout, onTimeout: () {
-        if (!abort.isCompleted) abort.complete();
-        throw const WeatherException(
-            'Weather update timed out. Please try again.');
-      });
+      final raw =
+          await _read(
+            _openMeteo
+                ? openMeteoRequest(city)
+                : uri.replace(queryParameters: {'city': city}),
+            abort,
+          ).timeout(
+            requestTimeout,
+            onTimeout: () {
+              if (!abort.isCompleted) abort.complete();
+              throw const WeatherException(
+                'Weather update timed out. Please try again.',
+              );
+            },
+          );
       if (_disposed) throw const WeatherException('Weather is unavailable.');
       final decoded = jsonDecode(raw) as Map<String, dynamic>;
       final normalized = _openMeteo
@@ -116,13 +134,16 @@ class WeatherService {
       try {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(_cacheKey(city), jsonEncode(normalized));
-      } catch (_) {/* A successful update remains usable if storage fails. */}
+      } catch (_) {
+        /* A successful update remains usable if storage fails. */
+      }
       return snapshot;
     } on WeatherException {
       rethrow;
     } catch (_) {
       throw const WeatherException(
-          'Unable to update weather. Check your connection and try again.');
+        'Unable to update weather. Check your connection and try again.',
+      );
     } finally {
       if (!abort.isCompleted) abort.complete();
       _aborts.remove(abort);
@@ -139,8 +160,9 @@ class WeatherService {
           utf8.encode(raw).length > maxResponseBytes) {
         return null;
       }
-      final snapshot =
-          WeatherSnapshot.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+      final snapshot = WeatherSnapshot.fromJson(
+        jsonDecode(raw) as Map<String, dynamic>,
+      );
       if ((_openMeteo && snapshot.source != 'Open-Meteo') ||
           snapshot.city != city ||
           !snapshot.isUsable(_now(), offline: true) ||

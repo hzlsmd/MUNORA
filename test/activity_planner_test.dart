@@ -23,6 +23,20 @@ void main() {
   );
   WeatherInsights data(List<PlanningHour> hours) =>
       WeatherInsights(fetchedAt: now, hours: hours);
+  test('all supported precipitation codes require precautions', () {
+    for (final code in [51, 61, 82, 85, 86]) {
+      expect(
+        assessActivity(
+          data([hour(1, code: code)]),
+          Activity.walk,
+          now.add(const Duration(hours: 1)),
+          1,
+          now,
+        ).status,
+        PlanStatus.caution,
+      );
+    }
+  });
   test('exercise is more cautious than commuting in the same heat', () {
     final forecast = data([hour(1, temp: 31)]);
     expect(
