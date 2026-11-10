@@ -20,3 +20,17 @@ jobs:
       - run: flutter analyze
       - run: flutter test
       - run: flutter build web --no-web-resources-cdn
+  recommendation-gateway:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: node --version
+      - run: npm ci --ignore-scripts
+      - run: npm test
+      - run: npm run check
+        env:
+          WRANGLER_SEND_METRICS: 'false'

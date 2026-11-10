@@ -1,6 +1,8 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../models/weather_snapshot.dart';
+import '../services/ai_service.dart';
+import 'ai_recommendation_panel.dart';
 import '../services/activity_planner.dart';
 import '../services/planner_preferences.dart';
 import '../services/weather_insights.dart';
@@ -10,10 +12,14 @@ import 'atmosphere.dart';
 class ActivityPlannerCard extends StatefulWidget {
   final String city;
   final WeatherInsights? insights;
+  final WeatherSnapshot? weather;
+  final AiService? aiService;
   const ActivityPlannerCard({
     super.key,
     required this.city,
     required this.insights,
+    this.weather,
+    this.aiService,
   });
   @override
   State<ActivityPlannerCard> createState() => _ActivityPlannerCardState();
@@ -165,6 +171,21 @@ class _ActivityPlannerCardState extends State<ActivityPlannerCard> {
       duration,
       current,
     );
+    AiPlan? aiPlan;
+    if (checked && widget.weather != null) {
+      try {
+        aiPlan = AiPlan.fromWeather(
+          widget.weather!,
+          widget.insights,
+          activity,
+          start,
+          duration,
+          current,
+        );
+      } on AiException {
+        /* Keep deterministic guidance when AI inputs are incomplete. */
+      }
+    }
     final better = checked
         ? findBetterWindow(widget.insights, activity, start, duration, current)
         : null;
@@ -303,6 +324,10 @@ class _ActivityPlannerCardState extends State<ActivityPlannerCard> {
               'Planning guidance, not a safety guarantee. Recheck conditions and official advisories before leaving.',
               style: TextStyle(fontSize: 11),
             ),
+          ],
+          if (checked && widget.weather != null) ...[
+            const SizedBox(height: 12),
+            AiRecommendationPanel(plan: aiPlan, service: widget.aiService),
           ],
           const SizedBox(height: 12),
           Wrap(

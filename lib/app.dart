@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/supported_cities.dart';
 import 'services/weather_service.dart';
+import 'services/ai_service.dart';
 import 'services/weather_insights.dart';
 
 import 'screens/ai_screen.dart';
@@ -44,6 +45,7 @@ class _RootScreenState extends State<_RootScreen> {
   String selectedCity = 'Muntinlupa';
   final weatherService = WeatherService();
   final insightsService = WeatherInsightsService();
+  final aiService = AiService();
 
   @override
   void initState() {
@@ -77,6 +79,7 @@ class _RootScreenState extends State<_RootScreen> {
   void dispose() {
     weatherService.dispose();
     insightsService.dispose();
+    aiService.dispose();
     super.dispose();
   }
 
@@ -118,6 +121,7 @@ class _RootScreenState extends State<_RootScreen> {
           city: selectedCity,
           service: weatherService,
           insightsService: insightsService,
+          aiService: aiService,
         );
         break;
     }

@@ -21,8 +21,10 @@ List<WeatherTip> weatherRecommendations(WeatherSnapshot weather, DateTime now) {
   }
   final tips = <WeatherTip>[];
   final end = now.toUtc().add(const Duration(hours: 6));
+  final utc = now.toUtc();
+  final currentHour = DateTime.utc(utc.year, utc.month, utc.day, utc.hour);
   final upcoming = weather.readings.where(
-    (r) => !r.at.isBefore(now.toUtc()) && !r.at.isAfter(end),
+    (r) => !r.at.isBefore(currentHour) && !r.at.isAfter(end),
   );
   bool storm(String value) => value.toLowerCase().contains('thunder');
   bool rain(String value) =>
