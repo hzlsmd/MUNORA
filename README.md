@@ -21,10 +21,6 @@ Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
   notification and approximate hourly background checks. Native phone validation
   is still required. See [notifications](docs/NOTIFICATIONS.md).
 
-## Hybrid AI recommendations
-
-Tips can optionally generate personalized Gemini recommendations for a checked activity plan. Fixed weather rules remain visible and continue to work without AI. A Cloudflare Worker keeps the provider key off the phone and enforces free-tier request limits. Connect it using [AI setup](docs/AI_SETUP.md); without that setup, the app keeps its existing rule-based guidance. No paid billing is required or enabled by the code.
-
 ## Setup
 
 For Android builds in GitHub Codespaces, follow

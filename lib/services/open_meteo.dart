@@ -22,19 +22,18 @@ const _coordinates = <String, (double, double)>{
 
 Uri openMeteoRequest(String city) {
   final coordinates = _coordinates[city]!;
-  return Uri.parse(openMeteoEndpoint).replace(
-    queryParameters: {
-      'latitude': '${coordinates.$1}',
-      'longitude': '${coordinates.$2}',
-      'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,pressure_msl,wind_speed_10m',
-      'hourly': 'temperature_2m,weather_code',
-      'wind_speed_unit': 'ms',
-      'temperature_unit': 'celsius',
-      'timeformat': 'unixtime',
-      'timezone': 'Asia/Manila',
-      'forecast_days': '6',
-    },
-  );
+  return Uri.parse(openMeteoEndpoint).replace(queryParameters: {
+    'latitude': '${coordinates.$1}',
+    'longitude': '${coordinates.$2}',
+    'current':
+        'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,pressure_msl,wind_speed_10m',
+    'hourly': 'temperature_2m,weather_code',
+    'wind_speed_unit': 'ms',
+    'temperature_unit': 'celsius',
+    'timeformat': 'unixtime',
+    'timezone': 'Asia/Manila',
+    'forecast_days': '6',
+  });
 }
 
 const _conditions = <int, String>{
@@ -89,10 +88,7 @@ void _units(dynamic units, Map<String, String> expected) {
 }
 
 Map<String, dynamic> normalizeOpenMeteo(
-  Map<String, dynamic> json,
-  String city,
-  DateTime now,
-) {
+    Map<String, dynamic> json, String city, DateTime now) {
   _units(json['current_units'], {
     'time': 'unixtime',
     'temperature_2m': '\u00b0C',
@@ -105,7 +101,7 @@ Map<String, dynamic> normalizeOpenMeteo(
   _units(json['hourly_units'], {
     'time': 'unixtime',
     'temperature_2m': '\u00b0C',
-    'weather_code': 'wmo code',
+    'weather_code': 'wmo code'
   });
   final current = json['current'] as Map<String, dynamic>;
   final hourly = json['hourly'] as Map<String, dynamic>;
@@ -119,7 +115,6 @@ Map<String, dynamic> normalizeOpenMeteo(
     throw const FormatException('Invalid hourly arrays');
   }
   final points = <Map<String, dynamic>>[];
-  final conditionReadings = <Map<String, dynamic>>[];
   DateTime? previous;
   final hour = DateTime.utc(now.year, now.month, now.day, now.hour);
   var upcoming = 0;
@@ -139,7 +134,6 @@ Map<String, dynamic> normalizeOpenMeteo(
     }
     final condition = _condition(codes[i]);
     if (at.isBefore(hour)) continue;
-    conditionReadings.add({'at': at.toIso8601String(), 'condition': condition});
     // Retain the existing three-hour presentation; daily ranges are sampled ranges.
     if (upcoming++ % 3 == 0 && points.length < 40) {
       points.add({
@@ -147,7 +141,7 @@ Map<String, dynamic> normalizeOpenMeteo(
         'temperature': temperature,
         'low': temperature,
         'high': temperature,
-        'condition': condition,
+        'condition': condition
       });
     }
   }
@@ -165,9 +159,8 @@ Map<String, dynamic> normalizeOpenMeteo(
       'humidity': current['relative_humidity_2m'],
       'pressure': current['pressure_msl'],
       'wind': current['wind_speed_10m'],
-      'condition': _condition(current['weather_code']),
+      'condition': _condition(current['weather_code'])
     },
     'hourly': points,
-    'conditionReadings': conditionReadings,
   };
 }

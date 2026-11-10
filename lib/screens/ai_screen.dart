@@ -2,7 +2,6 @@ import 'package:material_ui/material_ui.dart';
 
 import '../services/weather_recommendations.dart';
 import '../services/weather_service.dart';
-import '../services/ai_service.dart';
 import '../services/weather_insights.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
@@ -18,14 +17,12 @@ class AIScreen extends StatefulWidget {
   final String city;
   final WeatherService service;
   final WeatherInsightsService? insightsService;
-  final AiService? aiService;
   const AIScreen({
     super.key,
     required this.navigate,
     required this.city,
     required this.service,
     this.insightsService,
-    this.aiService,
   });
   @override
   State<AIScreen> createState() => _AIScreenState();
@@ -140,8 +137,6 @@ class _AIScreenState extends State<AIScreen> {
                     key: ValueKey('planner:${widget.city}'),
                     city: widget.city,
                     insights: insight,
-                    weather: weather,
-                    aiService: widget.aiService,
                   ),
                   const SizedBox(height: 16),
                   OutdoorPanel(insights: insight),
