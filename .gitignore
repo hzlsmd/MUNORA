@@ -64,8 +64,3 @@ key.properties
 *serviceAccount*.json
 application_default_credentials.json
 .superpowers/
-
-# Hybrid recommendation gateway
-backend/node_modules/
-backend/.wrangler/
-backend/.dev.vars*
