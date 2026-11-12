@@ -64,3 +64,10 @@ key.properties
 *serviceAccount*.json
 application_default_credentials.json
 .superpowers/
+
+# Push backend tooling and task scratch
+backend/node_modules/
+backend/.wrangler/
+backend/.dev.vars*
+backend/dist/
+work/

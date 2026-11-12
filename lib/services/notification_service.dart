@@ -10,6 +10,7 @@ import '../data/supported_cities.dart';
 import '../models/weather_snapshot.dart';
 import 'notification_policy.dart';
 import 'weather_service.dart';
+import 'push_notifications.dart';
 
 const _job = 'munora.weather.tips.v1';
 const _enabledKey = 'notifications.weather.enabled';
@@ -43,6 +44,9 @@ class NotificationService {
 
   Future<bool> enabled() async {
     if (!supported) return false;
+    if (PushNotifications.configured) {
+      return PushNotifications.instance.enabled();
+    }
     await _reload();
     return _prefs.getBool(_enabledKey) ?? false;
   }
@@ -52,12 +56,16 @@ class NotificationService {
       const InitializationSettings(
         android: AndroidInitializationSettings('ic_weather_notification'),
       ),
+      onDidReceiveNotificationResponse: PushNotifications.instance.localTap,
     );
     if (ready != true) throw StateError('Notifications unavailable');
   }
 
   Future<bool> setEnabled(bool value) async {
     if (!supported) return false;
+    if (PushNotifications.configured) {
+      return PushNotifications.instance.setEnabled(value);
+    }
     await _reload();
     if (!value) {
       // Persist first so an already-running worker cannot publish after opt-out.
@@ -66,6 +74,7 @@ class NotificationService {
       await _initialize();
       await _plugin.cancel(_notificationId);
       await _plugin.cancel(_notificationId + 1);
+      await PushNotifications.instance.cleanupLegacyPush();
       return false;
     }
     await _initialize();
@@ -120,7 +129,7 @@ class NotificationService {
 
   Future<void> checkWeather() async {
     WidgetsFlutterBinding.ensureInitialized();
-    if (!await enabled()) return;
+    if (PushNotifications.configured || !await enabled()) return;
     final android = _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin

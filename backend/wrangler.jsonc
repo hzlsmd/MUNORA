@@ -1,0 +1,18 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "munora-weather",
+  "main": "src/worker.mjs",
+  "account_id": "d47c9ddabf3322c910aec7a165616679",
+  "compatibility_date": "2026-11-12",
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "munora-weather",
+      "database_id": "a0858a81-3f2c-4afb-8831-bc6ab65d4fbd",
+    },
+  ],
+  // Enable * * * * * only after schema, credentials, CPU limits and device testing.
+  "triggers": { "crons": [] },
+  "keep_vars": true,
+}

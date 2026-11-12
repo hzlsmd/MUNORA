@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "190100221536",
+    "project_id": "munora-5adfa",
+    "storage_bucket": "munora-5adfa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:190100221536:android:79f547bfa164505d01dd05",
+        "android_client_info": {
+          "package_name": "com.example.munora"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXMOvxETj1oT0-7x7hb8LJE_W0cLjWvHA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

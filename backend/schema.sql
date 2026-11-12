@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS city_alert_state (
+ city TEXT PRIMARY KEY,
+ active TEXT NOT NULL DEFAULT '[]',
+ last_sent TEXT NOT NULL DEFAULT '{}',
+ lease_token TEXT NOT NULL DEFAULT '',
+ lease_until INTEGER NOT NULL DEFAULT 0,
+ updated_at INTEGER NOT NULL DEFAULT 0
+);

@@ -1,10 +1,22 @@
-# Android weather-tip notifications
+# Android weather notifications
+
+## New optional server push mode
+
+See [free push deployment](setup/DEPLOY_WEATHER_PUSH.md). The optional Android
+`ENABLE_WEATHER_PUSH=true` build uses Cloudflare/D1 and Firebase Messaging city
+topics. Each city is checked every five minutes; the same active condition can
+remind after one hour. Deployment and real-device delivery are not yet verified.
+The button labelled "Send test notification" tests local display, not remote push.
+
+The historical implementation notes below describe the default local mode.
+Current local and push policies use one-hour suppression; historical verification
+counts are not evidence for the new implementation.
 
 ## Design and implementation plan
 
 Use flutter_local_notifications for Android permission/channel/display and workmanager for network-constrained hourly checks. This follows the existing no-login/no-paid-backend decision. Remote push would require server operations; foreground-only notices would not cover a backgrounded app.
 
-- [x] Add a tested notification policy: fresh weather only, rain/storm/heat/wind only, per-city six-hour repeat suppression, no routine/stale notifications.
+- [x] Add a tested notification policy: fresh weather only, rain/storm/heat/wind only, per-city one-hour repeat suppression, no routine/stale notifications.
 - [x] Add Android local notification delivery and persistent opt-in, permission denial/error handling, opt-out cancellation and selected-city background checks.
 - [x] Add a Tips toggle and test notification command. Request OS permission only after opt-in.
 - [x] Verify unit/widget tests, analysis and release web build; document native test limitations.

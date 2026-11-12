@@ -11,5 +11,5 @@ List<WeatherTip> notificationTips(
   if (!const {'storm', 'rain', 'heat', 'wind'}.contains(tip.id)) return false;
   final previous = lastShown[notificationKey(weather.city, tip.id)];
   return previous == null ||
-      now.difference(previous) >= const Duration(hours: 6);
+      now.difference(previous) >= const Duration(hours: 1);
 }).toList();

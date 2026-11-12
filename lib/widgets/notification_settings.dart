@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../services/notification_service.dart';
+import '../services/push_notifications.dart';
 
 class NotificationSettings extends StatefulWidget {
   const NotificationSettings({super.key});
@@ -69,6 +70,26 @@ class _NotificationSettingsState extends State<NotificationSettings> {
             title: const Text('Weather notifications'),
             value: enabled,
             onChanged: busy ? null : _change,
+          ),
+          ValueListenableBuilder<String?>(
+            valueListenable: PushNotifications.instance.status,
+            builder: (context, value, _) =>
+                value == null && !PushNotifications.configured
+                ? const SizedBox.shrink()
+                : Column(
+                    children: [
+                      Text(
+                        value ?? 'Push setup is pending.',
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      TextButton(
+                        onPressed: busy
+                            ? null
+                            : PushNotifications.instance.retry,
+                        child: const Text('Retry push connection'),
+                      ),
+                    ],
+                  ),
           ),
           if (enabled)
             Align(

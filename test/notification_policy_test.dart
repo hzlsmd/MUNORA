@@ -24,7 +24,7 @@ void main() {
   });
 
   test(
-    'six-hour suppression is per city and trigger, and clock rollback is quiet',
+    'one-hour suppression is per city and trigger, and clock rollback is quiet',
     () {
       final key = notificationKey('Muntinlupa', 'rain');
       expect(notificationTips(rain(), now, {key: now}), isEmpty);
@@ -34,7 +34,7 @@ void main() {
       );
       expect(
         notificationTips(rain(), now, {
-          key: now.subtract(const Duration(hours: 6)),
+          key: now.subtract(const Duration(hours: 1)),
         }),
         hasLength(1),
       );
