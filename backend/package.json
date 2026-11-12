@@ -8,6 +8,7 @@
     "dry-run": "wrangler deploy --dry-run"
   },
   "devDependencies": {
+    "miniflare": "5.20261110.1-beta",
     "wrangler": "^4.0.0"
   },
   "engines": {

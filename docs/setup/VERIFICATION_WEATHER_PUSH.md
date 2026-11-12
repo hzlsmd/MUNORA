@@ -29,3 +29,19 @@ ambiguous timeout (can postpone a failed send until the next hour); split cities
 across five minute slots (can wait five minutes before the first city check).
 FCM topic/normal-priority transport does not guarantee immediate delivery. Never
 label these automated model-based notices as official warnings or trained AI.
+
+## Runtime regression discovered during live setup
+
+Owner enabled the schedule and logging, created the D1 table, and deployed the
+Worker. The public health endpoint returned the expected JSON, but city rows had
+no completed-check timestamps. Reproduced the HTTP failure in real local workerd:
+Cloudflare rejects `redirect: "error"`, although Node accepts it. The shared adapter
+failed before sending weather, OAuth or FCM requests.
+
+Fix: use `redirect: "manual"` and continue rejecting all non-2xx responses. Two
+new runtime regression tests fail on the old code and pass with the fix. Complete
+backend suite now passes 14 tests. Direct Miniflare dependency is pinned to the
+same runtime version already resolved by Wrangler; CI installs backend dependencies.
+The config now preserves the owner's active cron and logs through Git deployments.
+Post-fix live weather checks, FCM authentication and phone delivery still require
+verification after the fix is merged and deployed.

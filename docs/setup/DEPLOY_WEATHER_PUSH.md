@@ -35,7 +35,9 @@ Login grants local CLI deployment access. It is separate from the GitHub plugin
 and the browser session. Confirm the account and resource names before running
 remote commands. Wrangler configuration preserves variables and references the
 existing DB; no secret value is included in the bundle. Deploying this replaces
-the Worker Hello World source. The initial config intentionally has no cron.
+the Worker source. The current config preserves the one-minute cron already
+enabled by the owner and persists invocation logs. Deployment starts scheduled
+monitoring; use an empty cron list only when deliberately pausing monitoring.
 
 Check `/health`; it describes the service, not successful FCM delivery or provider
 freshness. No `/send` or public manual-trigger endpoint exists.
@@ -70,21 +72,15 @@ topics with other subscribers.
 
 ## Enable and validate scheduled monitoring
 
-In `backend/wrangler.jsonc`, change:
-
-```json
-"triggers": {"crons": []}
-```
-
-to:
+The owner enabled this schedule in the dashboard. The current checked-in config
+preserves it so a Git-triggered deployment does not silently remove the schedule:
 
 ```json
 "triggers": {"crons": ["* * * * *"]}
 ```
 
-Then run `npm run deploy` again. Alternatively add this cron in Worker Settings >
-Trigger Events; future Wrangler deployments use the checked-in cron setting, so
-keep the config consistent.
+Logs are also enabled in the config. To deliberately pause monitoring, set
+`crons` to `[]` and deploy; restore the expression to resume.
 
 The cron runs each minute and checks 3–4 cities according to their slot. Each of
 17 cities is checked every five minutes, not every minute. Expect up to five
