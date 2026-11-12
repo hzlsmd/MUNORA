@@ -17,7 +17,10 @@ Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
 - Alerts shows app-generated rain, thunderstorm, heat and wind notices from the
   selected city's weather, with explanations and a link to official PAGASA advisories.
   No forecast triggers is explicitly not an all-clear.
-- Android weather-tip notifications can be enabled from Tips, with a test
+- Cloudflare/FCM push implementation is prepared for Android, with five-minute
+  city checks and one-hour reminders. It is not deployed or phone-validated.
+  See [free push deployment](docs/setup/DEPLOY_WEATHER_PUSH.md).
+- Default-build Android weather-tip notifications can be enabled from Tips, with a test
   notification and approximate hourly background checks. Native phone validation
   is still required. See [notifications](docs/NOTIFICATIONS.md).
 
@@ -69,8 +72,10 @@ Home and Forecast retain the existing five-day, three-hour forecast data. AQI, s
 Alerts/Tips optionally fetch hourly UV, precipitation probability and three-model
 rain agreement; missing data is explicitly unavailable. Humidity, pressure, wind and feels-like values use the existing provider.
 
+Weather refreshes every ten minutes while its screen is foregrounded and on resume.
 Alerts and Tips share the same weather client, refresh/caching and freshness checks.
-They do not introduce new background notification triggers or an official alert feed.
+The default build retains local background checks; opt-in push builds use the
+separate Cloudflare monitoring service. Neither is an official alert feed.
 The Flutter splash remains visible for 5 seconds after its first frame on startup.
 Android 12+ uses a solid lavender startup surface matching the midpoint of the
 Flutter splash gradient, with a transparent icon and no icon animation;

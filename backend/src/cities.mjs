@@ -1,0 +1,105 @@
+export const cities = Object.freeze([
+  {
+    name: "Muntinlupa",
+    slug: "muntinlupa",
+    latitude: 14.4081,
+    longitude: 121.0415,
+  },
+  {
+    name: "Manila",
+    slug: "manila",
+    latitude: 14.5995,
+    longitude: 120.9842,
+  },
+  {
+    name: "Quezon City",
+    slug: "quezon_city",
+    latitude: 14.676,
+    longitude: 121.0437,
+  },
+  {
+    name: "Makati",
+    slug: "makati",
+    latitude: 14.5547,
+    longitude: 121.0244,
+  },
+  {
+    name: "Taguig",
+    slug: "taguig",
+    latitude: 14.5176,
+    longitude: 121.0509,
+  },
+  {
+    name: "Pasig",
+    slug: "pasig",
+    latitude: 14.5764,
+    longitude: 121.0851,
+  },
+  {
+    name: "Pasay",
+    slug: "pasay",
+    latitude: 14.5378,
+    longitude: 121.0014,
+  },
+  {
+    name: "Mandaluyong",
+    slug: "mandaluyong",
+    latitude: 14.5794,
+    longitude: 121.0359,
+  },
+  {
+    name: "Marikina",
+    slug: "marikina",
+    latitude: 14.6507,
+    longitude: 121.1029,
+  },
+  {
+    name: "Caloocan",
+    slug: "caloocan",
+    latitude: 14.6488,
+    longitude: 120.9841,
+  },
+  {
+    name: "Malabon",
+    slug: "malabon",
+    latitude: 14.6681,
+    longitude: 120.9658,
+  },
+  {
+    name: "Navotas",
+    slug: "navotas",
+    latitude: 14.6667,
+    longitude: 120.9417,
+  },
+  {
+    name: "Valenzuela",
+    slug: "valenzuela",
+    latitude: 14.7011,
+    longitude: 120.983,
+  },
+  {
+    name: "Las Pinas",
+    slug: "las_pinas",
+    latitude: 14.4445,
+    longitude: 120.9939,
+  },
+  {
+    name: "Paranaque",
+    slug: "paranaque",
+    latitude: 14.4793,
+    longitude: 121.0198,
+  },
+  {
+    name: "San Juan",
+    slug: "san_juan",
+    latitude: 14.6019,
+    longitude: 121.0355,
+  },
+  {
+    name: "Pateros",
+    slug: "pateros",
+    latitude: 14.5445,
+    longitude: 121.068,
+  },
+]);
+export const topicFor = (city) => `munora_weather_${city.slug}`;
