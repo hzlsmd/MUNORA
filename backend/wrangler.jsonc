@@ -12,7 +12,8 @@
       "database_id": "a0858a81-3f2c-4afb-8831-bc6ab65d4fbd",
     },
   ],
-  // Enable * * * * * only after schema, credentials, CPU limits and device testing.
-  "triggers": { "crons": [] },
+  // Match the one-minute schedule enabled by the owner in the dashboard.
+  "triggers": { "crons": ["* * * * *"] },
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
   "keep_vars": true,
 }

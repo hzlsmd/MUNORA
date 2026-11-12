@@ -80,7 +80,9 @@ export async function readJson(
 ) {
   const response = await fetcher(url, {
     ...options,
-    redirect: "error",
+    // Workers supports manual/follow, not error. Non-2xx (including redirects)
+    // are rejected below, so credentials cannot follow a redirect.
+    redirect: "manual",
     signal: AbortSignal.timeout(10000),
   });
   if (!response.ok) {
