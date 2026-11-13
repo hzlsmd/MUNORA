@@ -104,7 +104,16 @@ class WeatherMetrics extends StatelessWidget {
       final values = [
         ('HUMIDITY', weather.humidity, 'Relative humidity', '73038'),
         ('WIND', weather.wind, 'Current wind speed', 'e1569'),
-        ('PRESSURE', weather.pressure, 'Mean sea-level pressure', '1b317'),
+        (
+          'HEAT INDEX',
+          weather.heatIndexC == null
+              ? '—'
+              : '${weather.heatIndexC!.toStringAsFixed(1)}°C',
+          weather.heatIndexC == null
+              ? 'Outside calculation range'
+              : 'Estimated in shade',
+          'f4ad0',
+        ),
         ('FEELS LIKE', weather.feelsLike, 'Apparent temperature', 'f4ad0'),
       ];
       return Wrap(

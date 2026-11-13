@@ -6,6 +6,7 @@ import '../services/weather_service.dart';
 import '../services/weather_alerts.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
+import '../widgets/ai_rain_outlook.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/weather_icon.dart';
 import '../widgets/weather_cards.dart';
@@ -212,6 +213,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
               ],
+              AIRainOutlook(weather: weather),
+              const SizedBox(height: 16),
               WeatherMetrics(weather: weather.current),
               const SizedBox(height: 16),
               FilledButton.tonal(

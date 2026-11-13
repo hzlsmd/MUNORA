@@ -59,6 +59,29 @@ void main() {
     }
   });
 
+  test('disk cache cannot masquerade as a fresh network update after restart', () async {
+    final json = weatherFixture();
+    SharedPreferences.setMockInitialValues({'weather.v1.Muntinlupa': jsonEncode(json)});
+    var calls = 0;
+    final service = WeatherService(endpoint: 'https://weather.example',
+      client: MockClient((_) async { calls++; return http.Response('{}', 503); }));
+    addTearDown(service.dispose);
+    expect(await service.cached('Muntinlupa'), isNotNull);
+    await expectLater(service.fetch('Muntinlupa'), throwsA(isA<WeatherException>()));
+    expect(calls, 1);
+  });
+
+  test('failed manual update cannot reappear as live memory on next load', () async {
+    var fail = false;
+    final service = WeatherService(endpoint: 'https://weather.example',
+      client: MockClient((_) async => fail ? http.Response('{}',503) : http.Response(jsonEncode(weatherFixture()),200)));
+    addTearDown(service.dispose);
+    await service.fetch('Muntinlupa'); fail = true;
+    await expectLater(service.fetch('Muntinlupa',force:true),throwsA(isA<WeatherException>()));
+    await expectLater(service.fetch('Muntinlupa'),throwsA(isA<WeatherException>()));
+    expect(await service.cached('Muntinlupa'),isNotNull);
+  });
+
   test('handles rate limiting, invalid JSON and provider failures', () async {
     for (final response in [
       http.Response('{}', 429),

@@ -6,6 +6,22 @@ import 'package:url_launcher/link.dart';
 import '../models/weather_snapshot.dart';
 import '../services/weather_service.dart';
 
+/// Whether the visible weather came from a successful live request.
+class WeatherLiveStatus extends InheritedWidget {
+  final bool isLive;
+  const WeatherLiveStatus({
+    super.key,
+    required this.isLive,
+    required super.child,
+  });
+  static bool of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<WeatherLiveStatus>()?.isLive ??
+      false;
+  @override
+  bool updateShouldNotify(WeatherLiveStatus oldWidget) =>
+      isLive != oldWidget.isLive;
+}
+
 class WeatherView extends StatefulWidget {
   final String city;
   final WeatherService service;
@@ -249,7 +265,12 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
             ),
           ),
         ),
-        Expanded(child: widget.builder(data!)),
+        Expanded(
+          child: WeatherLiveStatus(
+            isLive: !saved && error == null,
+            child: widget.builder(data!),
+          ),
+        ),
       ],
     );
   }

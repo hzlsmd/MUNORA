@@ -24,6 +24,25 @@ Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
   notification and approximate hourly background checks. Native phone validation
   is still required. See [notifications](docs/NOTIFICATIONS.md).
 
+## Experimental AI rain model and Heat Index
+
+The bundled logistic-regression model estimates at least 0.1 mm rain over the
+three hours after the current weather estimate. It runs locally without a paid AI
+API. Its 2025 held-out reanalysis Brier score is 0.12049, versus 0.14166 for a
+wet/dry persistence baseline. This does not establish live predictive accuracy;
+ERA5 data cover two shared grids across the 17 NCR locations. See
+[model data, evaluation and reproduction](docs/AI_RAIN_MODEL.md).
+
+Home and Tips display the experimental outlook only for fresh, supported live
+inputs and a validated model. Existing background notification rules are unchanged.
+The shared Pressure card is replaced with current Heat Index, calculated from
+unrounded temperature/humidity using NWS screening/regression and adjustments.
+It is an estimate for shade/light wind, distinct from provider Feels Like.
+Outside the conservative supported domain it displays an em dash, never an
+extrapolated extreme. MUNORA limits display to 80–112°F input temperature and
+80–140°F resulting heat index after screening; these are application limits,
+not official hazard categories. Pressure remains an internal model input.
+
 ## Setup
 
 For Android builds in GitHub Codespaces, follow

@@ -119,8 +119,10 @@ class WeatherService {
       } catch (_) {/* A successful update remains usable if storage fails. */}
       return snapshot;
     } on WeatherException {
+      _memory.remove(city);
       rethrow;
     } catch (_) {
+      _memory.remove(city);
       throw const WeatherException(
           'Unable to update weather. Check your connection and try again.');
     } finally {
@@ -147,7 +149,7 @@ class WeatherService {
           snapshot.updatedAt.isAfter(_now().toUtc())) {
         return null;
       }
-      _memory[city] = snapshot;
+      // Disk data is saved-only. Only _load may populate the live reuse cache.
       return snapshot;
     } catch (_) {
       return null;

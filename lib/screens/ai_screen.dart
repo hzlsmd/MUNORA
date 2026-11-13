@@ -5,6 +5,7 @@ import '../services/weather_service.dart';
 import '../services/weather_insights.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
+import '../widgets/ai_rain_outlook.dart';
 import '../widgets/activity_planner_card.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/guidance_card.dart';
@@ -115,6 +116,8 @@ class _AIScreenState extends State<AIScreen> {
                     'LIVE MICROCLIMATE',
                     trailing: 'Metro Manila Basin',
                   ),
+                  AIRainOutlook(weather: weather),
+                  const SizedBox(height: 16),
                   ModelAgreementPanel(insights: insight),
                   const SizedBox(height: 16),
                   const SizedBox(height: 16),
