@@ -108,12 +108,26 @@ void main() {
       (j) => j['current']['condition'] = 'x' * 121,
       (j) => j['hourly'][0]['low'] = 80,
       (j) => j['hourly'] =
-          List.generate(41, (_) => Map<String, dynamic>.from(j['hourly'][0])),
+          List.generate(121, (_) => Map<String, dynamic>.from(j['hourly'][0])),
     ]) {
       final json = weatherFixture();
       change(json);
       expect(() => WeatherSnapshot.fromJson(json), throwsFormatException);
     }
+  });
+
+  test('accepts 120 hourly points and rejects a larger unique forecast', () {
+    final now = DateTime.utc(2026, 11, 13, 4);
+    final json = weatherFixture(updatedAt: now);
+    final template = Map<String, dynamic>.from(json['hourly'][0]);
+    json['hourly'] = List.generate(120, (i) => {
+      ...template, 'at': now.add(Duration(hours: i)).toIso8601String(),
+    });
+    expect(WeatherSnapshot.fromJson(json).hourly, hasLength(120));
+    json['hourly'].add({...template,
+      'at': now.add(const Duration(hours: 120)).toIso8601String(),
+    });
+    expect(() => WeatherSnapshot.fromJson(json), throwsFormatException);
   });
 
   test(

@@ -20,7 +20,8 @@ not station observations or official warnings. The visible model timestamp and
 local fetch/update time are distinct.
 
 The adapter validates units, WMO codes, hourly array alignment/order, measurements
-and age. Six days of hourly data supply at most 40 upcoming three-hour samples;
+and age. Six days of provider data supply 120 consecutive hourly points from the
+current UTC hour;
 the UI groups the first five Philippine calendar dates. Daily ranges are sampled
 temperature ranges, not full daily extrema. Ten-minute fresh reuse and concurrent
 request sharing reduce traffic; manual refresh forces a request. Offline data is
@@ -37,7 +38,7 @@ broad distribution. No paid plan is enabled.
 
 Weather data is provided under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
 The app links to Open-Meteo and the license. Data is adapted into descriptions,
-rounded display values and three-hour samples. These are third-party estimates
+rounded display values and hourly forecast entries. These are third-party estimates
 without an availability/accuracy guarantee. See the
 [forecast API documentation](https://open-meteo.com/en/docs).
 
@@ -83,3 +84,19 @@ backend CI job were removed from the repository on 9 November 2026. Current app
 features use Open-Meteo and on-device storage. No Firebase cloud project, deployed
 rules, database or other remote resources were changed. Historical audit reports
 refer to the former implementation and are not current setup instructions.
+
+## Hourly timeline (13 November 2026)
+
+Home shows the first eight hourly entries; Forecast's Hourly tab shows up to 120
+consecutive hours. The Daily tab still groups the first five Philippine calendar
+dates, with a possibly partial first date. Values are provider estimates; hourly
+display does not mean new observations arrive each hour. Daily ranges cover the
+available hourly points, not guaranteed whole-day extrema.
+
+The default provider cache now uses `weather.openmeteo.hourly.v2.<city>` so older
+three-hour snapshots are not displayed under an Hourly label. Custom normalized
+endpoints must supply the desired hourly resolution. The parser retains bounded
+size (120 points), duplicate checks, horizons, units and freshness validation.
+App tips and backend notices inspect every available hourly point within their
+existing six-hour forecast window. Monitoring cadence and repeat cooldowns are
+independent of the display interval. No trained AI model is added by this change.

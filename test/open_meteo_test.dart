@@ -95,12 +95,45 @@ void main() {
     expect(snapshot.current.wind, '2.5 m/s');
     expect(snapshot.current.condition, 'Light rain');
     expect(snapshot.observedAt, now);
-    expect(snapshot.hourly.length, 40);
+    expect(snapshot.hourly.length, 120);
+    for (var i = 1; i < snapshot.readings.length; i++) {
+      expect(snapshot.readings[i].at.difference(snapshot.readings[i - 1].at),
+          const Duration(hours: 1));
+    }
+    expect(snapshot.hourly[1].time, 'Sat 7/11\n1 PM');
+    expect(snapshot.readings.last.at.difference(snapshot.readings.first.at),
+        const Duration(hours: 119));
     expect(snapshot.daily.length, 5);
     expect(snapshot.hourly.first.time, 'Sat 7/11\n12 PM');
     expect((await service.cached('Muntinlupa'))!.current.temp, '30');
     await service.fetch('Muntinlupa');
     expect(calls, 1);
+  });
+
+  test('old three-hour provider cache is not shown as hourly weather', () async {
+    final old = weatherFixture(updatedAt: now)..['source'] = 'Open-Meteo';
+    SharedPreferences.setMockInitialValues({
+      'weather.openmeteo.v1.Muntinlupa': jsonEncode(old),
+    });
+    final service = WeatherService(now: () => now);
+    addTearDown(service.dispose);
+    expect(await service.cached('Muntinlupa'), isNull);
+  });
+
+  test('hourly forecast retains five Philippine dates across midnight', () async {
+    final late = DateTime.utc(2026, 11, 7, 15, 30);
+    final service = WeatherService(now: () => late, client: MockClient((_) async =>
+      http.Response.bytes(utf8.encode(jsonEncode(openMeteoFixture(late))), 200)));
+    addTearDown(service.dispose);
+    final data = await service.fetch('Muntinlupa');
+    expect(data.hourly.length, 120);
+    expect(data.hourly[0].time, 'Sat 7/11\n11 PM');
+    expect(data.hourly[1].time, 'Sun 8/11\n12 AM');
+    expect(data.daily, hasLength(5));
+    expect(data.daily.first.hi, '28°C');
+    expect(data.daily.first.lo, '28°C');
+    expect(data.daily[1].hi, '31°C');
+    expect(data.daily[1].lo, '28°C');
   });
 
   test(

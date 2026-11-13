@@ -34,7 +34,7 @@ class WeatherService {
 
   bool get _openMeteo => endpoint == openMeteoEndpoint;
   String _cacheKey(String city) =>
-      _openMeteo ? 'weather.openmeteo.v1.$city' : 'weather.v1.$city';
+      _openMeteo ? 'weather.openmeteo.hourly.v2.$city' : 'weather.v1.$city';
 
   Future<WeatherSnapshot> fetch(String city, {bool force = false}) {
     final uri = Uri.tryParse(endpoint);

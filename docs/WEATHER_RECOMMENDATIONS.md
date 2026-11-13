@@ -21,8 +21,8 @@ These are application-chosen preparedness thresholds, not official hazard levels
 or medically calculated heat-index categories. Apparent temperature is the
 provider's feels-like value. Numeric checks use validated unrounded measurements.
 Rain uses condition descriptions; no rain probability is inferred or fabricated.
-The next-six-hour check includes its end time and excludes past samples. Three-hour
-samples can miss shorter events. Each matching tip states the measurement or
+The next-six-hour check includes its end time and excludes past samples. Every
+available hourly forecast point is checked; sub-hour events can still be missed. Each matching tip states the measurement or
 forecast condition/time that triggered it.
 
 ## Age and limitations
@@ -39,8 +39,8 @@ official advisory or unrestricted chatbot. Alerts now display the same rain,
 thunderstorm, heat and wind triggers as app-generated notices. Routine advice is
 not an alert, and the empty state does not claim conditions are safe. The thesis must
 describe this implementation accurately; it does not fulfill an independently
-trained predictive-model claim. Model training is intentionally excluded per the
-team's time constraint.
+trained predictive-model claim. A trained model is being planned separately;
+hourly forecast entries do not implement that model.
 
 ## Verification
 

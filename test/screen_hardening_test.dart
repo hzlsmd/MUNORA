@@ -148,7 +148,7 @@ void main() {
         await tester.tap(find.text('Muntinlupa'));
         await tester.pump();
       } else if (screen == 'forecast') {
-        await tester.tap(find.text('3-Hour'));
+        await tester.tap(find.text('Hourly'));
         await tester.pump();
       } else if (screen == 'ai') {
         expect(find.text('Rule-based weather guidance'), findsOneWidget);
