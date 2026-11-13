@@ -93,7 +93,7 @@ class WeatherSnapshot {
     }
     final current = json['current'] as Map<String, dynamic>;
     final raw = json['hourly'];
-    if (raw is! List || raw.isEmpty || raw.length > 40) {
+    if (raw is! List || raw.isEmpty || raw.length > 120) {
       throw const FormatException('Invalid forecast size');
     }
     final updatedAt = _time(json['updatedAt']);

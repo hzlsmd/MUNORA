@@ -117,7 +117,6 @@ Map<String, dynamic> normalizeOpenMeteo(
   final points = <Map<String, dynamic>>[];
   DateTime? previous;
   final hour = DateTime.utc(now.year, now.month, now.day, now.hour);
-  var upcoming = 0;
   for (var i = 0; i < times.length; i++) {
     final at = _time(times[i]);
     if (previous != null &&
@@ -134,8 +133,8 @@ Map<String, dynamic> normalizeOpenMeteo(
     }
     final condition = _condition(codes[i]);
     if (at.isBefore(hour)) continue;
-    // Retain the existing three-hour presentation; daily ranges are sampled ranges.
-    if (upcoming++ % 3 == 0 && points.length < 40) {
+    // Keep consecutive hourly estimates across a five-day (120-hour) window.
+    if (points.length < 120) {
       points.add({
         'at': at.toIso8601String(),
         'temperature': temperature,
@@ -145,7 +144,7 @@ Map<String, dynamic> normalizeOpenMeteo(
       });
     }
   }
-  if (points.length != 40) {
+  if (points.length != 120) {
     throw const FormatException('Incomplete five-day forecast');
   }
   return {

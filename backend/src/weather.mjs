@@ -44,7 +44,6 @@ export function weatherTriggers(data, now) {
   )
     throw Error("invalid_forecast");
   const hour = Math.floor(now / 3600000) * 3600;
-  let sample = 0;
   const considered = [c.weather_code];
   for (let i = 0; i < times.length; i++) {
     number(times[i], 0, 4102444800);
@@ -56,7 +55,6 @@ export function weatherTriggers(data, now) {
       throw Error("invalid_forecast");
     if (times[i] < hour) continue;
     if (
-      sample++ % 3 === 0 &&
       times[i] * 1000 >= now &&
       times[i] * 1000 <= now + 21600000
     )

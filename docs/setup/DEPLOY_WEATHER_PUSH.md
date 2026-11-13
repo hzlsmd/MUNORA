@@ -99,7 +99,7 @@ failure and malformed/stale weather must produce no notifications.
 
 ## Delivery behavior
 
-- Rain/storm: current estimate or available next-six-hour three-hour samples.
+- Rain/storm: current estimate or all available hourly samples within the next six hours.
 - Heat: temperature >=32 C or apparent temperature >=35 C.
 - Wind: >=10 m/s.
 - A newly active condition can notify immediately after a successful check.

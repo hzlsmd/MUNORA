@@ -15,6 +15,7 @@ const path = require('node:path');
     for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 900 }]) {
       const page = await browser.newPage({ viewport });
       let calls = 0;
+      let firstForecastStart;
       const errors = [];
       page.on('pageerror', e => errors.push(e.message));
       await page.route('https://api.open-meteo.com/**', route => {
@@ -33,6 +34,7 @@ const path = require('node:path');
           }
           return route.fulfill({json:{hourly,hourly_units}});
         }
+        firstForecastStart ??= start;
         return route.fulfill({ json: {
           current_units: { time: 'unixtime', temperature_2m: '\u00b0C', apparent_temperature: '\u00b0C',
             relative_humidity_2m: '%', pressure_msl: 'hPa', wind_speed_10m: 'm/s', weather_code: 'wmo code' },
@@ -53,8 +55,16 @@ const path = require('node:path');
       await page.getByText('Forecast', { exact: true }).last().click();
       await page.getByText('5-Day Forecast', { exact: true }).waitFor();
       await page.screenshot({ path: path.join(output, `forecast-${viewport.width}.png`) });
-      await page.getByText('3-Hour', { exact: true }).click();
+      await page.getByText('Hourly', { exact: true }).click();
       await page.getByText('Forecast outlook', { exact: true }).waitFor();
+      await page.getByText('1-hour intervals', { exact: true }).waitFor();
+      // One forecast hour later, displayed in PHT (UTC + 8 hours).
+      const nextHour = new Date(firstForecastStart + 9 * 3600000);
+      const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const h = nextHour.getUTCHours();
+      const nextLabel = `${weekdays[nextHour.getUTCDay()]} ${nextHour.getUTCDate()}/${nextHour.getUTCMonth() + 1}\n${h % 12 || 12} ${h < 12 ? 'AM' : 'PM'}`;
+      // Flutter exposes each forecast card as a combined accessibility group.
+      await page.getByText(nextLabel, { exact: false }).first().waitFor();
 
       await page.getByText('Alerts', { exact: true }).click();
       await page.getByText('App-generated notices from weather estimates. These are not official warnings.', { exact: true }).waitFor();

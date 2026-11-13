@@ -60,7 +60,7 @@ function dependencies(overrides = {}) {
     ...overrides,
   };
 }
-test("weather thresholds and three-hour upcoming samples match app policy", () => {
+test("weather thresholds and hourly upcoming samples match app policy", () => {
   assert.deepEqual(weatherTriggers(fixture(), now), ["rain"]);
   const f = fixture(0);
   f.current.temperature_2m = 32;
@@ -69,7 +69,7 @@ test("weather thresholds and three-hour upcoming samples match app policy", () =
   assert.deepEqual(weatherTriggers(f, now), ["storm", "heat", "wind"]);
   f.hourly.weather_code[3] = 0;
   f.hourly.weather_code[1] = 95;
-  assert.deepEqual(weatherTriggers(f, now), ["heat", "wind"]);
+  assert.deepEqual(weatherTriggers(f, now), ["storm", "heat", "wind"]);
 });
 test("stale, future, malformed and incomplete observations do not generate alerts", () => {
   for (const edit of [

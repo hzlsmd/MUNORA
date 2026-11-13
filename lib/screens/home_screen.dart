@@ -162,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     const SectionTitle(
                       'Forecast outlook',
-                      trailing: '3-hour intervals',
+                      trailing: '1-hour intervals',
                     ),
                     HourlyReel(
                       points: weather.hourly.take(8).toList(),

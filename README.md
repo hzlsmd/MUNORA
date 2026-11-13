@@ -11,7 +11,7 @@ Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
 - Weather requests contain city coordinates, with no provider credentials.
 - The city picker supports all 17 NCR cities/municipality and saves the selection locally.
 - Loading, retry, refresh and saved-weather fallback are implemented.
-- Forecast shows five days of available three-hour samples in Philippine time.
+- Forecast shows five days of available hourly forecasts in Philippine time.
 - Tips provides rule-based rain, heat, wind and thunderstorm guidance from live
   weather, with category filters and an expandable reason for each tip. [Rules and limits](docs/WEATHER_RECOMMENDATIONS.md).
 - Alerts shows app-generated rain, thunderstorm, heat and wind notices from the
@@ -68,7 +68,7 @@ Use a current Flutter stable SDK; this change was checked with Flutter 3.47.9.
 
 The Flutter UI follows the supplied MUNORA Figma Make design: pastel sky gradients,
 translucent cards, bundled Inter/Abyssinica typography and a rounded navigation bar.
-Home and Forecast retain the existing five-day, three-hour forecast data. AQI, seven-day forecasts and fabricated AI confidence are not shown.
+Home and Forecast retain the five-day overview and consecutive hourly forecast data. AQI, seven-day forecasts and fabricated AI confidence are not shown.
 Alerts/Tips optionally fetch hourly UV, precipitation probability and three-model
 rain agreement; missing data is explicitly unavailable. Humidity, pressure, wind and feels-like values use the existing provider.
 

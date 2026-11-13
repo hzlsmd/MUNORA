@@ -70,7 +70,7 @@ class _ForecastScreenState extends State<ForecastScreen> {
               segments: const [
                 ButtonSegment(
                   value: false,
-                  label: Text('3-Hour'),
+                  label: Text('Hourly'),
                   icon: Icon(Icons.schedule),
                 ),
                 ButtonSegment(
@@ -97,13 +97,13 @@ class _ForecastScreenState extends State<ForecastScreen> {
             else ...[
               const SectionTitle(
                 'Forecast outlook',
-                trailing: '3-hour intervals',
+                trailing: '1-hour intervals',
               ),
               HourlyReel(points: weather.hourly),
             ],
             const SizedBox(height: 12),
             const Text(
-              'Philippine time (PHT). Daily ranges cover available 3-hour forecasts; the first day may be partial.',
+              'Philippine time (PHT). Daily ranges cover available hourly forecasts; the first day may be partial.',
               style: TextStyle(
                 fontSize: 11,
                 height: 1.5,
