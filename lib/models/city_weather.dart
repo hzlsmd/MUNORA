@@ -8,6 +8,7 @@ class CityWeather {
   final String uv;
   final String uvNum;
   final String pressure;
+  final double? heatIndexC;
   final String visibility;
   final String max;
   final String min;
@@ -22,6 +23,7 @@ class CityWeather {
     required this.uv,
     required this.uvNum,
     required this.pressure,
+    this.heatIndexC,
     required this.visibility,
     required this.max,
     required this.min,
@@ -32,7 +34,11 @@ class HourlyPoint {
   final String time;
   final String condition;
   final String temp;
-  const HourlyPoint({required this.time, required this.condition, required this.temp});
+  const HourlyPoint({
+    required this.time,
+    required this.condition,
+    required this.temp,
+  });
 }
 
 class DailyPoint {

@@ -158,6 +158,7 @@ Map<String, dynamic> normalizeOpenMeteo(
       'humidity': current['relative_humidity_2m'],
       'pressure': current['pressure_msl'],
       'wind': current['wind_speed_10m'],
+      'weatherCode': current['weather_code'],
       'condition': _condition(current['weather_code'])
     },
     'hourly': points,

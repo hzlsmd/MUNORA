@@ -1,4 +1,5 @@
 import 'city_weather.dart';
+import '../services/heat_index.dart';
 
 double _number(dynamic value, double min, double max) {
   if (value is! num || !value.isFinite || value < min || value > max) {
@@ -44,6 +45,8 @@ class WeatherSnapshot {
   final double temperature;
   final double feelsLike;
   final double windSpeed;
+  final double? humidity, pressure;
+  final int? weatherCode;
   final List<ForecastReading> readings;
   final String city;
   final String source;
@@ -59,6 +62,9 @@ class WeatherSnapshot {
     required this.temperature,
     required this.feelsLike,
     required this.windSpeed,
+    this.humidity,
+    this.pressure,
+    this.weatherCode,
     required this.readings,
     this.source = 'OpenWeatherMap',
     required this.updatedAt,
@@ -122,6 +128,41 @@ class WeatherSnapshot {
     if (entries.map((item) => item['at']).toSet().length != entries.length) {
       throw const FormatException('Duplicate forecast timestamps');
     }
+    final rawCode = current['weatherCode'];
+    if (rawCode != null &&
+        (rawCode is! int ||
+            !const {
+              0,
+              1,
+              2,
+              3,
+              45,
+              48,
+              51,
+              53,
+              55,
+              56,
+              57,
+              61,
+              63,
+              65,
+              66,
+              67,
+              71,
+              73,
+              75,
+              77,
+              80,
+              81,
+              82,
+              85,
+              86,
+              95,
+              96,
+              99,
+            }.contains(rawCode))) {
+      throw const FormatException('Invalid weather code');
+    }
     _number(current['temperature'], -100, 70);
     _number(current['feelsLike'], -120, 100);
     _number(current['humidity'], 0, 100);
@@ -139,6 +180,9 @@ class WeatherSnapshot {
       temperature: (current['temperature'] as num).toDouble(),
       feelsLike: (current['feelsLike'] as num).toDouble(),
       windSpeed: (current['wind'] as num).toDouble(),
+      humidity: (current['humidity'] as num).toDouble(),
+      pressure: (current['pressure'] as num).toDouble(),
+      weatherCode: rawCode as int?,
       readings: List.unmodifiable(
         entries.map(
           (item) =>
@@ -158,6 +202,10 @@ class WeatherSnapshot {
         humidity: '${current['humidity']}%',
         wind: '${current['wind']} m/s',
         pressure: '${current['pressure']} hPa',
+        heatIndexC: heatIndexCelsius(
+          (current['temperature'] as num).toDouble(),
+          (current['humidity'] as num).toDouble(),
+        ),
         uv: 'Unavailable',
         uvNum: '--',
         visibility: '--',

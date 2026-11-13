@@ -1,0 +1,5777 @@
+{
+  "schemaVersion": 1,
+  "modelVersion": "ncr-era5-logistic-v1",
+  "validationPassed": true,
+  "featureNames": [
+    "temperatureC",
+    "humidityPercent",
+    "pressureHpa",
+    "windSpeedMs",
+    "wetFlag",
+    "hourSin",
+    "hourCos",
+    "seasonSin",
+    "seasonCos",
+    "city_muntinlupa",
+    "city_manila",
+    "city_quezon_city",
+    "city_makati",
+    "city_taguig",
+    "city_pasig",
+    "city_pasay",
+    "city_mandaluyong",
+    "city_marikina",
+    "city_caloocan",
+    "city_malabon",
+    "city_navotas",
+    "city_valenzuela",
+    "city_las_pinas",
+    "city_paranaque",
+    "city_san_juan",
+    "city_pateros"
+  ],
+  "means": [
+    28.17415039758544,
+    78.00462381522563,
+    1010.1516154776003,
+    2.4947168626465777,
+    0.3382045134516345,
+    5.578741204412193e-05,
+    -9.662663208325025e-05,
+    2.2640244489569927e-06,
+    -0.0007786234317574678,
+    0.04545454545437976,
+    0.04545454545437976,
+    0.08333333333303015,
+    0.04545454545437976,
+    0.04545454545437976,
+    0.04545454545437976,
+    0.04545454545437976,
+    0.04545454545437976,
+    0.08333333333301625,
+    0.08333333333303015,
+    0.08333333333303015,
+    0.08333333333303015,
+    0.08333333333303015,
+    0.04545454545437976,
+    0.04545454545437976,
+    0.04545454545437976,
+    0.04545454545437976
+  ],
+  "scales": [
+    2.1258942512362533,
+    9.155344604386864,
+    2.7173037263295465,
+    1.6304622940260478,
+    0.4730985315261545,
+    0.7071251584285138,
+    0.7070883946617141,
+    0.707382008048559,
+    0.7068310182964416,
+    0.2082988952244648,
+    0.20829889522437509,
+    0.2763853991957512,
+    0.20829889522422815,
+    0.20829889522486622,
+    0.2082988952246655,
+    0.20829889522460998,
+    0.20829889522431871,
+    0.2763853991949993,
+    0.27638539919560684,
+    0.2763853991956405,
+    0.2763853991956927,
+    0.27638539919579025,
+    0.20829889522417216,
+    0.2082988952245545,
+    0.2082988952248107,
+    0.208298895224721
+  ],
+  "coefficients": [
+    0.5265029239771281,
+    1.2650583767329429,
+    -0.158710134241262,
+    -0.0476236558904751,
+    1.227726838555767,
+    -0.08912706343400499,
+    -0.8227470980071375,
+    -0.1816536324375552,
+    -0.3786550805845977,
+    0.012559602090287138,
+    0.0125596020902814,
+    -0.017353584115472456,
+    0.012559602090272497,
+    0.012559602090311305,
+    0.01255960209029923,
+    0.012559602090295734,
+    0.012559602090278165,
+    -0.017353584115424855,
+    -0.017353584115463363,
+    -0.01735358411546548,
+    -0.017353584115468886,
+    -0.017353584115475263,
+    0.01255960209026912,
+    0.012559602090292504,
+    0.012559602090308012,
+    0.012559602090302477
+  ],
+  "intercept": -0.22615373698168015,
+  "units": {
+    "temperatureC": "\u00b0C",
+    "humidityPercent": "%",
+    "pressureHpa": "hPa",
+    "windSpeedMs": "m/s"
+  },
+  "bounds": {
+    "temperatureC": {
+      "min": 21.8,
+      "max": 36.3
+    },
+    "humidityPercent": {
+      "min": 43.0,
+      "max": 98.0
+    },
+    "pressureHpa": {
+      "min": 988.8,
+      "max": 1019.2
+    },
+    "windSpeedMs": {
+      "min": 0.0,
+      "max": 11.42
+    }
+  },
+  "cities": [
+    "muntinlupa",
+    "manila",
+    "quezon_city",
+    "makati",
+    "taguig",
+    "pasig",
+    "pasay",
+    "mandaluyong",
+    "marikina",
+    "caloocan",
+    "malabon",
+    "navotas",
+    "valenzuela",
+    "las_pinas",
+    "paranaque",
+    "san_juan",
+    "pateros"
+  ],
+  "wetWeatherCodes": [
+    51,
+    53,
+    55,
+    56,
+    57,
+    61,
+    63,
+    65,
+    66,
+    67,
+    71,
+    73,
+    75,
+    77,
+    80,
+    81,
+    82,
+    85,
+    86,
+    95,
+    96,
+    99
+  ],
+  "acceptedWeatherCodes": [
+    0,
+    1,
+    2,
+    3,
+    45,
+    48,
+    51,
+    53,
+    55,
+    56,
+    57,
+    61,
+    63,
+    65,
+    66,
+    67,
+    71,
+    73,
+    75,
+    77,
+    80,
+    81,
+    82,
+    85,
+    86,
+    95,
+    96,
+    99
+  ],
+  "trainingDates": {
+    "train": "2021\u20132023",
+    "validation": "2024",
+    "test": "2025"
+  },
+  "target": {
+    "hours": 3,
+    "rainThresholdMm": 0.1,
+    "definition": "sum rainfall t+1,t+2,t+3 >= 0.1 mm",
+    "futureOffsets": [
+      1,
+      2,
+      3
+    ]
+  },
+  "regularizationC": 1.0,
+  "internalValidation": [
+    [
+      0.12521779213045267,
+      0.01
+    ],
+    [
+      0.1248775728175909,
+      0.1
+    ],
+    [
+      0.12484686650721398,
+      1.0
+    ]
+  ],
+  "baselines": {
+    "climatology": 0.446892719869087,
+    "dry": 0.22021276595744682,
+    "wet": 0.8904579723191178
+  },
+  "metrics": {
+    "train": {
+      "brier": 0.12222073356998985,
+      "logLoss": 0.3888780048336253,
+      "rocAuc": 0.9048461274097316,
+      "prAuc": 0.8913147671765782,
+      "precisionAt60": 0.8795135338744884,
+      "recallAt60": 0.6959039427748873,
+      "prevalence": 0.446892719869087,
+      "cityRows": 446709,
+      "uniqueGridHours": 52554,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "count": 96397,
+          "meanProbability": 0.055244194130762404,
+          "observedFrequency": 0.04538202446374756
+        },
+        {
+          "lower": 0.1,
+          "count": 72085,
+          "meanProbability": 0.1449081026645238,
+          "observedFrequency": 0.12280285035629454
+        },
+        {
+          "lower": 0.2,
+          "count": 45222,
+          "meanProbability": 0.24650531129559877,
+          "observedFrequency": 0.26138279932546377
+        },
+        {
+          "lower": 0.30000000000000004,
+          "count": 33036,
+          "meanProbability": 0.34696553248103845,
+          "observedFrequency": 0.4025157232704403
+        },
+        {
+          "lower": 0.4,
+          "count": 24479,
+          "meanProbability": 0.4476609726481203,
+          "observedFrequency": 0.4730809308787773
+        },
+        {
+          "lower": 0.5,
+          "count": 19077,
+          "meanProbability": 0.5488772681710945,
+          "observedFrequency": 0.5824765310683951
+        },
+        {
+          "lower": 0.6000000000000001,
+          "count": 14379,
+          "meanProbability": 0.6468323248283873,
+          "observedFrequency": 0.6885150812064967
+        },
+        {
+          "lower": 0.7000000000000001,
+          "count": 12731,
+          "meanProbability": 0.7536595773878694,
+          "observedFrequency": 0.7796161482461945
+        },
+        {
+          "lower": 0.8,
+          "count": 33971,
+          "meanProbability": 0.8612200657988561,
+          "observedFrequency": 0.8186785891703925
+        },
+        {
+          "lower": 0.9,
+          "count": 95332,
+          "meanProbability": 0.9507459056303753,
+          "observedFrequency": 0.9435612082670907
+        }
+      ],
+      "climatologyBrier": 0.24717961679709674,
+      "persistenceBrier": 0.1466322658149187,
+      "byCity": {
+        "muntinlupa": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.3948361209265286,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.0544641490372655,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.14512023010682962,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.24672201564620141,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.34706777973946606,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.44743457699501515,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.549226341760124,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291908,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499721,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.861488678046748,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "manila": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.3948361209265286,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.054464149037265416,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.14512023010682942,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.24672201564620114,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.34706777973946573,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.4474345769950147,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.5492263417601235,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291903,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499719,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.8614886780467477,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "quezon_city": {
+          "brier": 0.12026449847850959,
+          "logLoss": 0.38291988874072214,
+          "rocAuc": 0.908471658754801,
+          "prAuc": 0.897988954268897,
+          "precisionAt60": 0.8819791666666255,
+          "recallAt60": 0.7082984774969903,
+          "prevalence": 0.45492255584731894,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5541,
+              "meanProbability": 0.05605239461474831,
+              "observedFrequency": 0.04150875293268363
+            },
+            {
+              "lower": 0.1,
+              "count": 4107,
+              "meanProbability": 0.14468533527746152,
+              "observedFrequency": 0.12515217920623325
+            },
+            {
+              "lower": 0.2,
+              "count": 2697,
+              "meanProbability": 0.2462931869034628,
+              "observedFrequency": 0.26177233963663327
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 1788,
+              "meanProbability": 0.3468495607583925,
+              "observedFrequency": 0.39988814317673377
+            },
+            {
+              "lower": 0.4,
+              "count": 1438,
+              "meanProbability": 0.44788784061482734,
+              "observedFrequency": 0.47079276773296236
+            },
+            {
+              "lower": 0.5,
+              "count": 1106,
+              "meanProbability": 0.5485203041302334,
+              "observedFrequency": 0.5831826401446655
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 917,
+              "meanProbability": 0.6477273223253899,
+              "observedFrequency": 0.6804798255179936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 778,
+              "meanProbability": 0.7539394076166333,
+              "observedFrequency": 0.7866323907455012
+            },
+            {
+              "lower": 0.8,
+              "count": 2063,
+              "meanProbability": 0.8609644740186277,
+              "observedFrequency": 0.8225884634028116
+            },
+            {
+              "lower": 0.9,
+              "count": 5842,
+              "meanProbability": 0.9511921786564275,
+              "observedFrequency": 0.9472783293392674
+            }
+          ]
+        },
+        "makati": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.39483612092652853,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.054464149037265416,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.1451202301068294,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.24672201564620114,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.3470677797394657,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.4474345769950147,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.5492263417601235,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291903,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499719,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.8614886780467477,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "taguig": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.3948361209265286,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.0544641490372655,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.1451202301068296,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.24672201564620141,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.347067779739466,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.44743457699501504,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.549226341760124,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291907,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499721,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.8614886780467479,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "pasig": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.3948361209265286,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.0544641490372655,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.14512023010682962,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.24672201564620141,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.34706777973946606,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.44743457699501515,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.549226341760124,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291907,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499721,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.861488678046748,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "pasay": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.39483612092652853,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.05446414903726547,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.1451202301068295,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.2467220156462013,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.3470677797394659,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.44743457699501493,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.5492263417601239,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291906,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499721,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.8614886780467479,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "mandaluyong": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.39483612092652853,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.05446414903726547,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.14512023010682953,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.2467220156462013,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.3470677797394659,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.44743457699501493,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.5492263417601237,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291906,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499721,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.8614886780467479,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "marikina": {
+          "brier": 0.12026449847850959,
+          "logLoss": 0.38291988874072214,
+          "rocAuc": 0.908471658754801,
+          "prAuc": 0.897988954268897,
+          "precisionAt60": 0.8819791666666255,
+          "recallAt60": 0.7082984774969903,
+          "prevalence": 0.45492255584731894,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5541,
+              "meanProbability": 0.05605239461474839,
+              "observedFrequency": 0.04150875293268363
+            },
+            {
+              "lower": 0.1,
+              "count": 4107,
+              "meanProbability": 0.14468533527746172,
+              "observedFrequency": 0.12515217920623325
+            },
+            {
+              "lower": 0.2,
+              "count": 2697,
+              "meanProbability": 0.24629318690346305,
+              "observedFrequency": 0.26177233963663327
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 1788,
+              "meanProbability": 0.3468495607583928,
+              "observedFrequency": 0.39988814317673377
+            },
+            {
+              "lower": 0.4,
+              "count": 1438,
+              "meanProbability": 0.44788784061482767,
+              "observedFrequency": 0.47079276773296236
+            },
+            {
+              "lower": 0.5,
+              "count": 1106,
+              "meanProbability": 0.5485203041302338,
+              "observedFrequency": 0.5831826401446655
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 917,
+              "meanProbability": 0.6477273223253901,
+              "observedFrequency": 0.6804798255179936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 778,
+              "meanProbability": 0.7539394076166335,
+              "observedFrequency": 0.7866323907455012
+            },
+            {
+              "lower": 0.8,
+              "count": 2063,
+              "meanProbability": 0.8609644740186279,
+              "observedFrequency": 0.8225884634028116
+            },
+            {
+              "lower": 0.9,
+              "count": 5842,
+              "meanProbability": 0.9511921786564276,
+              "observedFrequency": 0.9472783293392674
+            }
+          ]
+        },
+        "caloocan": {
+          "brier": 0.12026449847850959,
+          "logLoss": 0.38291988874072214,
+          "rocAuc": 0.908471658754801,
+          "prAuc": 0.897988954268897,
+          "precisionAt60": 0.8819791666666255,
+          "recallAt60": 0.7082984774969903,
+          "prevalence": 0.45492255584731894,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5541,
+              "meanProbability": 0.05605239461474832,
+              "observedFrequency": 0.04150875293268363
+            },
+            {
+              "lower": 0.1,
+              "count": 4107,
+              "meanProbability": 0.14468533527746155,
+              "observedFrequency": 0.12515217920623325
+            },
+            {
+              "lower": 0.2,
+              "count": 2697,
+              "meanProbability": 0.2462931869034628,
+              "observedFrequency": 0.26177233963663327
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 1788,
+              "meanProbability": 0.3468495607583925,
+              "observedFrequency": 0.39988814317673377
+            },
+            {
+              "lower": 0.4,
+              "count": 1438,
+              "meanProbability": 0.4478878406148274,
+              "observedFrequency": 0.47079276773296236
+            },
+            {
+              "lower": 0.5,
+              "count": 1106,
+              "meanProbability": 0.5485203041302334,
+              "observedFrequency": 0.5831826401446655
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 917,
+              "meanProbability": 0.6477273223253899,
+              "observedFrequency": 0.6804798255179936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 778,
+              "meanProbability": 0.7539394076166333,
+              "observedFrequency": 0.7866323907455012
+            },
+            {
+              "lower": 0.8,
+              "count": 2063,
+              "meanProbability": 0.8609644740186277,
+              "observedFrequency": 0.8225884634028116
+            },
+            {
+              "lower": 0.9,
+              "count": 5842,
+              "meanProbability": 0.9511921786564275,
+              "observedFrequency": 0.9472783293392674
+            }
+          ]
+        },
+        "malabon": {
+          "brier": 0.12026449847850959,
+          "logLoss": 0.38291988874072214,
+          "rocAuc": 0.908471658754801,
+          "prAuc": 0.897988954268897,
+          "precisionAt60": 0.8819791666666255,
+          "recallAt60": 0.7082984774969903,
+          "prevalence": 0.45492255584731894,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5541,
+              "meanProbability": 0.05605239461474832,
+              "observedFrequency": 0.04150875293268363
+            },
+            {
+              "lower": 0.1,
+              "count": 4107,
+              "meanProbability": 0.14468533527746152,
+              "observedFrequency": 0.12515217920623325
+            },
+            {
+              "lower": 0.2,
+              "count": 2697,
+              "meanProbability": 0.2462931869034628,
+              "observedFrequency": 0.26177233963663327
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 1788,
+              "meanProbability": 0.3468495607583925,
+              "observedFrequency": 0.39988814317673377
+            },
+            {
+              "lower": 0.4,
+              "count": 1438,
+              "meanProbability": 0.4478878406148274,
+              "observedFrequency": 0.47079276773296236
+            },
+            {
+              "lower": 0.5,
+              "count": 1106,
+              "meanProbability": 0.5485203041302334,
+              "observedFrequency": 0.5831826401446655
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 917,
+              "meanProbability": 0.6477273223253899,
+              "observedFrequency": 0.6804798255179936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 778,
+              "meanProbability": 0.7539394076166333,
+              "observedFrequency": 0.7866323907455012
+            },
+            {
+              "lower": 0.8,
+              "count": 2063,
+              "meanProbability": 0.8609644740186277,
+              "observedFrequency": 0.8225884634028116
+            },
+            {
+              "lower": 0.9,
+              "count": 5842,
+              "meanProbability": 0.9511921786564275,
+              "observedFrequency": 0.9472783293392674
+            }
+          ]
+        },
+        "navotas": {
+          "brier": 0.12026449847850959,
+          "logLoss": 0.38291988874072214,
+          "rocAuc": 0.908471658754801,
+          "prAuc": 0.897988954268897,
+          "precisionAt60": 0.8819791666666255,
+          "recallAt60": 0.7082984774969903,
+          "prevalence": 0.45492255584731894,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5541,
+              "meanProbability": 0.0560523946147483,
+              "observedFrequency": 0.04150875293268363
+            },
+            {
+              "lower": 0.1,
+              "count": 4107,
+              "meanProbability": 0.14468533527746147,
+              "observedFrequency": 0.12515217920623325
+            },
+            {
+              "lower": 0.2,
+              "count": 2697,
+              "meanProbability": 0.24629318690346266,
+              "observedFrequency": 0.26177233963663327
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 1788,
+              "meanProbability": 0.3468495607583924,
+              "observedFrequency": 0.39988814317673377
+            },
+            {
+              "lower": 0.4,
+              "count": 1438,
+              "meanProbability": 0.4478878406148273,
+              "observedFrequency": 0.47079276773296236
+            },
+            {
+              "lower": 0.5,
+              "count": 1106,
+              "meanProbability": 0.5485203041302333,
+              "observedFrequency": 0.5831826401446655
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 917,
+              "meanProbability": 0.6477273223253898,
+              "observedFrequency": 0.6804798255179936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 778,
+              "meanProbability": 0.7539394076166333,
+              "observedFrequency": 0.7866323907455012
+            },
+            {
+              "lower": 0.8,
+              "count": 2063,
+              "meanProbability": 0.8609644740186277,
+              "observedFrequency": 0.8225884634028116
+            },
+            {
+              "lower": 0.9,
+              "count": 5842,
+              "meanProbability": 0.9511921786564275,
+              "observedFrequency": 0.9472783293392674
+            }
+          ]
+        },
+        "valenzuela": {
+          "brier": 0.12026449847850962,
+          "logLoss": 0.38291988874072214,
+          "rocAuc": 0.908471658754801,
+          "prAuc": 0.897988954268897,
+          "precisionAt60": 0.8819791666666255,
+          "recallAt60": 0.7082984774969903,
+          "prevalence": 0.45492255584731894,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5541,
+              "meanProbability": 0.05605239461474825,
+              "observedFrequency": 0.04150875293268363
+            },
+            {
+              "lower": 0.1,
+              "count": 4107,
+              "meanProbability": 0.14468533527746139,
+              "observedFrequency": 0.12515217920623325
+            },
+            {
+              "lower": 0.2,
+              "count": 2697,
+              "meanProbability": 0.24629318690346255,
+              "observedFrequency": 0.26177233963663327
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 1788,
+              "meanProbability": 0.3468495607583922,
+              "observedFrequency": 0.39988814317673377
+            },
+            {
+              "lower": 0.4,
+              "count": 1438,
+              "meanProbability": 0.44788784061482706,
+              "observedFrequency": 0.47079276773296236
+            },
+            {
+              "lower": 0.5,
+              "count": 1106,
+              "meanProbability": 0.5485203041302331,
+              "observedFrequency": 0.5831826401446655
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 917,
+              "meanProbability": 0.6477273223253895,
+              "observedFrequency": 0.6804798255179936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 778,
+              "meanProbability": 0.753939407616633,
+              "observedFrequency": 0.7866323907455012
+            },
+            {
+              "lower": 0.8,
+              "count": 2063,
+              "meanProbability": 0.8609644740186275,
+              "observedFrequency": 0.8225884634028116
+            },
+            {
+              "lower": 0.9,
+              "count": 5842,
+              "meanProbability": 0.9511921786564275,
+              "observedFrequency": 0.9472783293392674
+            }
+          ]
+        },
+        "las_pinas": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.39483612092652853,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.054464149037265416,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.1451202301068294,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.24672201564620114,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.3470677797394657,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.4474345769950147,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.5492263417601235,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291903,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499719,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.8614886780467477,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "paranaque": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.3948361209265286,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.05446414903726549,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.1451202301068296,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.24672201564620141,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.347067779739466,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.44743457699501504,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.549226341760124,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291907,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499721,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.8614886780467479,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "san_juan": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.3948361209265286,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.054464149037265513,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.14512023010682965,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.24672201564620147,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.3470677797394661,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.44743457699501515,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.549226341760124,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291908,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499723,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.861488678046748,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        },
+        "pateros": {
+          "brier": 0.12417696866147011,
+          "logLoss": 0.3948361209265286,
+          "rocAuc": 0.9011204995267441,
+          "prAuc": 0.8842685027742258,
+          "precisionAt60": 0.8768785483691054,
+          "recallAt60": 0.6830558446062599,
+          "prevalence": 0.4388628838908552,
+          "cityRows": 26277,
+          "uniqueGridHours": 26277,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5741,
+              "meanProbability": 0.054464149037265486,
+              "observedFrequency": 0.04912036230621841
+            },
+            {
+              "lower": 0.1,
+              "count": 4313,
+              "meanProbability": 0.14512023010682956,
+              "observedFrequency": 0.12056573150939019
+            },
+            {
+              "lower": 0.2,
+              "count": 2640,
+              "meanProbability": 0.24672201564620136,
+              "observedFrequency": 0.26098484848484843
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2028,
+              "meanProbability": 0.34706777973946595,
+              "observedFrequency": 0.4048323471400396
+            },
+            {
+              "lower": 0.4,
+              "count": 1441,
+              "meanProbability": 0.44743457699501504,
+              "observedFrequency": 0.4753643303261623
+            },
+            {
+              "lower": 0.5,
+              "count": 1131,
+              "meanProbability": 0.5492263417601239,
+              "observedFrequency": 0.581786030061892
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 807,
+              "meanProbability": 0.6458153326291906,
+              "observedFrequency": 0.6976456009913259
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 733,
+              "meanProbability": 0.7533625679499721,
+              "observedFrequency": 0.772169167803547
+            },
+            {
+              "lower": 0.8,
+              "count": 1963,
+              "meanProbability": 0.8614886780467479,
+              "observedFrequency": 0.8145695364238412
+            },
+            {
+              "lower": 0.9,
+              "count": 5480,
+              "meanProbability": 0.9502701525248641,
+              "observedFrequency": 0.9395985401459853
+            }
+          ]
+        }
+      },
+      "bySeason": {
+        "wetMayOct": {
+          "brier": 0.13739264658590025,
+          "logLoss": 0.42339426512346595,
+          "rocAuc": 0.866904311025142,
+          "prAuc": 0.9286650955500937,
+          "precisionAt60": 0.8937182327640832,
+          "recallAt60": 0.7738531851259243,
+          "prevalence": 0.6688934178743962,
+          "cityRows": 225216,
+          "uniqueGridHours": 26496,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 5374,
+              "meanProbability": 0.07754340130470815,
+              "observedFrequency": 0.03154574132492113
+            },
+            {
+              "lower": 0.1,
+              "count": 15553,
+              "meanProbability": 0.15201781284167068,
+              "observedFrequency": 0.15466816647919013
+            },
+            {
+              "lower": 0.2,
+              "count": 19108,
+              "meanProbability": 0.25131641805297195,
+              "observedFrequency": 0.28859964093357265
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 20923,
+              "meanProbability": 0.3496413664881774,
+              "observedFrequency": 0.4158623583718002
+            },
+            {
+              "lower": 0.4,
+              "count": 19385,
+              "meanProbability": 0.44889744311661123,
+              "observedFrequency": 0.4555066079295154
+            },
+            {
+              "lower": 0.5,
+              "count": 15807,
+              "meanProbability": 0.5488035188136751,
+              "observedFrequency": 0.5627355950457729
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 10572,
+              "meanProbability": 0.6442555897701071,
+              "observedFrequency": 0.6591263650546022
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 5308,
+              "meanProbability": 0.751876710663952,
+              "observedFrequency": 0.7854938271604939
+            },
+            {
+              "lower": 0.8,
+              "count": 22258,
+              "meanProbability": 0.8660271273827684,
+              "observedFrequency": 0.8242009132420092
+            },
+            {
+              "lower": 0.9,
+              "count": 90928,
+              "meanProbability": 0.9519964601339479,
+              "observedFrequency": 0.9450315164998148
+            }
+          ]
+        },
+        "dryNovApr": {
+          "brier": 0.10679380106290715,
+          "logLoss": 0.35378157254259696,
+          "rocAuc": 0.8625865482228198,
+          "prAuc": 0.7005425912724856,
+          "precisionAt60": 0.8121717639790437,
+          "recallAt60": 0.45618601422861055,
+          "prevalence": 0.22116048814183745,
+          "cityRows": 221493,
+          "uniqueGridHours": 26058,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 91023,
+              "meanProbability": 0.05391646147220853,
+              "observedFrequency": 0.046205860255447026
+            },
+            {
+              "lower": 0.1,
+              "count": 56532,
+              "meanProbability": 0.14300490111454378,
+              "observedFrequency": 0.11427280939476062
+            },
+            {
+              "lower": 0.2,
+              "count": 26114,
+              "meanProbability": 0.24305753199182664,
+              "observedFrequency": 0.24187841749758765
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 12113,
+              "meanProbability": 0.3425157680434862,
+              "observedFrequency": 0.38032100488485693
+            },
+            {
+              "lower": 0.4,
+              "count": 5094,
+              "meanProbability": 0.4430521254174566,
+              "observedFrequency": 0.5385878489326765
+            },
+            {
+              "lower": 0.5,
+              "count": 3270,
+              "meanProbability": 0.5492376696361677,
+              "observedFrequency": 0.6789473684210526
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 3807,
+              "meanProbability": 0.6543060224408641,
+              "observedFrequency": 0.7737556561085973
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 7423,
+              "meanProbability": 0.7549982768514827,
+              "observedFrequency": 0.7752027809965237
+            },
+            {
+              "lower": 0.8,
+              "count": 11713,
+              "meanProbability": 0.8521836152677251,
+              "observedFrequency": 0.8082975679542204
+            },
+            {
+              "lower": 0.9,
+              "count": 4404,
+              "meanProbability": 0.9254818944233664,
+              "observedFrequency": 0.9138576779026218
+            }
+          ]
+        }
+      }
+    },
+    "validation": {
+      "brier": 0.10714661231321772,
+      "logLoss": 0.34677391062787694,
+      "rocAuc": 0.9252544511115004,
+      "prAuc": 0.9078720894920099,
+      "precisionAt60": 0.886252175288747,
+      "recallAt60": 0.7369113391212857,
+      "prevalence": 0.432866416125726,
+      "cityRows": 149277,
+      "uniqueGridHours": 17562,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "count": 40864,
+          "meanProbability": 0.05020868651126681,
+          "observedFrequency": 0.02761382799325464
+        },
+        {
+          "lower": 0.1,
+          "count": 20132,
+          "meanProbability": 0.1440460811087437,
+          "observedFrequency": 0.12682519816437213
+        },
+        {
+          "lower": 0.2,
+          "count": 10874,
+          "meanProbability": 0.24875835892442533,
+          "observedFrequency": 0.25327174749807546
+        },
+        {
+          "lower": 0.30000000000000004,
+          "count": 9096,
+          "meanProbability": 0.34910978056259645,
+          "observedFrequency": 0.32987747408105556
+        },
+        {
+          "lower": 0.4,
+          "count": 8209,
+          "meanProbability": 0.4504782457512309,
+          "observedFrequency": 0.4716981132075473
+        },
+        {
+          "lower": 0.5,
+          "count": 6661,
+          "meanProbability": 0.5486963841154024,
+          "observedFrequency": 0.55470737913486
+        },
+        {
+          "lower": 0.6000000000000001,
+          "count": 4862,
+          "meanProbability": 0.6451380780362842,
+          "observedFrequency": 0.6707105719237435
+        },
+        {
+          "lower": 0.7000000000000001,
+          "count": 3563,
+          "meanProbability": 0.7513080456929057,
+          "observedFrequency": 0.739952718676123
+        },
+        {
+          "lower": 0.8,
+          "count": 8881,
+          "meanProbability": 0.8628432574280361,
+          "observedFrequency": 0.8341187558906692
+        },
+        {
+          "lower": 0.9,
+          "count": 36135,
+          "meanProbability": 0.953210791984897,
+          "observedFrequency": 0.9429577464788732
+        }
+      ],
+      "climatologyBrier": 0.2456898191128968,
+      "persistenceBrier": 0.134276381264383,
+      "byCity": {
+        "muntinlupa": {
+          "brier": 0.10703084753299145,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.04830560818139941,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.144027252663084,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.24873019258166423,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.34968131420772147,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.44950048374267704,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208647,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660807,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077246,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456949,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "manila": {
+          "brier": 0.10703084753299144,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.048305608181399326,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.1440272526630838,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.2487301925816639,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.34968131420772114,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.44950048374267654,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208645,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660805,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077243,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456948,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "quezon_city": {
+          "brier": 0.10726237709344397,
+          "logLoss": 0.34485335185493426,
+          "rocAuc": 0.9276398353563172,
+          "prAuc": 0.9113352696272352,
+          "precisionAt60": 0.8875077688005037,
+          "recallAt60": 0.7370322580645541,
+          "prevalence": 0.44129370231180953,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2264,
+              "meanProbability": 0.05229333061818874,
+              "observedFrequency": 0.018551236749116608
+            },
+            {
+              "lower": 0.1,
+              "count": 1247,
+              "meanProbability": 0.14406344495197446,
+              "observedFrequency": 0.12590216519647154
+            },
+            {
+              "lower": 0.2,
+              "count": 683,
+              "meanProbability": 0.2487837622438117,
+              "observedFrequency": 0.27818448023426057
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 515,
+              "meanProbability": 0.3485038439213574,
+              "observedFrequency": 0.37864077669902924
+            },
+            {
+              "lower": 0.4,
+              "count": 457,
+              "meanProbability": 0.4515415886795707,
+              "observedFrequency": 0.4638949671772429
+            },
+            {
+              "lower": 0.5,
+              "count": 397,
+              "meanProbability": 0.5502242453002266,
+              "observedFrequency": 0.5617128463476069
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 297,
+              "meanProbability": 0.6475482542775535,
+              "observedFrequency": 0.6936026936026936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 218,
+              "meanProbability": 0.7510118656285114,
+              "observedFrequency": 0.724770642201835
+            },
+            {
+              "lower": 0.8,
+              "count": 558,
+              "meanProbability": 0.8614892354981399,
+              "observedFrequency": 0.8207885304659499
+            },
+            {
+              "lower": 0.9,
+              "count": 2145,
+              "meanProbability": 0.9532979488011398,
+              "observedFrequency": 0.9482517482517484
+            }
+          ]
+        },
+        "makati": {
+          "brier": 0.10703084753299143,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.048305608181399326,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.14402725266308378,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.2487301925816639,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.34968131420772103,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.44950048374267654,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208643,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660805,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077243,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456948,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "taguig": {
+          "brier": 0.10703084753299144,
+          "logLoss": 0.3486944694008195,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.04830560818139939,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.14402725266308397,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.24873019258166415,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.34968131420772136,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.44950048374267687,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208647,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660807,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077246,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456949,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "pasig": {
+          "brier": 0.10703084753299145,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.048305608181399395,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.144027252663084,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.24873019258166423,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.34968131420772147,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.4495004837426769,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208647,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660807,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077246,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456949,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "pasay": {
+          "brier": 0.10703084753299144,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.048305608181399375,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.14402725266308392,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.2487301925816641,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.3496813142077213,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.4495004837426768,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208645,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660806,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077245,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456949,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "mandaluyong": {
+          "brier": 0.10703084753299144,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.048305608181399375,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.14402725266308392,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.2487301925816641,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.3496813142077213,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.4495004837426768,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208645,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660806,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077245,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456948,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "marikina": {
+          "brier": 0.10726237709344395,
+          "logLoss": 0.3448533518549343,
+          "rocAuc": 0.9276398353563172,
+          "prAuc": 0.9113352696272352,
+          "precisionAt60": 0.8875077688005037,
+          "recallAt60": 0.7370322580645541,
+          "prevalence": 0.44129370231180953,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2264,
+              "meanProbability": 0.052293330618188805,
+              "observedFrequency": 0.018551236749116608
+            },
+            {
+              "lower": 0.1,
+              "count": 1247,
+              "meanProbability": 0.14406344495197462,
+              "observedFrequency": 0.12590216519647154
+            },
+            {
+              "lower": 0.2,
+              "count": 683,
+              "meanProbability": 0.24878376224381196,
+              "observedFrequency": 0.27818448023426057
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 515,
+              "meanProbability": 0.34850384392135775,
+              "observedFrequency": 0.37864077669902924
+            },
+            {
+              "lower": 0.4,
+              "count": 457,
+              "meanProbability": 0.4515415886795711,
+              "observedFrequency": 0.4638949671772429
+            },
+            {
+              "lower": 0.5,
+              "count": 397,
+              "meanProbability": 0.5502242453002268,
+              "observedFrequency": 0.5617128463476069
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 297,
+              "meanProbability": 0.6475482542775538,
+              "observedFrequency": 0.6936026936026936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 218,
+              "meanProbability": 0.7510118656285117,
+              "observedFrequency": 0.724770642201835
+            },
+            {
+              "lower": 0.8,
+              "count": 558,
+              "meanProbability": 0.86148923549814,
+              "observedFrequency": 0.8207885304659499
+            },
+            {
+              "lower": 0.9,
+              "count": 2145,
+              "meanProbability": 0.9532979488011399,
+              "observedFrequency": 0.9482517482517484
+            }
+          ]
+        },
+        "caloocan": {
+          "brier": 0.10726237709344397,
+          "logLoss": 0.34485335185493426,
+          "rocAuc": 0.9276398353563172,
+          "prAuc": 0.9113352696272352,
+          "precisionAt60": 0.8875077688005037,
+          "recallAt60": 0.7370322580645541,
+          "prevalence": 0.44129370231180953,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2264,
+              "meanProbability": 0.05229333061818874,
+              "observedFrequency": 0.018551236749116608
+            },
+            {
+              "lower": 0.1,
+              "count": 1247,
+              "meanProbability": 0.14406344495197446,
+              "observedFrequency": 0.12590216519647154
+            },
+            {
+              "lower": 0.2,
+              "count": 683,
+              "meanProbability": 0.2487837622438117,
+              "observedFrequency": 0.27818448023426057
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 515,
+              "meanProbability": 0.3485038439213574,
+              "observedFrequency": 0.37864077669902924
+            },
+            {
+              "lower": 0.4,
+              "count": 457,
+              "meanProbability": 0.45154158867957084,
+              "observedFrequency": 0.4638949671772429
+            },
+            {
+              "lower": 0.5,
+              "count": 397,
+              "meanProbability": 0.5502242453002266,
+              "observedFrequency": 0.5617128463476069
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 297,
+              "meanProbability": 0.6475482542775535,
+              "observedFrequency": 0.6936026936026936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 218,
+              "meanProbability": 0.7510118656285114,
+              "observedFrequency": 0.724770642201835
+            },
+            {
+              "lower": 0.8,
+              "count": 558,
+              "meanProbability": 0.8614892354981399,
+              "observedFrequency": 0.8207885304659499
+            },
+            {
+              "lower": 0.9,
+              "count": 2145,
+              "meanProbability": 0.9532979488011398,
+              "observedFrequency": 0.9482517482517484
+            }
+          ]
+        },
+        "malabon": {
+          "brier": 0.10726237709344397,
+          "logLoss": 0.34485335185493426,
+          "rocAuc": 0.9276398353563172,
+          "prAuc": 0.9113352696272352,
+          "precisionAt60": 0.8875077688005037,
+          "recallAt60": 0.7370322580645541,
+          "prevalence": 0.44129370231180953,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2264,
+              "meanProbability": 0.05229333061818874,
+              "observedFrequency": 0.018551236749116608
+            },
+            {
+              "lower": 0.1,
+              "count": 1247,
+              "meanProbability": 0.14406344495197448,
+              "observedFrequency": 0.12590216519647154
+            },
+            {
+              "lower": 0.2,
+              "count": 683,
+              "meanProbability": 0.2487837622438117,
+              "observedFrequency": 0.27818448023426057
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 515,
+              "meanProbability": 0.3485038439213574,
+              "observedFrequency": 0.37864077669902924
+            },
+            {
+              "lower": 0.4,
+              "count": 457,
+              "meanProbability": 0.4515415886795707,
+              "observedFrequency": 0.4638949671772429
+            },
+            {
+              "lower": 0.5,
+              "count": 397,
+              "meanProbability": 0.5502242453002266,
+              "observedFrequency": 0.5617128463476069
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 297,
+              "meanProbability": 0.6475482542775535,
+              "observedFrequency": 0.6936026936026936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 218,
+              "meanProbability": 0.7510118656285114,
+              "observedFrequency": 0.724770642201835
+            },
+            {
+              "lower": 0.8,
+              "count": 558,
+              "meanProbability": 0.8614892354981399,
+              "observedFrequency": 0.8207885304659499
+            },
+            {
+              "lower": 0.9,
+              "count": 2145,
+              "meanProbability": 0.9532979488011398,
+              "observedFrequency": 0.9482517482517484
+            }
+          ]
+        },
+        "navotas": {
+          "brier": 0.10726237709344395,
+          "logLoss": 0.34485335185493426,
+          "rocAuc": 0.9276398353563172,
+          "prAuc": 0.9113352696272352,
+          "precisionAt60": 0.8875077688005037,
+          "recallAt60": 0.7370322580645541,
+          "prevalence": 0.44129370231180953,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2264,
+              "meanProbability": 0.05229333061818872,
+              "observedFrequency": 0.018551236749116608
+            },
+            {
+              "lower": 0.1,
+              "count": 1247,
+              "meanProbability": 0.14406344495197443,
+              "observedFrequency": 0.12590216519647154
+            },
+            {
+              "lower": 0.2,
+              "count": 683,
+              "meanProbability": 0.2487837622438116,
+              "observedFrequency": 0.27818448023426057
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 515,
+              "meanProbability": 0.34850384392135736,
+              "observedFrequency": 0.37864077669902924
+            },
+            {
+              "lower": 0.4,
+              "count": 457,
+              "meanProbability": 0.4515415886795706,
+              "observedFrequency": 0.4638949671772429
+            },
+            {
+              "lower": 0.5,
+              "count": 397,
+              "meanProbability": 0.5502242453002264,
+              "observedFrequency": 0.5617128463476069
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 297,
+              "meanProbability": 0.6475482542775534,
+              "observedFrequency": 0.6936026936026936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 218,
+              "meanProbability": 0.7510118656285114,
+              "observedFrequency": 0.724770642201835
+            },
+            {
+              "lower": 0.8,
+              "count": 558,
+              "meanProbability": 0.8614892354981399,
+              "observedFrequency": 0.8207885304659499
+            },
+            {
+              "lower": 0.9,
+              "count": 2145,
+              "meanProbability": 0.9532979488011398,
+              "observedFrequency": 0.9482517482517484
+            }
+          ]
+        },
+        "valenzuela": {
+          "brier": 0.10726237709344397,
+          "logLoss": 0.34485335185493426,
+          "rocAuc": 0.9276398353563172,
+          "prAuc": 0.9113352696272352,
+          "precisionAt60": 0.8875077688005037,
+          "recallAt60": 0.7370322580645541,
+          "prevalence": 0.44129370231180953,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2264,
+              "meanProbability": 0.05229333061818867,
+              "observedFrequency": 0.018551236749116608
+            },
+            {
+              "lower": 0.1,
+              "count": 1247,
+              "meanProbability": 0.14406344495197432,
+              "observedFrequency": 0.12590216519647154
+            },
+            {
+              "lower": 0.2,
+              "count": 683,
+              "meanProbability": 0.24878376224381146,
+              "observedFrequency": 0.27818448023426057
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 515,
+              "meanProbability": 0.34850384392135714,
+              "observedFrequency": 0.37864077669902924
+            },
+            {
+              "lower": 0.4,
+              "count": 457,
+              "meanProbability": 0.45154158867957045,
+              "observedFrequency": 0.4638949671772429
+            },
+            {
+              "lower": 0.5,
+              "count": 397,
+              "meanProbability": 0.5502242453002262,
+              "observedFrequency": 0.5617128463476069
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 297,
+              "meanProbability": 0.6475482542775532,
+              "observedFrequency": 0.6936026936026936
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 218,
+              "meanProbability": 0.7510118656285113,
+              "observedFrequency": 0.724770642201835
+            },
+            {
+              "lower": 0.8,
+              "count": 558,
+              "meanProbability": 0.8614892354981398,
+              "observedFrequency": 0.8207885304659499
+            },
+            {
+              "lower": 0.9,
+              "count": 2145,
+              "meanProbability": 0.9532979488011398,
+              "observedFrequency": 0.9482517482517484
+            }
+          ]
+        },
+        "las_pinas": {
+          "brier": 0.10703084753299144,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.048305608181399326,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.14402725266308378,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.2487301925816639,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.34968131420772103,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.44950048374267654,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208643,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660805,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077243,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456948,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "paranaque": {
+          "brier": 0.10703084753299144,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.04830560818139939,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.14402725266308397,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.24873019258166415,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.34968131420772136,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.44950048374267687,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208647,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660807,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077246,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456949,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "san_juan": {
+          "brier": 0.10703084753299145,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.048305608181399416,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.144027252663084,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.24873019258166423,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.34968131420772147,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.44950048374267704,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208647,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660809,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077246,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456949,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        },
+        "pateros": {
+          "brier": 0.10703084753299144,
+          "logLoss": 0.34869446940081944,
+          "rocAuc": 0.9230494188389271,
+          "prAuc": 0.9044517198564413,
+          "precisionAt60": 0.884950048340341,
+          "recallAt60": 0.7367856184599428,
+          "prevalence": 0.4244391299396424,
+          "cityRows": 8781,
+          "uniqueGridHours": 8781,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2480,
+              "meanProbability": 0.04830560818139939,
+              "observedFrequency": 0.035887096774193536
+            },
+            {
+              "lower": 0.1,
+              "count": 1150,
+              "meanProbability": 0.14402725266308392,
+              "observedFrequency": 0.12782608695652173
+            },
+            {
+              "lower": 0.2,
+              "count": 616,
+              "meanProbability": 0.2487301925816641,
+              "observedFrequency": 0.22564935064935063
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 546,
+              "meanProbability": 0.3496813142077213,
+              "observedFrequency": 0.2838827838827838
+            },
+            {
+              "lower": 0.4,
+              "count": 497,
+              "meanProbability": 0.44950048374267687,
+              "observedFrequency": 0.47887323943661975
+            },
+            {
+              "lower": 0.5,
+              "count": 389,
+              "meanProbability": 0.5471371016208647,
+              "observedFrequency": 0.5475578406169666
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 280,
+              "meanProbability": 0.6425815696660807,
+              "observedFrequency": 0.6464285714285714
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7516230079077245,
+              "observedFrequency": 0.75609756097561
+            },
+            {
+              "lower": 0.8,
+              "count": 503,
+              "meanProbability": 0.8643453334456949,
+              "observedFrequency": 0.8489065606361832
+            },
+            {
+              "lower": 0.9,
+              "count": 2115,
+              "meanProbability": 0.9531223989017572,
+              "observedFrequency": 0.9375886524822694
+            }
+          ]
+        }
+      },
+      "bySeason": {
+        "wetMayOct": {
+          "brier": 0.13266275203092748,
+          "logLoss": 0.4108091980968236,
+          "rocAuc": 0.8722815882412767,
+          "prAuc": 0.9346080531179046,
+          "precisionAt60": 0.8953575439909048,
+          "recallAt60": 0.7965029142380057,
+          "prevalence": 0.6799139492753623,
+          "cityRows": 75072,
+          "uniqueGridHours": 8832,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 2643,
+              "meanProbability": 0.07129354995490987,
+              "observedFrequency": 0.026845637583892617
+            },
+            {
+              "lower": 0.1,
+              "count": 4344,
+              "meanProbability": 0.14961236343895812,
+              "observedFrequency": 0.2043222003929273
+            },
+            {
+              "lower": 0.2,
+              "count": 4667,
+              "meanProbability": 0.2530702158253475,
+              "observedFrequency": 0.3079710144927536
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 6268,
+              "meanProbability": 0.35141245022248074,
+              "observedFrequency": 0.33516483516483514
+            },
+            {
+              "lower": 0.4,
+              "count": 6405,
+              "meanProbability": 0.45085450634930574,
+              "observedFrequency": 0.4577181208053691
+            },
+            {
+              "lower": 0.5,
+              "count": 5618,
+              "meanProbability": 0.5490875128872836,
+              "observedFrequency": 0.5395136778115501
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 3676,
+              "meanProbability": 0.643508794207666,
+              "observedFrequency": 0.6575963718820862
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 1676,
+              "meanProbability": 0.7467474794175466,
+              "observedFrequency": 0.7064676616915423
+            },
+            {
+              "lower": 0.8,
+              "count": 6167,
+              "meanProbability": 0.8662789957189723,
+              "observedFrequency": 0.8288409703504043
+            },
+            {
+              "lower": 0.9,
+              "count": 33608,
+              "meanProbability": 0.9547120272569793,
+              "observedFrequency": 0.9439110661950482
+            }
+          ]
+        },
+        "dryNovApr": {
+          "brier": 0.08133234587715671,
+          "logLoss": 0.2819904445424546,
+          "rocAuc": 0.8976505172630085,
+          "prAuc": 0.7487367865883744,
+          "precisionAt60": 0.8365679264555571,
+          "recallAt60": 0.5128365685661144,
+          "prevalence": 0.1829324169530355,
+          "cityRows": 74205,
+          "uniqueGridHours": 8730,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 38221,
+              "meanProbability": 0.04879544105328085,
+              "observedFrequency": 0.02766531713900135
+            },
+            {
+              "lower": 0.1,
+              "count": 15788,
+              "meanProbability": 0.14254542554408317,
+              "observedFrequency": 0.10593220338983052
+            },
+            {
+              "lower": 0.2,
+              "count": 6207,
+              "meanProbability": 0.24557208715828205,
+              "observedFrequency": 0.21285140562248997
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 2828,
+              "meanProbability": 0.3440757159608074,
+              "observedFrequency": 0.31831831831831825
+            },
+            {
+              "lower": 0.4,
+              "count": 1804,
+              "meanProbability": 0.449137029743739,
+              "observedFrequency": 0.521531100478469
+            },
+            {
+              "lower": 0.5,
+              "count": 1043,
+              "meanProbability": 0.546685737772451,
+              "observedFrequency": 0.6328125
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 1186,
+              "meanProbability": 0.6504212704511416,
+              "observedFrequency": 0.7132352941176471
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 1887,
+              "meanProbability": 0.755437207050325,
+              "observedFrequency": 0.7702702702702703
+            },
+            {
+              "lower": 0.8,
+              "count": 2714,
+              "meanProbability": 0.8548516655412822,
+              "observedFrequency": 0.8463949843260187
+            },
+            {
+              "lower": 0.9,
+              "count": 2527,
+              "meanProbability": 0.9335356621607191,
+              "observedFrequency": 0.9304635761589404
+            }
+          ]
+        }
+      }
+    },
+    "test": {
+      "brier": 0.12048617356109881,
+      "logLoss": 0.3830763876843131,
+      "rocAuc": 0.9089211816715544,
+      "prAuc": 0.9190758401650793,
+      "precisionAt60": 0.904894327030054,
+      "recallAt60": 0.7273133661155756,
+      "prevalence": 0.5109055612652735,
+      "cityRows": 148869,
+      "uniqueGridHours": 17514,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "count": 26151,
+          "meanProbability": 0.06180802882473757,
+          "observedFrequency": 0.057310322370563334
+        },
+        {
+          "lower": 0.1,
+          "count": 23194,
+          "meanProbability": 0.1445551108379437,
+          "observedFrequency": 0.15280322462440454
+        },
+        {
+          "lower": 0.2,
+          "count": 14568,
+          "meanProbability": 0.24586179215841353,
+          "observedFrequency": 0.2712060011540681
+        },
+        {
+          "lower": 0.30000000000000004,
+          "count": 9779,
+          "meanProbability": 0.34869529269141675,
+          "observedFrequency": 0.3968253968253968
+        },
+        {
+          "lower": 0.4,
+          "count": 8080,
+          "meanProbability": 0.4488959403128668,
+          "observedFrequency": 0.5286486486486487
+        },
+        {
+          "lower": 0.5,
+          "count": 6305,
+          "meanProbability": 0.549253095758982,
+          "observedFrequency": 0.6
+        },
+        {
+          "lower": 0.6000000000000001,
+          "count": 4787,
+          "meanProbability": 0.6466311829989119,
+          "observedFrequency": 0.7117437722419929
+        },
+        {
+          "lower": 0.7000000000000001,
+          "count": 3875,
+          "meanProbability": 0.7534539530666873,
+          "observedFrequency": 0.7663157894736844
+        },
+        {
+          "lower": 0.8,
+          "count": 12716,
+          "meanProbability": 0.8613655490063404,
+          "observedFrequency": 0.8580946035976017
+        },
+        {
+          "lower": 0.9,
+          "count": 39414,
+          "meanProbability": 0.9518310858629818,
+          "observedFrequency": 0.9574559518693597
+        }
+      ],
+      "climatologyBrier": 0.25397871259710264,
+      "persistenceBrier": 0.14166010648462835,
+      "byCity": {
+        "muntinlupa": {
+          "brier": 0.12248233668943291,
+          "logLoss": 0.3898198144084754,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.061505134855329296,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.14325283621525658,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167032,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.3486266019536857,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.4483955016931096,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450308,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694915,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477609,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.8605581270387861,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "manila": {
+          "brier": 0.12248233668943295,
+          "logLoss": 0.38981981440847546,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532921,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.1432528362152564,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167004,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.34862660195368544,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.4483955016931091,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450305,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694912,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477606,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.860558127038786,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "quezon_city": {
+          "brier": 0.11849001043276464,
+          "logLoss": 0.3763329609601507,
+          "rocAuc": 0.9122353563627893,
+          "prAuc": 0.9239783508324275,
+          "precisionAt60": 0.908296943231462,
+          "recallAt60": 0.7356321839080949,
+          "prevalence": 0.5166152792052072,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1526,
+              "meanProbability": 0.06211469408210048,
+              "observedFrequency": 0.053079947575360414
+            },
+            {
+              "lower": 0.1,
+              "count": 1365,
+              "meanProbability": 0.14585643141328827,
+              "observedFrequency": 0.15824175824175823
+            },
+            {
+              "lower": 0.2,
+              "count": 899,
+              "meanProbability": 0.24624654749819552,
+              "observedFrequency": 0.28698553948832034
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 539,
+              "meanProbability": 0.3487711201291719,
+              "observedFrequency": 0.4007421150278294
+            },
+            {
+              "lower": 0.4,
+              "count": 419,
+              "meanProbability": 0.44950028862216806,
+              "observedFrequency": 0.5274463007159903
+            },
+            {
+              "lower": 0.5,
+              "count": 345,
+              "meanProbability": 0.5499599567788985,
+              "observedFrequency": 0.591304347826087
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 279,
+              "meanProbability": 0.6470738734369978,
+              "observedFrequency": 0.6989247311827956
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 270,
+              "meanProbability": 0.7553985981143905,
+              "observedFrequency": 0.7703703703703705
+            },
+            {
+              "lower": 0.8,
+              "count": 759,
+              "meanProbability": 0.8621548864238965,
+              "observedFrequency": 0.8577075098814229
+            },
+            {
+              "lower": 0.9,
+              "count": 2356,
+              "meanProbability": 0.9523106045153035,
+              "observedFrequency": 0.965195246179966
+            }
+          ]
+        },
+        "makati": {
+          "brier": 0.12248233668943295,
+          "logLoss": 0.38981981440847546,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532921,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.1432528362152564,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989166993,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.34862660195368533,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.4483955016931091,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450303,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694911,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477604,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.860558127038786,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "taguig": {
+          "brier": 0.12248233668943294,
+          "logLoss": 0.3898198144084754,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532929,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.14325283621525656,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167027,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.3486266019536857,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.4483955016931095,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450307,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694915,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477609,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.8605581270387861,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "pasig": {
+          "brier": 0.12248233668943291,
+          "logLoss": 0.3898198144084754,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532929,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.14325283621525658,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167032,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.3486266019536857,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.4483955016931096,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450308,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694915,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477609,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.8605581270387861,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "pasay": {
+          "brier": 0.12248233668943291,
+          "logLoss": 0.3898198144084754,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532926,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.1432528362152565,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167018,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.3486266019536856,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.4483955016931094,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450306,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694915,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477606,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.8605581270387861,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "mandaluyong": {
+          "brier": 0.12248233668943291,
+          "logLoss": 0.3898198144084754,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532926,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.1432528362152565,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167013,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.3486266019536856,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.44839550169310943,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450306,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694915,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477607,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.8605581270387861,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "marikina": {
+          "brier": 0.11849001043276462,
+          "logLoss": 0.3763329609601507,
+          "rocAuc": 0.9122353563627893,
+          "prAuc": 0.9239783508324275,
+          "precisionAt60": 0.908296943231462,
+          "recallAt60": 0.7356321839080949,
+          "prevalence": 0.5166152792052072,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1526,
+              "meanProbability": 0.06211469408210056,
+              "observedFrequency": 0.053079947575360414
+            },
+            {
+              "lower": 0.1,
+              "count": 1365,
+              "meanProbability": 0.14585643141328844,
+              "observedFrequency": 0.15824175824175823
+            },
+            {
+              "lower": 0.2,
+              "count": 899,
+              "meanProbability": 0.24624654749819574,
+              "observedFrequency": 0.28698553948832034
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 539,
+              "meanProbability": 0.3487711201291722,
+              "observedFrequency": 0.4007421150278294
+            },
+            {
+              "lower": 0.4,
+              "count": 419,
+              "meanProbability": 0.44950028862216834,
+              "observedFrequency": 0.5274463007159903
+            },
+            {
+              "lower": 0.5,
+              "count": 345,
+              "meanProbability": 0.5499599567788989,
+              "observedFrequency": 0.591304347826087
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 279,
+              "meanProbability": 0.6470738734369982,
+              "observedFrequency": 0.6989247311827956
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 270,
+              "meanProbability": 0.7553985981143908,
+              "observedFrequency": 0.7703703703703705
+            },
+            {
+              "lower": 0.8,
+              "count": 759,
+              "meanProbability": 0.8621548864238966,
+              "observedFrequency": 0.8577075098814229
+            },
+            {
+              "lower": 0.9,
+              "count": 2356,
+              "meanProbability": 0.9523106045153035,
+              "observedFrequency": 0.965195246179966
+            }
+          ]
+        },
+        "caloocan": {
+          "brier": 0.11849001043276464,
+          "logLoss": 0.3763329609601507,
+          "rocAuc": 0.9122353563627893,
+          "prAuc": 0.9239783508324275,
+          "precisionAt60": 0.908296943231462,
+          "recallAt60": 0.7356321839080949,
+          "prevalence": 0.5166152792052072,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1526,
+              "meanProbability": 0.062114694082100484,
+              "observedFrequency": 0.053079947575360414
+            },
+            {
+              "lower": 0.1,
+              "count": 1365,
+              "meanProbability": 0.14585643141328827,
+              "observedFrequency": 0.15824175824175823
+            },
+            {
+              "lower": 0.2,
+              "count": 899,
+              "meanProbability": 0.24624654749819552,
+              "observedFrequency": 0.28698553948832034
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 539,
+              "meanProbability": 0.3487711201291719,
+              "observedFrequency": 0.4007421150278294
+            },
+            {
+              "lower": 0.4,
+              "count": 419,
+              "meanProbability": 0.44950028862216806,
+              "observedFrequency": 0.5274463007159903
+            },
+            {
+              "lower": 0.5,
+              "count": 345,
+              "meanProbability": 0.5499599567788985,
+              "observedFrequency": 0.591304347826087
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 279,
+              "meanProbability": 0.6470738734369978,
+              "observedFrequency": 0.6989247311827956
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 270,
+              "meanProbability": 0.7553985981143907,
+              "observedFrequency": 0.7703703703703705
+            },
+            {
+              "lower": 0.8,
+              "count": 759,
+              "meanProbability": 0.8621548864238965,
+              "observedFrequency": 0.8577075098814229
+            },
+            {
+              "lower": 0.9,
+              "count": 2356,
+              "meanProbability": 0.9523106045153035,
+              "observedFrequency": 0.965195246179966
+            }
+          ]
+        },
+        "malabon": {
+          "brier": 0.11849001043276464,
+          "logLoss": 0.3763329609601507,
+          "rocAuc": 0.9122353563627893,
+          "prAuc": 0.9239783508324275,
+          "precisionAt60": 0.908296943231462,
+          "recallAt60": 0.7356321839080949,
+          "prevalence": 0.5166152792052072,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1526,
+              "meanProbability": 0.062114694082100484,
+              "observedFrequency": 0.053079947575360414
+            },
+            {
+              "lower": 0.1,
+              "count": 1365,
+              "meanProbability": 0.14585643141328827,
+              "observedFrequency": 0.15824175824175823
+            },
+            {
+              "lower": 0.2,
+              "count": 899,
+              "meanProbability": 0.24624654749819552,
+              "observedFrequency": 0.28698553948832034
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 539,
+              "meanProbability": 0.3487711201291719,
+              "observedFrequency": 0.4007421150278294
+            },
+            {
+              "lower": 0.4,
+              "count": 419,
+              "meanProbability": 0.44950028862216806,
+              "observedFrequency": 0.5274463007159903
+            },
+            {
+              "lower": 0.5,
+              "count": 345,
+              "meanProbability": 0.5499599567788985,
+              "observedFrequency": 0.591304347826087
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 279,
+              "meanProbability": 0.6470738734369978,
+              "observedFrequency": 0.6989247311827956
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 270,
+              "meanProbability": 0.7553985981143907,
+              "observedFrequency": 0.7703703703703705
+            },
+            {
+              "lower": 0.8,
+              "count": 759,
+              "meanProbability": 0.8621548864238965,
+              "observedFrequency": 0.8577075098814229
+            },
+            {
+              "lower": 0.9,
+              "count": 2356,
+              "meanProbability": 0.9523106045153035,
+              "observedFrequency": 0.965195246179966
+            }
+          ]
+        },
+        "navotas": {
+          "brier": 0.11849001043276464,
+          "logLoss": 0.3763329609601507,
+          "rocAuc": 0.9122353563627893,
+          "prAuc": 0.9239783508324275,
+          "precisionAt60": 0.908296943231462,
+          "recallAt60": 0.7356321839080949,
+          "prevalence": 0.5166152792052072,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1526,
+              "meanProbability": 0.06211469408210044,
+              "observedFrequency": 0.053079947575360414
+            },
+            {
+              "lower": 0.1,
+              "count": 1365,
+              "meanProbability": 0.14585643141328822,
+              "observedFrequency": 0.15824175824175823
+            },
+            {
+              "lower": 0.2,
+              "count": 899,
+              "meanProbability": 0.2462465474981954,
+              "observedFrequency": 0.28698553948832034
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 539,
+              "meanProbability": 0.3487711201291718,
+              "observedFrequency": 0.4007421150278294
+            },
+            {
+              "lower": 0.4,
+              "count": 419,
+              "meanProbability": 0.4495002886221679,
+              "observedFrequency": 0.5274463007159903
+            },
+            {
+              "lower": 0.5,
+              "count": 345,
+              "meanProbability": 0.5499599567788984,
+              "observedFrequency": 0.591304347826087
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 279,
+              "meanProbability": 0.6470738734369976,
+              "observedFrequency": 0.6989247311827956
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 270,
+              "meanProbability": 0.7553985981143905,
+              "observedFrequency": 0.7703703703703705
+            },
+            {
+              "lower": 0.8,
+              "count": 759,
+              "meanProbability": 0.8621548864238965,
+              "observedFrequency": 0.8577075098814229
+            },
+            {
+              "lower": 0.9,
+              "count": 2356,
+              "meanProbability": 0.9523106045153035,
+              "observedFrequency": 0.965195246179966
+            }
+          ]
+        },
+        "valenzuela": {
+          "brier": 0.11849001043276464,
+          "logLoss": 0.3763329609601507,
+          "rocAuc": 0.9122353563627893,
+          "prAuc": 0.9239783508324275,
+          "precisionAt60": 0.908296943231462,
+          "recallAt60": 0.7356321839080949,
+          "prevalence": 0.5166152792052072,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1526,
+              "meanProbability": 0.0621146940821004,
+              "observedFrequency": 0.053079947575360414
+            },
+            {
+              "lower": 0.1,
+              "count": 1365,
+              "meanProbability": 0.14585643141328813,
+              "observedFrequency": 0.15824175824175823
+            },
+            {
+              "lower": 0.2,
+              "count": 899,
+              "meanProbability": 0.24624654749819527,
+              "observedFrequency": 0.28698553948832034
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 539,
+              "meanProbability": 0.3487711201291716,
+              "observedFrequency": 0.4007421150278294
+            },
+            {
+              "lower": 0.4,
+              "count": 419,
+              "meanProbability": 0.4495002886221677,
+              "observedFrequency": 0.5274463007159903
+            },
+            {
+              "lower": 0.5,
+              "count": 345,
+              "meanProbability": 0.5499599567788982,
+              "observedFrequency": 0.591304347826087
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 279,
+              "meanProbability": 0.6470738734369975,
+              "observedFrequency": 0.6989247311827956
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 270,
+              "meanProbability": 0.7553985981143904,
+              "observedFrequency": 0.7703703703703705
+            },
+            {
+              "lower": 0.8,
+              "count": 759,
+              "meanProbability": 0.8621548864238964,
+              "observedFrequency": 0.8577075098814229
+            },
+            {
+              "lower": 0.9,
+              "count": 2356,
+              "meanProbability": 0.9523106045153035,
+              "observedFrequency": 0.965195246179966
+            }
+          ]
+        },
+        "las_pinas": {
+          "brier": 0.12248233668943295,
+          "logLoss": 0.38981981440847546,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532921,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.1432528362152564,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.34862660195368533,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.4483955016931091,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450303,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694911,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477604,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.860558127038786,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "paranaque": {
+          "brier": 0.12248233668943294,
+          "logLoss": 0.3898198144084754,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532929,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.14325283621525656,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167027,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.3486266019536857,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.4483955016931095,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450307,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694915,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477609,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.8605581270387861,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "san_juan": {
+          "brier": 0.12248233668943291,
+          "logLoss": 0.3898198144084754,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532931,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.14325283621525658,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167032,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.3486266019536857,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.4483955016931096,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450308,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694916,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477609,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.8605581270387862,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        },
+        "pateros": {
+          "brier": 0.12248233668943291,
+          "logLoss": 0.3898198144084754,
+          "rocAuc": 0.9056125057331651,
+          "prAuc": 0.9140594986288044,
+          "precisionAt60": 0.9013605442177114,
+          "recallAt60": 0.7188065099458057,
+          "prevalence": 0.5051958433253396,
+          "cityRows": 8757,
+          "uniqueGridHours": 8757,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1545,
+              "meanProbability": 0.06150513485532929,
+              "observedFrequency": 0.06148867313915856
+            },
+            {
+              "lower": 0.1,
+              "count": 1364,
+              "meanProbability": 0.14325283621525653,
+              "observedFrequency": 0.1473607038123167
+            },
+            {
+              "lower": 0.2,
+              "count": 834,
+              "meanProbability": 0.24544704989167024,
+              "observedFrequency": 0.25419664268585135
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 595,
+              "meanProbability": 0.3486266019536856,
+              "observedFrequency": 0.3932773109243697
+            },
+            {
+              "lower": 0.4,
+              "count": 506,
+              "meanProbability": 0.44839550169310943,
+              "observedFrequency": 0.5296442687747036
+            },
+            {
+              "lower": 0.5,
+              "count": 385,
+              "meanProbability": 0.5486196748450307,
+              "observedFrequency": 0.6077922077922078
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 283,
+              "meanProbability": 0.6461947496694915,
+              "observedFrequency": 0.724381625441696
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 205,
+              "meanProbability": 0.7508927132477609,
+              "observedFrequency": 0.7609756097560975
+            },
+            {
+              "lower": 0.8,
+              "count": 742,
+              "meanProbability": 0.8605581270387861,
+              "observedFrequency": 0.8584905660377359
+            },
+            {
+              "lower": 0.9,
+              "count": 2298,
+              "meanProbability": 0.9513394644770503,
+              "observedFrequency": 0.9495213228894692
+            }
+          ]
+        }
+      },
+      "bySeason": {
+        "wetMayOct": {
+          "brier": 0.12477146419110421,
+          "logLoss": 0.3854134949939118,
+          "rocAuc": 0.8765006996267791,
+          "prAuc": 0.951205662651224,
+          "precisionAt60": 0.9195156695155619,
+          "recallAt60": 0.8028606965173491,
+          "prevalence": 0.7282608695652175,
+          "cityRows": 75072,
+          "uniqueGridHours": 8832,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 1265,
+              "meanProbability": 0.07806223078964368,
+              "observedFrequency": 0.09032258064516129
+            },
+            {
+              "lower": 0.1,
+              "count": 4333,
+              "meanProbability": 0.1472598811337841,
+              "observedFrequency": 0.2329317269076305
+            },
+            {
+              "lower": 0.2,
+              "count": 5504,
+              "meanProbability": 0.25154370165267814,
+              "observedFrequency": 0.3427230046948357
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 5774,
+              "meanProbability": 0.3523823531346873,
+              "observedFrequency": 0.3930722891566265
+            },
+            {
+              "lower": 0.4,
+              "count": 6036,
+              "meanProbability": 0.4500277343626755,
+              "observedFrequency": 0.4934876989869754
+            },
+            {
+              "lower": 0.5,
+              "count": 4934,
+              "meanProbability": 0.5487341855867803,
+              "observedFrequency": 0.5571177504393673
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 2680,
+              "meanProbability": 0.6426698656575598,
+              "observedFrequency": 0.6707692307692308
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 1366,
+              "meanProbability": 0.7524804011092314,
+              "observedFrequency": 0.7777777777777778
+            },
+            {
+              "lower": 0.8,
+              "count": 7158,
+              "meanProbability": 0.8679226550003728,
+              "observedFrequency": 0.8508158508158508
+            },
+            {
+              "lower": 0.9,
+              "count": 36022,
+              "meanProbability": 0.9534361054309348,
+              "observedFrequency": 0.9580009385265134
+            }
+          ]
+        },
+        "dryNovApr": {
+          "brier": 0.11612684542884724,
+          "logLoss": 0.38069890187938615,
+          "rocAuc": 0.8739874082550865,
+          "prAuc": 0.7890403885364214,
+          "precisionAt60": 0.8527918781726788,
+          "recallAt60": 0.5341812400637689,
+          "prevalence": 0.28979497811564153,
+          "cityRows": 73797,
+          "uniqueGridHours": 8682,
+          "reliability": [
+            {
+              "lower": 0.0,
+              "count": 24886,
+              "meanProbability": 0.060944036607810115,
+              "observedFrequency": 0.05555555555555555
+            },
+            {
+              "lower": 0.1,
+              "count": 18861,
+              "meanProbability": 0.1439513566437131,
+              "observedFrequency": 0.13491707754370239
+            },
+            {
+              "lower": 0.2,
+              "count": 9064,
+              "meanProbability": 0.24254301686880195,
+              "observedFrequency": 0.22943327239488115
+            },
+            {
+              "lower": 0.30000000000000004,
+              "count": 4005,
+              "meanProbability": 0.34348633921411537,
+              "observedFrequency": 0.4021276595744681
+            },
+            {
+              "lower": 0.4,
+              "count": 2044,
+              "meanProbability": 0.4455537621572351,
+              "observedFrequency": 0.6324786324786326
+            },
+            {
+              "lower": 0.5,
+              "count": 1371,
+              "meanProbability": 0.5510870081067004,
+              "observedFrequency": 0.7515527950310559
+            },
+            {
+              "lower": 0.6000000000000001,
+              "count": 2107,
+              "meanProbability": 0.6520633692265043,
+              "observedFrequency": 0.7679324894514767
+            },
+            {
+              "lower": 0.7000000000000001,
+              "count": 2509,
+              "meanProbability": 0.7540015760427561,
+              "observedFrequency": 0.7598684210526316
+            },
+            {
+              "lower": 0.8,
+              "count": 5558,
+              "meanProbability": 0.8526159425632923,
+              "observedFrequency": 0.8678071539657852
+            },
+            {
+              "lower": 0.9,
+              "count": 3392,
+              "meanProbability": 0.9343805924991656,
+              "observedFrequency": 0.951530612244898
+            }
+          ]
+        }
+      }
+    }
+  },
+  "goldenVectors": [
+    {
+      "input": {
+        "temperatureC": 27.4,
+        "humidityPercent": 86.0,
+        "pressureHpa": 1012.6,
+        "windSpeedMs": 1.22,
+        "weatherCode": 1,
+        "city": "caloocan",
+        "observedAt": "2023-12-31T16:00:00+00:00"
+      },
+      "features": [
+        27.4,
+        86.0,
+        1012.6,
+        1.22,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "probability": 0.1132582520978601
+    },
+    {
+      "input": {
+        "temperatureC": 28.3,
+        "humidityPercent": 84.0,
+        "pressureHpa": 1009.4,
+        "windSpeedMs": 0.65,
+        "weatherCode": 53,
+        "city": "navotas",
+        "observedAt": "2024-07-01T14:00:00+00:00"
+      },
+      "features": [
+        28.3,
+        84.0,
+        1009.4,
+        0.65,
+        1.0,
+        -0.5000000000000004,
+        0.8660254037844384,
+        -0.0050819651869691,
+        -0.999987086731543,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "probability": 0.8785649960778544
+    },
+    {
+      "input": {
+        "temperatureC": 28.1,
+        "humidityPercent": 78.0,
+        "pressureHpa": 1011.6,
+        "windSpeedMs": 1.58,
+        "weatherCode": 3,
+        "city": "valenzuela",
+        "observedAt": "2024-12-31T12:00:00+00:00"
+      },
+      "features": [
+        28.1,
+        78.0,
+        1011.6,
+        1.58,
+        0.0,
+        -0.8660254037844386,
+        0.5000000000000001,
+        0.010163799124376703,
+        0.9999483472596769,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "probability": 0.09503197804898694
+    }
+  ],
+  "provenance": {
+    "source": "Open-Meteo Historical Weather API, ERA5",
+    "attribution": "Weather data by Open-Meteo.com; ERA5 by Copernicus Climate Change Service (C3S), ECMWF. Contains modified Copernicus Climate Change Service information.",
+    "cityGrids": {
+      "muntinlupa": "14.5,121.0",
+      "manila": "14.5,121.0",
+      "quezon_city": "14.75,121.0",
+      "makati": "14.5,121.0",
+      "taguig": "14.5,121.0",
+      "pasig": "14.5,121.0",
+      "pasay": "14.5,121.0",
+      "mandaluyong": "14.5,121.0",
+      "marikina": "14.75,121.0",
+      "caloocan": "14.75,121.0",
+      "malabon": "14.75,121.0",
+      "navotas": "14.75,121.0",
+      "valenzuela": "14.75,121.0",
+      "las_pinas": "14.5,121.0",
+      "paranaque": "14.5,121.0",
+      "san_juan": "14.5,121.0",
+      "pateros": "14.5,121.0"
+    },
+    "requests": [
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.4081&longitude=121.0415&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.4081,
+          "longitude": 121.0415,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:17.436606+00:00",
+        "sha256": "5de73b73404aa886ec85d047472e90240c16d0e78fc1d2b200176c48c95cf849",
+        "bytes": 1397,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.5995&longitude=120.9842&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.5995,
+          "longitude": 120.9842,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:18.933592+00:00",
+        "sha256": "7b9fa8252eaf88e725a12c5888cf5dcfd876bce39affbde6b81b9931b51cbc72",
+        "bytes": 1397,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.676&longitude=121.0437&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.676,
+          "longitude": 121.0437,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:20.412084+00:00",
+        "sha256": "9a2b8614168f909dddb092e0c1cae2d725a258d3bd6827fe6ed3507ca64a931e",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.5547&longitude=121.0244&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.5547,
+          "longitude": 121.0244,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:21.925371+00:00",
+        "sha256": "986b5976789726c718f24953d5e02541ec09364a36a00d7a65c128e86bf7e6d2",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.5176&longitude=121.0509&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.5176,
+          "longitude": 121.0509,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:23.354360+00:00",
+        "sha256": "aed05f7f9f3a9223e68ed49796289ac1f4e31b53ec451501988ea617b53f1ed2",
+        "bytes": 1397,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.5764&longitude=121.0851&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.5764,
+          "longitude": 121.0851,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:24.788345+00:00",
+        "sha256": "fbfa683ea8945f50ce5bda59f34e7b127bb26688bac2119b339b25cd17bf386f",
+        "bytes": 1397,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.5378&longitude=121.0014&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.5378,
+          "longitude": 121.0014,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:26.234357+00:00",
+        "sha256": "1d90a77c596a36a674795e1fb44e2ff07b210c1d7f51b3ecf0211e159bbb497f",
+        "bytes": 1397,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.5794&longitude=121.0359&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.5794,
+          "longitude": 121.0359,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:27.835552+00:00",
+        "sha256": "7e637201083247d306b3fb9a05ce8e1d604d9f9a13d075aa42d62fa7c2bef2af",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.6507&longitude=121.1029&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.6507,
+          "longitude": 121.1029,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:29.250876+00:00",
+        "sha256": "9fbb1deb7eb22412ef78e8cc078c34eeb11d0b74af4d00ede94ee2392ea44c5b",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.6488&longitude=120.9841&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.6488,
+          "longitude": 120.9841,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:30.747044+00:00",
+        "sha256": "25c879ac537cc1a619c7bde4efb4a8dfbd652e97f996ce801d80e086d50f64ff",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.6681&longitude=120.9658&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.6681,
+          "longitude": 120.9658,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:32.183947+00:00",
+        "sha256": "accba984ca052b37bfc5ccd7d6c8ee3ec3a1109799a683ef306f287ac9c234b7",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.6667&longitude=120.9417&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.6667,
+          "longitude": 120.9417,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:33.597457+00:00",
+        "sha256": "39223b251692eac73f8b6f3577e6b07d5018c8df338528268dbc74fe5ba3c569",
+        "bytes": 1397,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.7011&longitude=120.983&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.7011,
+          "longitude": 120.983,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:35.005569+00:00",
+        "sha256": "d8f81d13647eb10fdd53294c364b9a862efb54b731498ab070b4af7f12ed25db",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.4445&longitude=120.9939&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.4445,
+          "longitude": 120.9939,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:36.431791+00:00",
+        "sha256": "f338aa7bda57170399c6c1c766e2353b68338b3e17f73570fa00a0277da429eb",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.4793&longitude=121.0198&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.4793,
+          "longitude": 121.0198,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:37.874076+00:00",
+        "sha256": "eff5cc127597553ad050c6a8f1d42f2cc3ae6477ad611ae5c2fed2f2873b30ec",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.6019&longitude=121.0355&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.6019,
+          "longitude": 121.0355,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:39.311497+00:00",
+        "sha256": "c0c5ea1bdc6c6d4ea880213144c0c6ffc90009521fd8b24a7856f47258cbe1a8",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.5445&longitude=121.068&start_date=2021-01-01&end_date=2021-01-01",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.5445,
+          "longitude": 121.068,
+          "start_date": "2021-01-01",
+          "end_date": "2021-01-01"
+        },
+        "downloadedAt": "2026-11-13T02:43:40.729583+00:00",
+        "sha256": "be6110b8c22a43f7422f4cfbab54bb06c2ced2834b337074f5ad1610db8fba24",
+        "bytes": 1398,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.4081&longitude=121.0415&start_date=2021-01-01&end_date=2021-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.4081,
+          "longitude": 121.0415,
+          "start_date": "2021-01-01",
+          "end_date": "2021-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:43:42.920737+00:00",
+        "sha256": "2d39d77cb47262fffb4a8250ceed3dd237a6fe87dda604866c7afab46edcbf8a",
+        "bytes": 335595,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.4081&longitude=121.0415&start_date=2022-01-01&end_date=2022-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.4081,
+          "longitude": 121.0415,
+          "start_date": "2022-01-01",
+          "end_date": "2022-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:43:45.034677+00:00",
+        "sha256": "7f1d64c180308acbe30a2f814514522b7e2169de6c03a6b05f034f5d72e60863",
+        "bytes": 336389,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.4081&longitude=121.0415&start_date=2023-01-01&end_date=2023-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.4081,
+          "longitude": 121.0415,
+          "start_date": "2023-01-01",
+          "end_date": "2023-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:43:47.239416+00:00",
+        "sha256": "0e0b4f00b3d2864d7bf9bc18afc0bbbf257730631e9e5cbab5ab7595c6b296d2",
+        "bytes": 336726,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.4081&longitude=121.0415&start_date=2024-01-01&end_date=2024-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.4081,
+          "longitude": 121.0415,
+          "start_date": "2024-01-01",
+          "end_date": "2024-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:43:49.325423+00:00",
+        "sha256": "6e36cc22f7b632e4fdad51e3b764d75f6210ac533e814039536b5bc6f9e4517d",
+        "bytes": 337130,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.4081&longitude=121.0415&start_date=2025-01-01&end_date=2025-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.4081,
+          "longitude": 121.0415,
+          "start_date": "2025-01-01",
+          "end_date": "2025-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:43:51.534035+00:00",
+        "sha256": "5947f3734a3e095b097dd989f2aa4642613a1c0b842f64647dd68be9b81d7640",
+        "bytes": 336809,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.5,
+          "longitude": 121.0,
+          "elevation": 6.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.676&longitude=121.0437&start_date=2021-01-01&end_date=2021-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.676,
+          "longitude": 121.0437,
+          "start_date": "2021-01-01",
+          "end_date": "2021-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:43:54.048785+00:00",
+        "sha256": "3e3acf3f56abb50f1510a6ecdd9f6ae10004d5c3c3316c20c349bc2643348fdc",
+        "bytes": 335798,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.676&longitude=121.0437&start_date=2022-01-01&end_date=2022-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.676,
+          "longitude": 121.0437,
+          "start_date": "2022-01-01",
+          "end_date": "2022-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:43:56.640163+00:00",
+        "sha256": "74756ff52d026febdb925946bd7bc1a8f2875a207a13654b5247ea2796210eb4",
+        "bytes": 336412,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.676&longitude=121.0437&start_date=2023-01-01&end_date=2023-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.676,
+          "longitude": 121.0437,
+          "start_date": "2023-01-01",
+          "end_date": "2023-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:43:58.934149+00:00",
+        "sha256": "c84e176fae33503f66d5fc3e09213cc0a2a8fe53c8e50864e0e9e4066de9c26a",
+        "bytes": 336834,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.676&longitude=121.0437&start_date=2024-01-01&end_date=2024-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.676,
+          "longitude": 121.0437,
+          "start_date": "2024-01-01",
+          "end_date": "2024-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:44:01.264131+00:00",
+        "sha256": "3f2618a35bbb8ade2aa6818853adbd0113939d7008c63049287a8356c96534bf",
+        "bytes": 337209,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      },
+      {
+        "url": "https://archive-api.open-meteo.com/v1/archive?hourly=temperature_2m%2Crelative_humidity_2m%2Cpressure_msl%2Cwind_speed_10m%2Cweather_code%2Crain&models=era5&temperature_unit=celsius&wind_speed_unit=ms&precipitation_unit=mm&timezone=Asia%2FManila&timeformat=unixtime&elevation=nan&latitude=14.676&longitude=121.0437&start_date=2025-01-01&end_date=2025-12-31",
+        "params": {
+          "hourly": "temperature_2m,relative_humidity_2m,pressure_msl,wind_speed_10m,weather_code,rain",
+          "models": "era5",
+          "temperature_unit": "celsius",
+          "wind_speed_unit": "ms",
+          "precipitation_unit": "mm",
+          "timezone": "Asia/Manila",
+          "timeformat": "unixtime",
+          "elevation": "nan",
+          "latitude": 14.676,
+          "longitude": 121.0437,
+          "start_date": "2025-01-01",
+          "end_date": "2025-12-31"
+        },
+        "downloadedAt": "2026-11-13T02:44:03.581835+00:00",
+        "sha256": "8e1f05858b6d645318f4e6ed2b0cc12e80abae46dd6e4a9bc6092516e23e6af8",
+        "bytes": 336878,
+        "units": {
+          "time": "unixtime",
+          "temperature_2m": "\u00b0C",
+          "relative_humidity_2m": "%",
+          "pressure_msl": "hPa",
+          "wind_speed_10m": "m/s",
+          "weather_code": "wmo code",
+          "rain": "mm"
+        },
+        "grid": {
+          "latitude": 14.75,
+          "longitude": 121.0,
+          "elevation": 85.0,
+          "timezone": "Asia/Manila",
+          "utc_offset_seconds": 28800
+        }
+      }
+    ],
+    "pipelineSha256": "d5d8d78279f4e2a54d2ea99abcd34aaff877b1be534c37bf3e5e589e142ebb8d",
+    "trainingDataSha256": "ab8e6f2f1f35e8695c47b26eeb6159cb0a7d593d09efa3236d86808651240c26",
+    "audit": "Internal 2023 C-selection scores recomputed with three-hour boundary purge; selected C unchanged. Frozen final parameters and held-out metrics were not re-fitted or re-evaluated."
+  },
+  "featureTransform": {
+    "timezone": "Asia/Manila",
+    "hour": "hour+minute/60+second/3600",
+    "season": "(dayOfYear-1+hour/24)/365.2425"
+  }
+}
