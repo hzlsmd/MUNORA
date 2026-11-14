@@ -46,36 +46,45 @@ monitoring; use an empty cron list only when deliberately pausing monitoring.
 Check `/health`; it describes the service, not successful FCM delivery or provider
 freshness. No `/send` or public manual-trigger endpoint exists.
 
-## Workers Builds and branch previews
+## Cloudflare Git builds and previews
 
-With the build root at the repository root, use these dashboard commands:
+The repository root contains Flutter; the Worker and its locked Wrangler
+dependency live in `backend`. Set **Settings > Builds** as follows:
 
-- Build: `npm --prefix backend ci`
-- Production deploy: `npx --prefix backend wrangler deploy --config backend/wrangler.jsonc`
-- Preview: `npx --prefix backend wrangler preview --config backend/wrangler.jsonc`
+| Setting | Production | Previews Base |
+| --- | --- | --- |
+| Build command | `npm --prefix backend ci` | `npm --prefix backend ci` |
+| Deploy / Preview command | `npm --prefix backend run deploy` | `npm --prefix backend run preview` |
+| Root directory | `/` | `/` |
 
-Wrangler 4.160.1 requires a `previews` block for the Preview command. The checked-in
-empty block is intentional: the HTTP interface exposes only `/health`, so a branch
-Preview does not need a database or FCM credentials. Wrangler may warn that the
-production `DB` binding is absent from Previews; that warning is expected here.
-Do not copy the suggested production D1 ID into the Preview block merely to silence
-that warning. Also check that the dashboard Preview base config has no production
-database binding or FCM secret attached.
+The preview script selects `backend/wrangler.jsonc` through npm's backend
+working directory and passes `--ignore-base-config`. The required `previews`
+block is deliberately empty. This backend's public HTTP surface is `/health`,
+which requires no database or FCM credentials. New previews therefore need no
+additional database, private key, or payment plan. Do not copy the production
+`DB` binding or service-account secret into Previews Base. Wrangler may warn
+that production `DB` is absent from Previews; that is expected for this HTTP-only
+preview. It does not prove production monitoring or FCM delivery works.
 
-Cloudflare runs Cron Triggers only against production; they do not invoke a
-Preview's `scheduled()` handler. A successful Preview verifies HTTP health, not
-weather monitoring, database writes or FCM delivery. Continue using the backend
-tests for scheduled behavior and the production acceptance checklist for delivery.
-For future remote scheduled integration tests, provision a separate staging D1
-database and test-only messaging configuration first.
+Preview URLs are public unless protected separately. Only GET `/health` is
+available; unknown routes return 404 and other methods return 405. These previews
+test HTTP packaging and routing, not weather monitoring or delivery. Cloudflare
+does not invoke a preview's `scheduled()` handler; the production one-minute
+schedule continues to check each city every five minutes.
 
-If production builds succeed but branch builds fail with `missing a previews
-block`, inspect the Preview command and the configuration in that branch. Dependency
-installation warnings about esbuild/workerd install scripts are separate from
-that configuration error; the supplied failure log completed `npm ci` successfully.
+A retry of an older build can retain its original commands and checkout. Test
+this fix with a new push to a branch containing the `previews` block and confirm
+that its build details show `npm --prefix backend run preview`. Retrying a
+pre-fix commit cannot pick up a configuration file added in a newer commit.
 
-References: [Preview configuration](https://developers.cloudflare.com/workers/previews/configuration/)
-and [resource isolation / Cron Triggers](https://developers.cloudflare.com/workers/previews/resources/).
+The backend regression test runs the installed Wrangler against a local API
+stub, checks the actual Worker upload, and rejects production API mutations or
+production bindings. It proves packaging/configuration locally, not successful
+Cloudflare authorization or a live preview deployment.
+
+References: [Preview configuration](https://developers.cloudflare.com/workers/previews/configuration/),
+[Cron limitations](https://developers.cloudflare.com/workers/previews/resources/#cron-triggers),
+and [Workers Builds configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/).
 
 ## Configure the Android build
 
