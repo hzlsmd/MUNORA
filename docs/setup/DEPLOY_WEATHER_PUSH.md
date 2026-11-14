@@ -46,6 +46,37 @@ monitoring; use an empty cron list only when deliberately pausing monitoring.
 Check `/health`; it describes the service, not successful FCM delivery or provider
 freshness. No `/send` or public manual-trigger endpoint exists.
 
+## Workers Builds and branch previews
+
+With the build root at the repository root, use these dashboard commands:
+
+- Build: `npm --prefix backend ci`
+- Production deploy: `npx --prefix backend wrangler deploy --config backend/wrangler.jsonc`
+- Preview: `npx --prefix backend wrangler preview --config backend/wrangler.jsonc`
+
+Wrangler 4.160.1 requires a `previews` block for the Preview command. The checked-in
+empty block is intentional: the HTTP interface exposes only `/health`, so a branch
+Preview does not need a database or FCM credentials. Wrangler may warn that the
+production `DB` binding is absent from Previews; that warning is expected here.
+Do not copy the suggested production D1 ID into the Preview block merely to silence
+that warning. Also check that the dashboard Preview base config has no production
+database binding or FCM secret attached.
+
+Cloudflare runs Cron Triggers only against production; they do not invoke a
+Preview's `scheduled()` handler. A successful Preview verifies HTTP health, not
+weather monitoring, database writes or FCM delivery. Continue using the backend
+tests for scheduled behavior and the production acceptance checklist for delivery.
+For future remote scheduled integration tests, provision a separate staging D1
+database and test-only messaging configuration first.
+
+If production builds succeed but branch builds fail with `missing a previews
+block`, inspect the Preview command and the configuration in that branch. Dependency
+installation warnings about esbuild/workerd install scripts are separate from
+that configuration error; the supplied failure log completed `npm ci` successfully.
+
+References: [Preview configuration](https://developers.cloudflare.com/workers/previews/configuration/)
+and [resource isolation / Cron Triggers](https://developers.cloudflare.com/workers/previews/resources/).
+
 ## Configure the Android build
 
 Use the repository's supported Flutter 3.47.9 and Android SDK setup. The client

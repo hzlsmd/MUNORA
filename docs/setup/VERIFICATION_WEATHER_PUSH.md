@@ -86,3 +86,20 @@ Remaining acceptance: merge/deploy the selected revision, confirm successful cit
 checks and FCM acceptance from sanitized logs, verify both signed Android build
 mode transitions and foreground/background/cold-start delivery on a controlled
 phone, and verify the historical credential's revocation in its provider account.
+
+### Branch Preview build failure
+
+The 14 November 03:06 UTC build log supplied by the owner shows `npm --prefix
+backend ci` succeeded, then `wrangler preview --config backend/wrangler.jsonc`
+failed because the branch had no `previews` block. This is distinct from the
+successful production deployments and GitHub Actions test jobs.
+
+Added an intentionally empty Preview configuration for the existing health-only
+HTTP interface. No production D1 binding or FCM secret is declared in that block.
+Cloudflare does not run Cron Triggers in Previews. See the runbook's Workers Builds
+section for the expected missing-DB warning and the limits of a health-only preview.
+Wrangler's installed Preview config parser now reads `{}` instead of an absent
+configuration; `npm run dry-run --prefix backend` bundles successfully, and all
+23 backend tests pass. No remote CLI authentication or deployment was performed.
+The next branch build must confirm the remote deploy; local parsing/packaging does
+not prove remote authentication or Preview base configuration.
