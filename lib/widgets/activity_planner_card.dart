@@ -4,16 +4,22 @@ import '../models/weather_snapshot.dart';
 import '../services/activity_planner.dart';
 import '../services/planner_preferences.dart';
 import '../services/weather_insights.dart';
+import '../services/rain_model.dart';
 import '../theme.dart';
 import 'atmosphere.dart';
+import 'ai_rain_plan_advice.dart';
 
 class ActivityPlannerCard extends StatefulWidget {
   final String city;
   final WeatherInsights? insights;
+  final WeatherSnapshot? weather;
+  final RainModelLoader? rainModelLoader;
   const ActivityPlannerCard({
     super.key,
     required this.city,
     required this.insights,
+    this.weather,
+    this.rainModelLoader,
   });
   @override
   State<ActivityPlannerCard> createState() => _ActivityPlannerCardState();
@@ -277,6 +283,17 @@ class _ActivityPlannerCardState extends State<ActivityPlannerCard> {
                   ),
                 ),
               ),
+            if (widget.weather != null) ...[
+              const SizedBox(height: 8),
+              AIRainPlanAdvice(
+                weather: widget.weather!,
+                activity: activity,
+                start: start,
+                durationHours: duration,
+                loader: widget.rainModelLoader,
+              ),
+              const SizedBox(height: 8),
+            ],
             if (better != null) ...[
               const SizedBox(height: 8),
               const Text(

@@ -59,6 +59,11 @@ void main() {
       await tester.pumpWidget(card(w, loader));
       await tester.pumpAndSettle();
       expect(find.text('73% probability of rain'), findsOneWidget);
+      expect(find.text('Muntinlupa · 3-hour rain outlook'), findsOneWidget);
+      expect(
+        find.text('Weather estimate ${weatherTime(w.observedAt)}'),
+        findsOneWidget,
+      );
       expect(
         find.textContaining(
           weatherTime(w.observedAt.add(const Duration(hours: 3))),
@@ -69,6 +74,7 @@ void main() {
       await tester.pumpWidget(card(w, loader, live: false));
       await tester.pumpAndSettle();
       expect(find.textContaining('Unavailable.'), findsOneWidget);
+      expect(find.textContaining('Saved weather'), findsOneWidget);
       expect(find.textContaining('probability of rain'), findsNothing);
       await tester.pumpWidget(const SizedBox.shrink());
     },
@@ -82,7 +88,37 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.textContaining('Unavailable.'), findsOneWidget);
+    expect(find.textContaining('older than 30 minutes'), findsOneWidget);
     expect(find.textContaining('probability of rain'), findsNothing);
+    await tester.tap(find.text('Model details'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Model: test-v1.'), findsOneWidget);
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets(
+    'a pending replacement model cannot reuse an earlier prediction',
+    (tester) async {
+      final w = weather();
+      await tester.pumpWidget(
+        card(w, RainModelLoader(read: () async => jsonEncode(artifact()))),
+      );
+      await tester.pumpAndSettle();
+      expect(find.text('50% probability of rain'), findsOneWidget);
+      final pending = Completer<String>();
+      await tester.pumpWidget(
+        card(w, RainModelLoader(read: () => pending.future)),
+      );
+      await tester.pump();
+      expect(find.textContaining('probability of rain'), findsNothing);
+      expect(find.text('Loading rain model…'), findsOneWidget);
+      pending.completeError(StateError('invalid replacement'));
+      await tester.pumpAndSettle();
+      expect(
+        find.textContaining('could not be loaded or validated'),
+        findsOneWidget,
+      );
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
 }
