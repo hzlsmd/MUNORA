@@ -52,6 +52,14 @@ const path = require('node:path');
       await page.waitForLoadState('networkidle');
       await page.screenshot({ path: path.join(output, `home-${viewport.width}.png`) });
 
+      // Home's shortcut must land on an expanded, scrolled-to planner.
+      await page.getByText('Plan an activity', {exact:true}).click();
+      await page.getByText('Check this plan', {exact:true}).waitFor();
+      await page.getByText('Forecast-based activity planner', {exact:true}).waitFor();
+      await page.waitForTimeout(400);
+      await page.screenshot({path: path.join(output, `planner-entry-${viewport.width}.png`)});
+      await page.getByText('Home', {exact:true}).last().click();
+
       await page.getByText('Forecast', { exact: true }).last().click();
       await page.getByText('5-Day Forecast', { exact: true }).waitFor();
       await page.screenshot({ path: path.join(output, `forecast-${viewport.width}.png`) });
@@ -77,7 +85,7 @@ const path = require('node:path');
 
       await page.getByText('Tips', { exact: true }).click();
       await page.getByText('Daily lifestyle tips', { exact: true }).waitFor();
-      await page.getByRole('button', {name:/Plan My Activity/}).click();
+      await page.getByText('Plan an activity', {exact:true}).click();
       await page.getByRole('checkbox', {name:'Exercise',exact:true}).click();
       await page.getByText('Check this plan', {exact:true}).click();
       await page.getByText('Fewer forecast concerns', {exact:true}).waitFor();
@@ -109,7 +117,7 @@ const path = require('node:path');
       await page.getByText('Check forecast notices', { exact: false }).waitFor();
       await page.getByText('AI rain outlook', {exact:true}).waitFor();
       await page.getByText(/probability of rain/).waitFor();
-      await page.getByText('Experimental estimate', {exact:true}).waitFor();
+      await page.getByText('AI prediction · Experimental', {exact:true}).waitFor();
       await page.getByText('Alerts', { exact: true }).click();
       await page.getByRole('checkbox', { name: 'Calm Skies', exact: true }).click();
       await page.getByText('No forecast triggers detected', { exact: false }).waitFor();
@@ -118,7 +126,7 @@ const path = require('node:path');
       await page.getByText('Tips', { exact: true }).click();
       await page.getByRole('button', {name:/Plan My Activity/}).click();
       await page.getByText('Check this plan', {exact:true}).click();
-      await page.getByText('AI rain context · Experimental', {exact:true}).waitFor();
+      await page.getByText('AI rain recommendation', {exact:true}).waitFor();
       await page.getByText(/chance of rain · full 3-hour outlook/).waitFor();
       await page.getByText(/Probability covers the complete three-hour window/).waitFor();
       await page.mouse.move(viewport.width / 2, 500);

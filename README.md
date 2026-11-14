@@ -41,6 +41,11 @@ inputs and a validated model, with city/time context and specific unavailable
 reasons. Tips' activity planner adds rain preparedness advice when the complete
 plan fits within the current three-hour AI window. Its probability describes the
 full outlook; hourly forecast warnings and planner severity remain independent.
+The outlook includes a short preparedness recommendation and a **Plan an activity**
+shortcut on Home and Tips. It opens and scrolls to the expanded planner. AI rain
+predictions are labelled experimental; hourly activity guidance and forecast model
+agreement are labelled separately. Stale/saved weather can be refreshed directly
+from the outlook explanation.
 Existing background notification rules are unchanged.
 The shared Pressure card is replaced with current Heat Index, calculated from
 unrounded temperature/humidity using NWS screening/regression and adjustments.

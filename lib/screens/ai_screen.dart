@@ -18,12 +18,14 @@ class AIScreen extends StatefulWidget {
   final String city;
   final WeatherService service;
   final WeatherInsightsService? insightsService;
+  final bool openPlannerOnLoad;
   const AIScreen({
     super.key,
     required this.navigate,
     required this.city,
     required this.service,
     this.insightsService,
+    this.openPlannerOnLoad = false,
   });
   @override
   State<AIScreen> createState() => _AIScreenState();
@@ -31,10 +33,27 @@ class AIScreen extends StatefulWidget {
 
 class _AIScreenState extends State<AIScreen> {
   String filter = 'All';
+  var _plannerKey = GlobalKey<ActivityPlannerCardState>();
+  late bool _pendingPlanner;
+
+  @override
+  void initState() {
+    super.initState();
+    _pendingPlanner = widget.openPlannerOnLoad;
+  }
+
+  void _openPlanner() => _plannerKey.currentState?.open();
+
   @override
   void didUpdateWidget(covariant AIScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.city != widget.city) filter = 'All';
+    if (oldWidget.city != widget.city) {
+      filter = 'All';
+      _plannerKey = GlobalKey<ActivityPlannerCardState>();
+      _pendingPlanner = widget.openPlannerOnLoad;
+    } else if (widget.openPlannerOnLoad && !oldWidget.openPlannerOnLoad) {
+      _pendingPlanner = true;
+    }
   }
 
   bool matches(String id) => switch (filter) {
@@ -69,6 +88,12 @@ class _AIScreenState extends State<AIScreen> {
           city: widget.city,
           service: widget.insightsService,
           builder: (raw) {
+            if (_pendingPlanner) {
+              _pendingPlanner = false;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) _openPlanner();
+              });
+            }
             final insight =
                 !stale && raw != null && raw.isFresh(DateTime.now().toUtc())
                 ? raw
@@ -116,11 +141,16 @@ class _AIScreenState extends State<AIScreen> {
                     'LIVE MICROCLIMATE',
                     trailing: 'Metro Manila Basin',
                   ),
-                  AIRainOutlook(weather: weather),
+                  AIRainOutlook(weather: weather, onPlanActivity: _openPlanner),
                   const SizedBox(height: 16),
                   ModelAgreementPanel(insights: insight),
                   const SizedBox(height: 16),
                   const SizedBox(height: 16),
+                  const Text(
+                    'Forecast-based recommendation',
+                    style: TextStyle(fontSize: 12, color: AppColors.indigo),
+                  ),
+                  const SizedBox(height: 8),
                   GuidanceCard(
                     key: ValueKey(
                       '${widget.city}:featured:${recommendations.first.id}',
@@ -130,14 +160,14 @@ class _AIScreenState extends State<AIScreen> {
                     window: stale ? null : 'Current / next 6 hours',
                   ),
                   const SizedBox(height: 20),
-                  const SectionTitle('AI Personalization Insights'),
+                  const SectionTitle('Forecast-based activity planner'),
                   const Text(
-                    'Personalize forecast-based guidance with your activity and an optional daily routine.',
+                    'Plan for rain, heat, UV, wind and thunderstorms using hourly forecasts. Add experimental AI rain advice for plans within the current three-hour outlook.',
                     style: TextStyle(fontSize: 12, color: AppColors.textBody),
                   ),
                   const SizedBox(height: 12),
                   ActivityPlannerCard(
-                    key: ValueKey('planner:${widget.city}'),
+                    key: _plannerKey,
                     city: widget.city,
                     insights: insight,
                     weather: weather,
@@ -146,7 +176,7 @@ class _AIScreenState extends State<AIScreen> {
                   OutdoorPanel(insights: insight),
                   const SizedBox(height: 16),
                   const Text(
-                    'Rule-based weather guidance',
+                    'Forecast-based weather guidance',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,

@@ -18,7 +18,7 @@ void main() {
         ),
       );
       await tester.pumpWidget(panel(100));
-      expect(find.text('Model Prediction Confidence'), findsOneWidget);
+      expect(find.text('Forecast model agreement'), findsOneWidget);
       expect(find.text('High · 100% model agreement'), findsOneWidget);
       expect(
         find.textContaining('not measured forecast accuracy'),

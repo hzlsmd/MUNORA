@@ -151,7 +151,7 @@ void main() {
         await tester.tap(find.text('Hourly'));
         await tester.pump();
       } else if (screen == 'ai') {
-        expect(find.text('Rule-based weather guidance'), findsOneWidget);
+        expect(find.text('Forecast-based weather guidance'), findsOneWidget);
       }
       expect(tester.takeException(), isNull);
     });

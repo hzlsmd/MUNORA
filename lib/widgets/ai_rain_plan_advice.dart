@@ -46,12 +46,17 @@ class AIRainPlanAdvice extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'AI rain context · Experimental',
+              'AI rain recommendation',
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: AppColors.indigo,
               ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              'AI prediction · Experimental',
+              style: TextStyle(fontSize: 11, color: AppColors.indigo),
             ),
             const SizedBox(height: 6),
             if (loading)

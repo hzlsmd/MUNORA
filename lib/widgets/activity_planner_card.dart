@@ -22,10 +22,11 @@ class ActivityPlannerCard extends StatefulWidget {
     this.rainModelLoader,
   });
   @override
-  State<ActivityPlannerCard> createState() => _ActivityPlannerCardState();
+  State<ActivityPlannerCard> createState() => ActivityPlannerCardState();
 }
 
-class _ActivityPlannerCardState extends State<ActivityPlannerCard> {
+class ActivityPlannerCardState extends State<ActivityPlannerCard> {
+  final _expansion = ExpansibleController();
   final store = PlannerPreferences();
   Activity activity = Activity.walk;
   late DateTime start;
@@ -34,6 +35,26 @@ class _ActivityPlannerCardState extends State<ActivityPlannerCard> {
   ActivityRoutine? routine;
   String? previousSummary, error;
   Future<void> writes = Future.value();
+
+  void open() {
+    _expansion.expand();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        Scrollable.ensureVisible(
+          context,
+          duration: const Duration(milliseconds: 300),
+          alignment: 0,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _expansion.dispose();
+    super.dispose();
+  }
+
   DateTime get now => DateTime.now().toUtc();
   DateTime nextHour(DateTime time) {
     final hour = DateTime.utc(time.year, time.month, time.day, time.hour);
@@ -177,6 +198,7 @@ class _ActivityPlannerCardState extends State<ActivityPlannerCard> {
     return GlassCard(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
       child: ExpansionTile(
+        controller: _expansion,
         tilePadding: EdgeInsets.zero,
         title: const Text(
           'Plan My Activity',
