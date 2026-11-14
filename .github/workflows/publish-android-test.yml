@@ -1,0 +1,29 @@
+name: Publish Android test APK
+on:
+  push:
+    branches: [delivery/android-test-20261114]
+    paths: [.github/workflows/publish-android-test.yml]
+permissions:
+  contents: write
+  actions: read
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Publish verified merged APK and QR code
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh api repos/hzlsmd/MUNORA/actions/runs/43559842886 --jq '.head_sha + " " + .conclusion' | grep -Fx 'e8c0171d0ea64023be15191845ca5e591d91b64a success'
+          gh run download 43559842886 --name munora-android-debug --dir apk
+          mv apk/app-debug.apk munora-test.apk
+          sha256sum munora-test.apk > SHA256SUMS.txt
+          pip install 'qrcode[pil]==8.2'
+          python - <<'PY'
+          import qrcode
+          qrcode.make('https://github.com/hzlsmd/MUNORA/releases/download/v1.0.0-test-20261114/munora-test.apk').save('munora-install-qr.png')
+          PY
+          gh release upload v1.0.0-test-20261114 munora-test.apk munora-install-qr.png SHA256SUMS.txt --clobber
