@@ -31,6 +31,7 @@ void main() {
             body: AIScreen(navigate: (_) {}, city: city, service: service)));
     await tester.pumpWidget(screen('Muntinlupa'));
     await tester.pumpAndSettle();
+    expect(find.text('Weather recommendations'), findsOneWidget);
     expect(find.text('Bring rain protection'), findsOneWidget);
     expect(find.text('Take breaks from the heat'), findsNothing);
     hot = true;

@@ -6,6 +6,7 @@ import '../services/weather_insights.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
 import '../widgets/ai_rain_outlook.dart';
+import '../widgets/preparedness_recommendations.dart';
 import '../widgets/activity_planner_card.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/guidance_card.dart';
@@ -142,6 +143,8 @@ class _AIScreenState extends State<AIScreen> {
                     trailing: 'Metro Manila Basin',
                   ),
                   AIRainOutlook(weather: weather, onPlanActivity: _openPlanner),
+                  const SizedBox(height: 16),
+                  PreparednessRecommendations(weather: weather),
                   const SizedBox(height: 16),
                   ModelAgreementPanel(insights: insight),
                   const SizedBox(height: 16),
