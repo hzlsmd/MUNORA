@@ -28,16 +28,18 @@ delivery. Earlier setup records report that the owner deployed the Worker,
 created the table and enabled scheduling. Those reports are separate from the
 current health observation.
 
-The latest baseline GitHub Checks run at source `2a131538024f13bfa84348651d5b72faa7aa87f9`
+The verified baseline [GitHub Checks run](https://github.com/hzlsmd/MUNORA/actions/runs/43551015145)
+at source `ef32e35180a7c22c267caed4300fb03cf89c1f02`
 passed Flutter analysis/tests/web build, backend/model tests and Android debug
 compilation. See [verification](setup/VERIFICATION_WEATHER_PUSH.md) for historical
 records and the notification reliability regression checks. A debug APK build is
 not a physical-phone acceptance test.
 
-The notification reliability changes still require merge, deployment and real
-Android acceptance. No deployment, cloud mutation or live FCM topic send was
-performed as part of this review/fix. Verify both local-to-push and push-to-local
-updates with the same application ID and compatible signing key.
+The notification reliability changes were merged in PR #33. Production source
+verification and real Android acceptance remain necessary; a successful build
+does not establish phone delivery. No live FCM topic send was performed as part
+of this review/fix. Verify both local-to-push and push-to-local updates with the
+same application ID and compatible signing key.
 
 Historical notes about removing an older Firebase backend on 9 November do not
 describe the newer Cloudflare/FCM implementation. Historical credential revocation
