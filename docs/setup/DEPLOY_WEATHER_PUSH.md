@@ -1,6 +1,6 @@
 # Deploy MUNORA free weather push
 
-The implementation is prepared locally, not deployed. Keep Firebase Spark and
+The owner has deployed the production Worker. Keep Firebase Spark and
 Cloudflare Workers/D1 Free. Do not enable a billing plan or trial to complete
 these steps. No domain purchase or public device-registration endpoint is needed.
 
@@ -41,6 +41,44 @@ monitoring; use an empty cron list only when deliberately pausing monitoring.
 
 Check `/health`; it describes the service, not successful FCM delivery or provider
 freshness. No `/send` or public manual-trigger endpoint exists.
+
+## Cloudflare Git builds and previews
+
+The repository root contains Flutter; the Worker and its locked Wrangler
+dependency live in `backend`. Set **Settings > Builds** as follows:
+
+| Setting | Production | Previews Base |
+| --- | --- | --- |
+| Build command | `npm --prefix backend ci` | `npm --prefix backend ci` |
+| Deploy / Preview command | `npm --prefix backend run deploy` | `npm --prefix backend run preview` |
+| Root directory | `/` | `/` |
+
+The preview script selects `backend/wrangler.jsonc` through npm's backend
+working directory and passes `--ignore-base-config`. The required `previews`
+block is deliberately empty. This backend's public HTTP surface is `/health`,
+which requires no database or FCM credentials. New previews therefore need no
+additional database, private key, or payment plan. Do not copy the production
+`DB` binding or service-account secret into Previews Base.
+
+Preview URLs are public unless protected separately. Only GET `/health` is
+available; unknown routes return 404 and other methods return 405. These previews
+test HTTP packaging and routing, not weather monitoring or delivery. Cloudflare
+does not invoke a preview's `scheduled()` handler; the production one-minute
+schedule continues to check each city every five minutes.
+
+A retry of an older build can retain its original commands and checkout. Test
+this fix with a new push to a branch containing the `previews` block and confirm
+that its build details show `npm --prefix backend run preview`. Retrying a
+pre-fix commit cannot pick up a configuration file added in a newer commit.
+
+The backend regression test runs the installed Wrangler against a local API
+stub, checks the actual Worker upload, and rejects production API mutations or
+production bindings. It proves packaging/configuration locally, not successful
+Cloudflare authorization or a live preview deployment.
+
+References: [Preview configuration](https://developers.cloudflare.com/workers/previews/configuration/),
+[Cron limitations](https://developers.cloudflare.com/workers/previews/resources/#cron-triggers),
+and [Workers Builds configuration](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/).
 
 ## Configure the Android build
 
