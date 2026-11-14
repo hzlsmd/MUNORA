@@ -133,3 +133,16 @@ Expand **Flood and emergency preparedness** for road-flood precautions and an
 emergency-kit checklist. These are general preparation tips: no live flood or
 typhoon warning feed is connected, and the app cannot identify safe roads.
 This checklist adds no network requests, trained models or push-alert triggers.
+
+### Redundancy cleanup
+
+Tips has one category-filtered contextual recommendation checklist. Its AI card
+shows the prediction; action advice appears in the checklist. Home retains its
+compact rain recommendation. UV guidance, forecast model agreement, the selected
+activity planner and the general outdoor window remain separate because they
+answer different questions.
+
+App city names derive from one coordinate registry. Local/push modes share native
+notification configuration, while their scheduling and reminder behavior remain
+distinct. Checks runs for pull requests and master pushes; use workflow dispatch
+for a standalone branch without a PR.

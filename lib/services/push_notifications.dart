@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'push_state.dart';
+import 'notification_config.dart';
 
 /// Enable only in a build whose matching Firebase configuration is installed.
 /// Deployment and phone acceptance must precede distributing that build.
@@ -19,7 +20,6 @@ class PushNotifications {
       const bool.fromEnvironment('ENABLE_WEATHER_PUSH') &&
       !kIsWeb &&
       defaultTargetPlatform == TargetPlatform.android;
-  static const enabledKey = 'notifications.weather.enabled';
   final status = ValueNotifier<String?>(null);
   final _local = FlutterLocalNotificationsPlugin();
   final _subscriptions = <StreamSubscription<dynamic>>[];
@@ -35,16 +35,6 @@ class PushNotifications {
     return next;
   }
 
-  static const details = NotificationDetails(
-    android: AndroidNotificationDetails(
-      'weather_tips',
-      'Weather recommendations',
-      channelDescription: 'Forecast-based guidance for the selected NCR city',
-      importance: Importance.defaultImportance,
-      priority: Priority.defaultPriority,
-    ),
-  );
-
   Future<void> initialize() async {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
     if (!configured) {
@@ -55,9 +45,7 @@ class PushNotifications {
     try {
       await Firebase.initializeApp();
       final ready = await _local.initialize(
-        const InitializationSettings(
-          android: AndroidInitializationSettings('ic_weather_notification'),
-        ),
+        weatherNotificationInitialization,
         onDidReceiveNotificationResponse: localTap,
       );
       if (ready != true) throw StateError('Notification initialization failed');
@@ -65,16 +53,9 @@ class PushNotifications {
           .resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin
           >()
-          ?.createNotificationChannel(
-            const AndroidNotificationChannel(
-              'weather_tips',
-              'Weather recommendations',
-              description: 'Forecast-based guidance for the selected NCR city',
-              importance: Importance.defaultImportance,
-            ),
-          );
+          ?.createNotificationChannel(weatherNotificationChannel);
       // Push mode replaces hourly local checks, including an older installed build.
-      await Workmanager().cancelByUniqueName('munora.weather.tips.v1');
+      await Workmanager().cancelByUniqueName(weatherNotificationJob);
       _ready = true;
       _subscriptions.add(
         FirebaseMessaging.onMessage.listen((message) {
@@ -106,7 +87,7 @@ class PushNotifications {
 
   Future<bool> enabled() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(enabledKey) ?? false;
+    return prefs.getBool(weatherNotificationsEnabledKey) ?? false;
   }
 
   Future<bool> setEnabled(bool value) async {
@@ -119,7 +100,7 @@ class PushNotifications {
       }
     }
     // Persist opt-out even if an earlier network reconciliation is still pending.
-    if (!await prefs.setBool(enabledKey, value)) {
+    if (!await prefs.setBool(weatherNotificationsEnabledKey, value)) {
       throw StateError('Preference save failed');
     }
     if (!value) {
@@ -179,7 +160,7 @@ class PushNotifications {
 
   Future<void> _sync(SharedPreferences prefs) async {
     try {
-      final desired = prefs.getBool(enabledKey) ?? false;
+      final desired = prefs.getBool(weatherNotificationsEnabledKey) ?? false;
       final permission = await FirebaseMessaging.instance
           .getNotificationSettings();
       final allowed =
@@ -214,17 +195,17 @@ class PushNotifications {
     if (alert == null) return;
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
-    if (!(prefs.getBool(enabledKey) ?? false) ||
+    if (!(prefs.getBool(weatherNotificationsEnabledKey) ?? false) ||
         (prefs.getString('selectedCity') ?? 'Muntinlupa') != alert.city ||
         prefs.getString('push.lastEvent') == alert.eventId) {
       return;
     }
     await _local.show(
-      2401,
+      weatherNotificationId,
       '${alert.city} weather update',
       message.notification?.body ??
           'Review forecast-based weather guidance in Alerts.',
-      details,
+      weatherNotificationDetails(),
       payload: jsonEncode(message.data),
     );
     await prefs.setString('push.lastEvent', alert.eventId);

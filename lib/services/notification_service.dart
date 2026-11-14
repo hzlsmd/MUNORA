@@ -9,18 +9,15 @@ import 'package:workmanager/workmanager.dart';
 import '../data/supported_cities.dart';
 import '../models/weather_snapshot.dart';
 import 'notification_policy.dart';
+import 'notification_config.dart';
 import 'weather_service.dart';
 import 'push_notifications.dart';
-
-const _job = 'munora.weather.tips.v1';
-const _enabledKey = 'notifications.weather.enabled';
-const _notificationId = 2401;
 
 @pragma('vm:entry-point')
 void weatherNotificationDispatcher() {
   Workmanager().executeTask((task, _) async {
     DartPluginRegistrant.ensureInitialized();
-    if (task != _job) return true;
+    if (task != weatherNotificationJob) return true;
     try {
       await NotificationService().checkWeather();
     } catch (_) {
@@ -51,7 +48,7 @@ class NotificationService {
     var localFailed = false;
     try {
       await _reload();
-      if (_prefs.getBool(_enabledKey) ?? false) {
+      if (_prefs.getBool(weatherNotificationsEnabledKey) ?? false) {
         await _initialize();
         final android = _plugin
             .resolvePlatformSpecificImplementation<
@@ -60,10 +57,10 @@ class NotificationService {
         if (await android?.areNotificationsEnabled() == true) {
           await _registerLocal();
         } else {
-          await Workmanager().cancelByUniqueName(_job);
+          await Workmanager().cancelByUniqueName(weatherNotificationJob);
         }
       } else {
-        await Workmanager().cancelByUniqueName(_job);
+        await Workmanager().cancelByUniqueName(weatherNotificationJob);
       }
       PushNotifications.instance.status.value = null;
     } catch (_) {
@@ -87,16 +84,16 @@ class NotificationService {
   Future<void> _registerLocal() async {
     await Workmanager().initialize(weatherNotificationDispatcher);
     await Workmanager().registerPeriodicTask(
-      _job,
-      _job,
+      weatherNotificationJob,
+      weatherNotificationJob,
       frequency: const Duration(hours: 1),
       existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
       constraints: Constraints(networkType: NetworkType.connected),
     );
     // An opt-out can race a startup/resume registration in the native scheduler.
     await _reload();
-    if (!(_prefs.getBool(_enabledKey) ?? false)) {
-      await Workmanager().cancelByUniqueName(_job);
+    if (!(_prefs.getBool(weatherNotificationsEnabledKey) ?? false)) {
+      await Workmanager().cancelByUniqueName(weatherNotificationJob);
     }
   }
 
@@ -112,14 +109,12 @@ class NotificationService {
       return PushNotifications.instance.enabled();
     }
     await _reload();
-    return _prefs.getBool(_enabledKey) ?? false;
+    return _prefs.getBool(weatherNotificationsEnabledKey) ?? false;
   }
 
   Future<void> _initialize() async {
     final ready = await _plugin.initialize(
-      const InitializationSettings(
-        android: AndroidInitializationSettings('ic_weather_notification'),
-      ),
+      weatherNotificationInitialization,
       onDidReceiveNotificationResponse: PushNotifications.instance.localTap,
     );
     if (ready != true) throw StateError('Notifications unavailable');
@@ -133,11 +128,11 @@ class NotificationService {
     await _reload();
     if (!value) {
       // Persist first so an already-running worker cannot publish after opt-out.
-      await _prefs.setBool(_enabledKey, false);
-      await Workmanager().cancelByUniqueName(_job);
+      await _prefs.setBool(weatherNotificationsEnabledKey, false);
+      await Workmanager().cancelByUniqueName(weatherNotificationJob);
       await _initialize();
-      await _plugin.cancel(_notificationId);
-      await _plugin.cancel(_notificationId + 1);
+      await _plugin.cancel(weatherNotificationId);
+      await _plugin.cancel(weatherNotificationId + 1);
       await PushNotifications.instance.cleanupLegacyPush();
       return false;
     }
@@ -148,39 +143,28 @@ class NotificationService {
         >();
     final allowed = await android?.requestNotificationsPermission() ?? false;
     if (!allowed) {
-      await _prefs.setBool(_enabledKey, false);
-      await Workmanager().cancelByUniqueName(_job);
+      await _prefs.setBool(weatherNotificationsEnabledKey, false);
+      await Workmanager().cancelByUniqueName(weatherNotificationJob);
       return false;
     }
     try {
-      await _prefs.setBool(_enabledKey, true);
+      await _prefs.setBool(weatherNotificationsEnabledKey, true);
       await _registerLocal();
     } catch (_) {
-      await _prefs.setBool(_enabledKey, false);
+      await _prefs.setBool(weatherNotificationsEnabledKey, false);
       rethrow;
     }
     return true;
   }
 
-  static const _details = NotificationDetails(
-    android: AndroidNotificationDetails(
-      'weather_tips',
-      'Weather recommendations',
-      channelDescription: 'Rule-based advice for the selected NCR city',
-      importance: Importance.defaultImportance,
-      priority: Priority.defaultPriority,
-      onlyAlertOnce: true,
-    ),
-  );
-
   Future<void> sendTest() async {
     if (!await enabled()) throw StateError('Enable notifications first');
     await _initialize();
     await _plugin.show(
-      _notificationId + 1,
+      weatherNotificationId + 1,
       'MUNORA notification test',
       'Weather recommendations are enabled on this phone.',
-      _details,
+      weatherNotificationDetails(onlyAlertOnce: true),
     );
   }
 
@@ -211,15 +195,15 @@ class NotificationService {
       if ((_prefs.getString('selectedCity') ?? 'Muntinlupa') != city) return;
       await _initialize();
       await _plugin.show(
-        _notificationId,
+        weatherNotificationId,
         '$city weather tips',
         '${tips.map((t) => t.title).join('. ')}. '
             'Estimate ${weatherTime(snapshot.observedAt)}. Check official advisories.',
-        _details,
+        weatherNotificationDetails(onlyAlertOnce: true),
       );
       // Recheck after platform delivery to honour a concurrent opt-out.
       if (!await enabled()) {
-        await _plugin.cancel(_notificationId);
+        await _plugin.cancel(weatherNotificationId);
         return;
       }
       for (final tip in tips) {

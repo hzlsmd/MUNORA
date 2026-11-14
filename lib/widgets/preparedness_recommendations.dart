@@ -12,12 +12,24 @@ class PreparednessRecommendations extends StatelessWidget {
   final WeatherSnapshot weather;
   final RainModelLoader? loader;
   final DateTime Function()? now;
+  final String filter;
+  final ValueChanged<String>? onFilterChanged;
   const PreparednessRecommendations({
     super.key,
     required this.weather,
     this.loader,
     this.now,
+    this.filter = 'All',
+    this.onFilterChanged,
   });
+
+  bool _matches(PreparednessRecommendation item) => switch (filter) {
+    'Rain' => {'rain', 'storm'}.contains(item.id),
+    'Heat' => item.id == 'heat',
+    'Outdoor' => {'heat', 'wind', 'storm'}.contains(item.id),
+    'Travel' => {'rain', 'wind', 'storm'}.contains(item.id),
+    _ => true,
+  };
 
   @override
   Widget build(BuildContext context) => RainOutlookBuilder(
@@ -30,6 +42,7 @@ class PreparednessRecommendations extends StatelessWidget {
         live: WeatherLiveStatus.of(context),
         now: (now?.call() ?? DateTime.now()).toUtc(),
       );
+      final visible = guidance.contextual.where(_matches).toList();
       return GlassCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -47,6 +60,29 @@ class PreparednessRecommendations extends StatelessWidget {
             const Text(
               'Practical steps based on available AI rain predictions and weather estimates. Each suggestion identifies its source.',
               style: TextStyle(fontSize: 12, height: 1.5),
+            ),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: ['All', 'Rain', 'Heat', 'Outdoor', 'Travel']
+                  .map(
+                    (category) => ChoiceChip(
+                      label: Text(category),
+                      selected: filter == category,
+                      showCheckmark: false,
+                      selectedColor: AppColors.indigo,
+                      labelStyle: TextStyle(
+                        color: filter == category
+                            ? Colors.white
+                            : AppColors.textBody,
+                      ),
+                      onSelected: onFilterChanged == null
+                          ? null
+                          : (_) => onFilterChanged!(category),
+                    ),
+                  )
+                  .toList(),
             ),
             if (guidance.unavailableReason != null) ...[
               const SizedBox(height: 12),
@@ -68,7 +104,7 @@ class PreparednessRecommendations extends StatelessWidget {
                   ),
                 ),
               ],
-              if (guidance.contextual.isEmpty) ...[
+              if (visible.isEmpty) ...[
                 const SizedBox(height: 12),
                 const Text(
                   'Keep checking current conditions and official advisories before heading out. No recommendation is an all-clear.',
@@ -76,7 +112,7 @@ class PreparednessRecommendations extends StatelessWidget {
                 ),
               ],
             ],
-            for (final recommendation in guidance.contextual)
+            for (final recommendation in visible)
               _Recommendation(recommendation: recommendation),
             const SizedBox(height: 8),
             ExpansionTile(

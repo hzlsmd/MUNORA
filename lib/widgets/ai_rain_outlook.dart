@@ -11,11 +11,13 @@ class AIRainOutlook extends StatelessWidget {
   final WeatherSnapshot weather;
   final RainModelLoader? loader;
   final VoidCallback? onPlanActivity;
+  final bool showRecommendation;
   const AIRainOutlook({
     super.key,
     required this.weather,
     this.loader,
     this.onPlanActivity,
+    this.showRecommendation = true,
   });
   @override
   Widget build(BuildContext context) {
@@ -69,22 +71,24 @@ class AIRainOutlook extends StatelessWidget {
                   'From ${weatherTime(prediction.estimatedAt)}\nThrough ${weatherTime(prediction.windowEnd)} (3 hours)',
                   style: const TextStyle(fontSize: 12, height: 1.5),
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  'Rain preparedness recommendation',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  prediction.probability >= .6
-                      ? 'Carry rain protection and consider a sheltered backup plan.'
-                      : 'Keep checking the hourly forecast and current conditions before heading out.',
-                  style: const TextStyle(fontSize: 12, height: 1.5),
-                ),
-                const Text(
-                  'Preparedness rules applied to this AI prediction.',
-                  style: TextStyle(fontSize: 11, color: AppColors.textBody),
-                ),
+                if (showRecommendation) ...[
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Rain preparedness recommendation',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    prediction.probability >= .6
+                        ? 'Carry rain protection and consider a sheltered backup plan.'
+                        : 'Keep checking the hourly forecast and current conditions before heading out.',
+                    style: const TextStyle(fontSize: 12, height: 1.5),
+                  ),
+                  const Text(
+                    'Preparedness rules applied to this AI prediction.',
+                    style: TextStyle(fontSize: 11, color: AppColors.textBody),
+                  ),
+                ],
                 const SizedBox(height: 8),
                 const Text(
                   'Chance of at least 0.1 mm total rain. Probability is not accuracy. Keep checking current conditions and official advisories.',

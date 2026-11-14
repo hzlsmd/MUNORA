@@ -1,5 +1,7 @@
 # MUNORA Comprehensive Project Audit
 
+> Historical record. For the current architecture and deployment evidence, see [DEPLOYMENT_STATUS.md](DEPLOYMENT_STATUS.md).
+
 **Audit date:** 7 November 2026  
 **Repository:** [hzlsmd/MUNORA](https://github.com/hzlsmd/MUNORA)  
 **Audited branch:** `master`  

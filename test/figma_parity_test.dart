@@ -78,11 +78,10 @@ void main() {
       'Forecast-based activity planner',
       'Plan My Activity',
       'Outdoor activity window',
-      'Stay Hydrated',
+      'Weather recommendations',
+      'Bring an umbrella or raincoat',
+      'Wear light clothing and drink water',
       'Check the UV Index',
-      'Plan Outdoor Activities',
-      'Travel Prepared',
-      'Thunderstorm Safety',
       'Was this guidance helpful?',
     ]) {
       expect(find.text(title), findsOneWidget);
