@@ -73,3 +73,28 @@ See [full model report](AI_RAIN_MODEL.md) and `ml/reports/evaluation.json`.
   verify integration, not live predictive accuracy.
 
 See [model and planner contract](AI_RAIN_MODEL.md#activity-planning-integration).
+
+## Recommendation visibility — 14 November 2026
+
+- Home/Tips show concise rain preparedness advice alongside the experimental AI
+  prediction, with a Plan an activity shortcut. Home opens Tips with the planner
+  expanded and scrolled into view; Tips reopens the same planner while preserving
+  the selected activity. A city change creates fresh planner state.
+- The supplement is labelled AI rain recommendation. Forecast-based activity
+  planning, weather recommendations and three-model agreement use distinct source
+  labels. The forecast model agreement percentage retains its existing definition;
+  model probabilities, warning thresholds and notification behavior are unchanged.
+- When loaded model inputs are unavailable, Refresh weather uses the shared
+  WeatherView force-refresh path, bypassing fresh memory reuse. Model-loading
+  failures retain their explanation instead of suggesting a weather refresh will
+  replace the model. The action is unavailable during an in-flight weather load.
+- Three new behavior tests cover shortcut expansion/scrolling without resetting
+  activity, explicit planner entry after weather loads, and forced refresh beyond
+  the memory cache. Existing label checks were updated intentionally.
+- All 124 Flutter tests pass; analysis is clean and web/Wasm dry-run build succeeds.
+  Independent read-only review found no defects. Prospective model accuracy and
+  physical Android delivery remain outside what these repository checks establish.
+- Browser regression passes at 390×844 and 1366×900 with zero page errors and
+  six provider calls per flow (unchanged). It now exercises actual Home routing
+  into the expanded/scrolled planner and the shortcut on Tips. The rendered
+  mobile planner entry was inspected to confirm its controls are visible.

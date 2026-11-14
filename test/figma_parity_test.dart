@@ -74,8 +74,8 @@ void main() {
     );
     await tester.pumpAndSettle();
     for (final title in [
-      'Model Prediction Confidence',
-      'AI Personalization Insights',
+      'Forecast model agreement',
+      'Forecast-based activity planner',
       'Plan My Activity',
       'Outdoor activity window',
       'Stay Hydrated',

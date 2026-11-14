@@ -17,12 +17,14 @@ class HomeScreen extends StatefulWidget {
   final ValueChanged<String> onCityChange;
   final String city;
   final WeatherService service;
+  final VoidCallback? onOpenPlanner;
   const HomeScreen({
     super.key,
     required this.navigate,
     required this.onCityChange,
     required this.city,
     required this.service,
+    this.onOpenPlanner,
   });
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -213,7 +215,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
               ],
-              AIRainOutlook(weather: weather),
+              AIRainOutlook(
+                weather: weather,
+                onPlanActivity:
+                    widget.onOpenPlanner ?? () => widget.navigate(AppScreen.ai),
+              ),
               const SizedBox(height: 16),
               WeatherMetrics(weather: weather.current),
               const SizedBox(height: 16),

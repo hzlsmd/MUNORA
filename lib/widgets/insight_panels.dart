@@ -138,7 +138,7 @@ class ModelAgreementPanel extends StatelessWidget {
     child: ExpansionTile(
       tilePadding: EdgeInsets.zero,
       title: const Text(
-        'Model Prediction Confidence',
+        'Forecast model agreement',
         style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
       ),
       subtitle: Column(

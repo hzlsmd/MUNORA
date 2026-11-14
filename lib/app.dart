@@ -46,6 +46,7 @@ class _RootScreenState extends State<_RootScreen> with WidgetsBindingObserver {
   PushAlert? pendingAlert;
   AppScreen screen = AppScreen.splash;
   String selectedCity = 'Muntinlupa';
+  bool openPlannerOnLoad = false;
   final weatherService = WeatherService();
   final insightsService = WeatherInsightsService();
 
@@ -124,8 +125,16 @@ class _RootScreenState extends State<_RootScreen> with WidgetsBindingObserver {
         return;
       }
     }
-    setState(() => screen = s);
+    setState(() {
+      screen = s;
+      openPlannerOnLoad = false;
+    });
   }
+
+  void openActivityPlanner() => setState(() {
+    screen = AppScreen.ai;
+    openPlannerOnLoad = true;
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +149,7 @@ class _RootScreenState extends State<_RootScreen> with WidgetsBindingObserver {
           city: selectedCity,
           service: weatherService,
           onCityChange: selectCity,
+          onOpenPlanner: openActivityPlanner,
         );
         break;
       case AppScreen.forecast:
@@ -163,6 +173,7 @@ class _RootScreenState extends State<_RootScreen> with WidgetsBindingObserver {
           city: selectedCity,
           service: weatherService,
           insightsService: insightsService,
+          openPlannerOnLoad: openPlannerOnLoad,
         );
         break;
     }
