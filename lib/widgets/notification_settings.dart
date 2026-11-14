@@ -83,10 +83,12 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                         style: const TextStyle(fontSize: 12),
                       ),
                       TextButton(
-                        onPressed: busy
-                            ? null
-                            : PushNotifications.instance.retry,
-                        child: const Text('Retry push connection'),
+                        onPressed: busy ? null : () => service.initialize(),
+                        child: Text(
+                          PushNotifications.configured
+                              ? 'Retry push connection'
+                              : 'Retry notification setup',
+                        ),
                       ),
                     ],
                   ),

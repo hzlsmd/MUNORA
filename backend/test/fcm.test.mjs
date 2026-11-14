@@ -90,3 +90,27 @@ test("HTTP adapter rejects non-success, oversized streaming and invalid JSON res
     readJson("https://test", {}, async () => new Response("no-json")),
   );
 });
+
+test("HTTP rejections preserve safe status and Retry-After without response content", async () => {
+  for (const [header, delay] of [["900", 900000], ["invalid", 0], ["-1", 0]]) {
+    await assert.rejects(
+      readJson("https://test", {}, async () => new Response("private upstream details", {
+        status: 429, headers: {"retry-after": header},
+      })),
+      (error) => {
+        assert.equal(error.status, 429);
+        assert.equal(error.retryAfterMs, delay);
+        assert.equal(error.message, "upstream_rejected");
+        assert.ok(!JSON.stringify(error).includes("private upstream details"));
+        return true;
+      },
+    );
+  }
+  const future = new Date(Date.now() + 900000).toUTCString();
+  await assert.rejects(
+    readJson("https://test", {}, async () => new Response(null, {
+      status: 503, headers: {"retry-after": future},
+    })),
+    (error) => error.status === 503 && error.retryAfterMs >= 898000 && error.retryAfterMs <= 900000,
+  );
+});

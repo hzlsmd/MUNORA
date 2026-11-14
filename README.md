@@ -18,11 +18,14 @@ Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
   selected city's weather, with explanations and a link to official PAGASA advisories.
   No forecast triggers is explicitly not an all-clear.
 - Cloudflare/FCM push implementation is prepared for Android, with five-minute
-  city checks and one-hour reminders. It is not deployed or phone-validated.
+  city checks and one-hour reminders. The existing Worker serves the expected
+  health response; end-to-end FCM delivery and phone acceptance remain unverified.
   See [free push deployment](docs/setup/DEPLOY_WEATHER_PUSH.md).
 - Default-build Android weather-tip notifications can be enabled from Tips, with a test
   notification and approximate hourly background checks. Native phone validation
   is still required. See [notifications](docs/NOTIFICATIONS.md).
+- Startup and resume restore local checks from the saved opt-in after switching
+  from a push build. Android permission is requested only through explicit opt-in.
 
 ## Experimental AI rain model and Heat Index
 

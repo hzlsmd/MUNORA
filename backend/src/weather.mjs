@@ -3,6 +3,21 @@ const codes = new Set([
   80, 81, 82, 85, 86, 95, 96, 99,
 ]);
 const rainCodes = new Set([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82]);
+// Preserve only metadata needed for retries/diagnostics, never upstream bodies.
+export class UpstreamRejection extends Error {
+  constructor(status, retryAfter) {
+    super("upstream_rejected");
+    this.status = status;
+    const seconds = typeof retryAfter === "string" && /^\d+$/.test(retryAfter.trim())
+      ? Number(retryAfter) : null;
+    const date = typeof retryAfter === "string" && /^[A-Za-z]{3},/.test(retryAfter)
+      ? Date.parse(retryAfter) : NaN;
+    const delay = seconds !== null ? seconds * 1000 : date - Date.now();
+    // Keep arithmetic and SQLite bindings finite even for malformed headers.
+    this.retryAfterMs = Number.isFinite(delay) && delay > 0
+      ? Math.min(delay, 86400000) : 0;
+  }
+}
 function number(n, min, max) {
   if (typeof n !== "number" || !Number.isFinite(n) || n < min || n > max)
     throw Error("invalid_measurement");
@@ -85,7 +100,7 @@ export async function readJson(
   });
   if (!response.ok) {
     await response.body?.cancel();
-    throw Error("upstream_rejected");
+    throw new UpstreamRejection(response.status, response.headers.get("retry-after"));
   }
   if (Number(response.headers.get("content-length")) > limit) {
     await response.body?.cancel();

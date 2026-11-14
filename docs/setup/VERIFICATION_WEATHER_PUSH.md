@@ -1,6 +1,8 @@
 # Weather push verification — 12 November 2026
 
-Prepared on feature branch feat/free-weather-push; not deployed.
+The following is a historical record, not current deployment status. See
+[current status](../DEPLOYMENT_STATUS.md) and the 14 November entry below.
+Originally prepared on feature branch feat/free-weather-push; not deployed then.
 
 - Backend: 12 Node tests pass using real SQLite for D1 statements and generated
   ephemeral cryptographic keys for OAuth signing. Includes expired-owner duplicate
@@ -45,3 +47,59 @@ same runtime version already resolved by Wrangler; CI installs backend dependenc
 The config now preserves the owner's active cron and logs through Git deployments.
 Post-fix live weather checks, FCM authentication and phone delivery still require
 verification after the fix is merged and deployed.
+
+## Notification reliability — 14 November 2026
+
+Reviewed baseline: `2a131538024f13bfa84348651d5b72faa7aa87f9`. The approved
+fixes cover transient push rejection, Android notification mode recovery,
+safe monitoring diagnostics and current deployment documentation.
+
+- Reproduced an explicit FCM HTTP 503 rejection consuming the one-hour reminder.
+  New failing tests demonstrated lost history and ignored Retry-After values.
+  The fix restores prior history and persists a minimum five-minute retry lease
+  for 429/5xx, respecting bounded Retry-After. Uncertain timeout/response failures
+  retain the hourly reservation. Expired owners cannot undo a newer send.
+- Backend: `npm test --prefix backend` passes all 23 tests, including real SQLite,
+  generated OAuth keys, retry/backoff, diagnostic redaction and workerd semantics.
+- Flutter 3.47.9 / Dart 3.13.7: `flutter analyze --no-pub` reports no issues;
+  `flutter test --no-pub --reporter expanded` passes all 111 tests. Six new
+  startup/widget regressions cover persisted opt-in restoration at startup/resume,
+  opt-out cancellation, denied/restored OS permission without prompting, offline
+  legacy cleanup, an opt-out during registration and the local setup retry button.
+  Tests replace only the native scheduler/host boundary; they do not prove actual
+  Workmanager execution or FCM delivery on a phone.
+- Model: `python -m unittest discover -s ml/tests -v` passes all seven tests.
+- Web: `flutter build web --no-pub --no-web-resources-cdn` succeeds, including
+  the Wasm compatibility dry run. No Android SDK or physical phone was available
+  for a new native build in this environment; the PR's Android CI job must confirm
+  compilation of the final revision.
+- Independent read-only review found no Critical/Important issue. It independently
+  reran all 23 backend tests. One minor diagnostic limitation remains: if releasing
+  a lease also fails after an upstream failure, the release error supersedes the
+  earlier error. Reporting both safely is deferred; database lease expiry still
+  provides recovery. `git diff --check` passes.
+- A read-only public `/health` request returned the expected service JSON. It is
+  liveness evidence only. No Worker deployment, database change, live topic send,
+  billing change or credential rotation was performed by this fix.
+
+Remaining acceptance: merge/deploy the selected revision, confirm successful city
+checks and FCM acceptance from sanitized logs, verify both signed Android build
+mode transitions and foreground/background/cold-start delivery on a controlled
+phone, and verify the historical credential's revocation in its provider account.
+
+### Branch Preview build failure
+
+The 14 November 03:06 UTC build log supplied by the owner shows `npm --prefix
+backend ci` succeeded, then `wrangler preview --config backend/wrangler.jsonc`
+failed because the branch had no `previews` block. This is distinct from the
+successful production deployments and GitHub Actions test jobs.
+
+Added an intentionally empty Preview configuration for the existing health-only
+HTTP interface. No production D1 binding or FCM secret is declared in that block.
+Cloudflare does not run Cron Triggers in Previews. See the runbook's Workers Builds
+section for the expected missing-DB warning and the limits of a health-only preview.
+Wrangler's installed Preview config parser now reads `{}` instead of an absent
+configuration; `npm run dry-run --prefix backend` bundles successfully, and all
+23 backend tests pass. No remote CLI authentication or deployment was performed.
+The next branch build must confirm the remote deploy; local parsing/packaging does
+not prove remote authentication or Preview base configuration.

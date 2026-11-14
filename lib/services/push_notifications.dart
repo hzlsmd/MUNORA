@@ -169,11 +169,13 @@ class PushNotifications {
   void retry() {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.android) return;
     unawaited(
-      (_ready ? synchronize() : initialize()).catchError((Object _) {
+      refresh().catchError((Object _) {
         status.value = 'Notification subscription is pending. Check your connection and retry.';
       }),
     );
   }
+
+  Future<void> refresh() => _ready ? synchronize() : initialize();
 
   Future<void> _sync(SharedPreferences prefs) async {
     try {
