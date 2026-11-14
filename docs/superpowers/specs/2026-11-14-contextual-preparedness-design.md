@@ -1,0 +1,11 @@
+# Contextual weather preparedness
+
+The user requests practical recommendations in MUNORA: umbrella, light clothing, water, indoor shelter, flood-road precautions and emergency kits. Add a compact Weather recommendations card on Tips, adjacent to the existing AI rain outlook. Preserve the planner, filters and existing forecast guidance.
+
+Use the existing local rain classifier plus validated live forecast data; no additional inference service, weather request, dependencies, training or push triggers. Each contextual item shows its source, city, reason and valid time. AI at or above the existing 60% preparation threshold recommends an umbrella. Current or upcoming forecast rain independently recommends rain protection. Merge these into one rain item without allowing low/unavailable AI to suppress forecast rain. When both sources apply, show separate labeled AI and forecast windows; a later forecast must not appear limited to the AI horizon. Heat advice uses the existing heat rule or a supported calculated heat index >=33°C; include water, light clothing, shade and breaks. Storm and wind use existing forecast rules. Keep general flood-road precautions and an emergency-kit checklist in a labeled expansion, with an explicit statement that no live flood or typhoon feed is connected.
+
+Saved/stale data must not produce contextual advice. Loading, expired, malformed or unavailable AI leaves forecast guidance available. No all-clear claims. General preparedness remains readable offline. Source badges distinguish experimental AI, weather forecast, calculated heat index and general preparedness; do not describe all recommendations as AI predictions.
+
+Approach: a typed pure recommendation evaluator and a small widget using the existing memoized RainOutlookBuilder. A generative API adds credentials and output-validation work without needed capability; a new multi-hazard model lacks data and is outside this change. This local approach follows the concrete behavior discussed with the user.
+
+Validation: decision tests for threshold, combined hazards, unavailable/expired model and saved weather; widget integration tests at narrow and wide sizes, general disclosure, expiry and city changes; full Flutter analysis/tests and web build. Existing notification and planner behavior must remain unchanged.

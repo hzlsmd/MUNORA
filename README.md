@@ -117,3 +117,19 @@ Browser regression check: serve `build/web` on port 8083 and run
 `node tools/check_weather_tips.cjs` with Playwright installed and Chromium available.
 It checks the redesign with controlled weather fixtures; real Android notification
 validation still requires a device.
+
+### Contextual weather recommendations
+
+Tips includes a **Weather recommendations** checklist for the selected city.
+It combines the existing experimental AI rain outlook (preparation at ≥60%) with
+independent forecast rain/storm/wind precautions and heat guidance. Each item
+shows its source, reason and applicable Philippine time. Heat advice includes
+light clothing, water, shade and breaks when the existing heat rule is reached
+or a supported calculated heat index reaches 33°C; this preparation threshold
+is not an official warning category. Low or unavailable AI never cancels forecast
+precautions. Saved/expired weather does not generate current recommendations.
+
+Expand **Flood and emergency preparedness** for road-flood precautions and an
+emergency-kit checklist. These are general preparation tips: no live flood or
+typhoon warning feed is connected, and the app cannot identify safe roads.
+This checklist adds no network requests, trained models or push-alert triggers.

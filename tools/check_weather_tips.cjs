@@ -85,6 +85,14 @@ const path = require('node:path');
 
       await page.getByText('Tips', { exact: true }).click();
       await page.getByText('Daily lifestyle tips', { exact: true }).waitFor();
+      await page.getByText('Weather recommendations', {exact:true}).waitFor();
+      await page.getByText('Bring an umbrella or raincoat', {exact:true}).waitFor();
+      await page.getByText('Wear light clothing and drink water', {exact:true}).waitFor();
+      await page.getByRole('button', {name:/Flood and emergency preparedness/}).click();
+      await page.getByText('Prepare an emergency kit', {exact:true}).waitFor();
+      await page.getByText(/No live flood or typhoon warning feed/).waitFor();
+      await page.screenshot({path:path.join(output, `preparedness-${viewport.width}.png`)});
+      await page.getByRole('button', {name:/Flood and emergency preparedness/}).click();
       await page.getByText('Plan an activity', {exact:true}).click();
       await page.getByRole('checkbox', {name:'Exercise',exact:true}).click();
       await page.getByText('Check this plan', {exact:true}).click();

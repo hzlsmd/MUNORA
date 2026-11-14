@@ -9,6 +9,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:munora/screens/alerts_screen.dart';
 import 'package:munora/screens/ai_screen.dart';
 import 'package:munora/services/weather_service.dart';
+import 'package:munora/widgets/guidance_card.dart';
 
 import 'weather_fixture.dart';
 
@@ -85,7 +86,11 @@ void main() {
       await tester.ensureVisible(find.text('Why this suggestion?'));
       await tester.tap(find.text('Why this suggestion?'));
       await tester.pumpAndSettle();
-      expect(find.text('light rain in the current estimate.'), findsOneWidget);
+      expect(
+        find.descendant(of: find.byType(GuidanceCard),
+          matching: find.text('light rain in the current estimate.')),
+        findsOneWidget,
+      );
     },
   );
   testWidgets('stale alert data never becomes an all-clear', (tester) async {
