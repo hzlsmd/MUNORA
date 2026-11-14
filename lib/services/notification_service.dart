@@ -36,6 +36,70 @@ class NotificationService {
   final _plugin = FlutterLocalNotificationsPlugin();
   late SharedPreferences _prefs;
 
+  /// Repair delivery after an app update or a change between push/local builds.
+  /// Permission is only requested by the explicit setEnabled(true) action.
+  Future<void> initialize() async {
+    if (!supported) return;
+    if (PushNotifications.configured) {
+      try {
+        await PushNotifications.instance.refresh();
+      } catch (_) {
+        // Subscription reconciliation already records its pending status.
+      }
+      return;
+    }
+    var localFailed = false;
+    try {
+      await _reload();
+      if (_prefs.getBool(_enabledKey) ?? false) {
+        await _initialize();
+        final android = _plugin
+            .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin
+            >();
+        if (await android?.areNotificationsEnabled() == true) {
+          await _registerLocal();
+        } else {
+          await Workmanager().cancelByUniqueName(_job);
+        }
+      } else {
+        await Workmanager().cancelByUniqueName(_job);
+      }
+      PushNotifications.instance.status.value = null;
+    } catch (_) {
+      localFailed = true;
+      PushNotifications.instance.status.value =
+          'Local weather notification setup is pending. Retry when online.';
+    }
+    // Local scheduling does not wait for Firebase or legacy topic cleanup.
+    try {
+      await PushNotifications.instance.initialize();
+    } catch (_) {
+      PushNotifications.instance.status.value =
+          'Previous push subscription cleanup is pending. Retry when online.';
+    }
+    if (localFailed) {
+      PushNotifications.instance.status.value =
+          'Local weather notification setup is pending. Retry when online.';
+    }
+  }
+
+  Future<void> _registerLocal() async {
+    await Workmanager().initialize(weatherNotificationDispatcher);
+    await Workmanager().registerPeriodicTask(
+      _job,
+      _job,
+      frequency: const Duration(hours: 1),
+      existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
+      constraints: Constraints(networkType: NetworkType.connected),
+    );
+    // An opt-out can race a startup/resume registration in the native scheduler.
+    await _reload();
+    if (!(_prefs.getBool(_enabledKey) ?? false)) {
+      await Workmanager().cancelByUniqueName(_job);
+    }
+  }
+
   Future<void> _reload() async {
     // Share the existing city-picker store, refreshing its per-isolate cache.
     _prefs = await SharedPreferences.getInstance();
@@ -89,15 +153,8 @@ class NotificationService {
       return false;
     }
     try {
-      await Workmanager().initialize(weatherNotificationDispatcher);
       await _prefs.setBool(_enabledKey, true);
-      await Workmanager().registerPeriodicTask(
-        _job,
-        _job,
-        frequency: const Duration(hours: 1),
-        existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
-        constraints: Constraints(networkType: NetworkType.connected),
-      );
+      await _registerLocal();
     } catch (_) {
       await _prefs.setBool(_enabledKey, false);
       rethrow;
