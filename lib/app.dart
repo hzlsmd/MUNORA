@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'data/supported_cities.dart';
 import 'services/weather_service.dart';
+import 'services/notification_service.dart';
 import 'services/push_notifications.dart';
 import 'services/push_state.dart';
 import 'services/weather_insights.dart';
@@ -68,7 +69,11 @@ class _RootScreenState extends State<_RootScreen> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) PushNotifications.instance.retry();
+    if (state == AppLifecycleState.resumed) {
+      // Startup/resume also restores local checks after leaving a push build.
+      // initialize handles setup failures without blocking the weather UI.
+      NotificationService().initialize();
+    }
   }
 
   Future<void> restoreCity() async {

@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 import { weatherTriggers } from "../src/weather.mjs";
 import worker, { monitorCity, scheduledCities } from "../src/worker.mjs";
 import { cities } from "../src/cities.mjs";
+import { send } from "../src/fcm.mjs";
 const now = Date.parse("2026-11-12T06:00:00Z");
 function fixture(code = 61) {
   return {
@@ -225,4 +226,110 @@ test("expired lease owner cannot overwrite or send after a newer owner claims", 
   unlock();
   await old;
   assert.equal(sent, 1);
+});
+
+function rejectedSend(status, headers = {}) {
+  return async (token, message) => send(token, message, async () =>
+    new Response("private upstream details", {status, headers}));
+}
+
+test("explicit FCM 503 retries after five minutes without consuming the hourly reminder", async () => {
+  const DB = database();
+  const deps = dependencies({send: rejectedSend(503)});
+  await assert.rejects(monitorCity(city(), {DB}, now, deps));
+  assert.equal(await monitorCity(city(), {DB}, now + 60000, deps), "busy");
+  const state = DB.sql.prepare("SELECT active,last_sent FROM city_alert_state").get();
+  assert.deepEqual(JSON.parse(state.active), []);
+  assert.deepEqual(JSON.parse(state.last_sent), {});
+  deps.send = async () => {};
+  assert.equal(await monitorCity(city(), {DB}, now + 300000, deps), "sent");
+  assert.equal(await monitorCity(city(), {DB}, now + 600000, deps), "quiet");
+});
+
+test("FCM 429 respects Retry-After across a new monitor invocation", async () => {
+  const DB = database();
+  const deps = dependencies({send: rejectedSend(429, {"retry-after": "900"})});
+  await assert.rejects(monitorCity(city(), {DB}, now, deps));
+  deps.send = async () => {};
+  assert.equal(await monitorCity(city(), {DB}, now + 300000, deps), "busy");
+  assert.equal(await monitorCity(city(), {DB}, now + 900000, deps), "sent");
+});
+
+test("rejected reminder restores previously successful history and repeated failures keep backing off", async () => {
+  const DB = database();
+  await monitorCity(city(), {DB}, now, dependencies());
+  const deps = dependencies({send: rejectedSend(503)});
+  await assert.rejects(monitorCity(city(), {DB}, now + 3600000, deps));
+  assert.deepEqual(JSON.parse(DB.sql.prepare("SELECT last_sent FROM city_alert_state").get().last_sent), {rain: now});
+  await assert.rejects(monitorCity(city(), {DB}, now + 3900000, deps));
+  assert.equal(await monitorCity(city(), {DB}, now + 3960000, deps), "busy");
+  deps.send = async () => {};
+  assert.equal(await monitorCity(city(), {DB}, now + 4200000, deps), "sent");
+});
+
+test("late rejected sender cannot restore history over a newer lease owner", async () => {
+  const DB = database();
+  let clock = now;
+  let release, started;
+  const gate = new Promise(r => release = r);
+  const ready = new Promise(r => started = r);
+  const old = monitorCity(city(), {DB}, now, dependencies({clock: () => clock, send: async (...args) => {
+    started(); await gate; await rejectedSend(503)(...args);
+  }}));
+  const failure = assert.rejects(old);
+  await ready;
+  clock = now + 121000;
+  const newer = dependencies({getWeather: async () => {
+    const f = fixture(); f.current.temperature_2m = 34; return f;
+  }});
+  assert.equal(await monitorCity(city(), {DB}, clock, newer), "sent");
+  release(); await failure;
+  const state = DB.sql.prepare("SELECT active,last_sent FROM city_alert_state").get();
+  assert.deepEqual(JSON.parse(state.active), ["rain", "heat"]);
+  assert.equal(JSON.parse(state.last_sent).heat, clock);
+  assert.equal(await monitorCity(city(), {DB}, now + 300000, newer), "quiet");
+});
+
+test("permanent FCM rejection retains the reservation rather than retrying rapidly", async () => {
+  const DB = database();
+  await assert.rejects(monitorCity(city(), {DB}, now, dependencies({send: rejectedSend(400)})));
+  assert.equal(await monitorCity(city(), {DB}, now + 300000, dependencies()), "quiet");
+});
+
+test("monitor failures identify weather, OAuth and FCM boundaries", async () => {
+  for (const [stage, overrides] of [
+    ["weather", {getWeather: async () => {throw Error("offline")}}],
+    ["oauth", {getToken: async () => {throw Error("invalid_fcm_configuration")}}],
+    ["fcm", {send: rejectedSend(503)}],
+  ]) {
+    await assert.rejects(monitorCity(city(), {DB: database()}, now, dependencies(overrides)),
+      (error) => {assert.equal(error.stage, stage); return true;});
+  }
+});
+
+test("scheduled database failures log stage and category without leaking raw errors", async (t) => {
+  const logs = [];
+  t.mock.method(console, "error", (...args) => logs.push(args));
+  const DB = {prepare() {throw Error("credential=private-token https://secret.example/body")}};
+  let work;
+  await worker.scheduled({scheduledTime: now}, {DB}, {waitUntil(p) {work = p}});
+  await work;
+  assert.equal(logs.length, scheduledCities(now).length);
+  assert.deepEqual(logs[0], ["weather_monitor_failed", {
+    city: scheduledCities(now)[0].slug, stage: "database", category: "unexpected_error",
+  }]);
+  assert.ok(!JSON.stringify(logs).includes("private-token"));
+});
+
+test("scheduled upstream rejections log HTTP status without upstream response bodies", async (t) => {
+  const logs = [];
+  t.mock.method(console, "error", (...args) => logs.push(args));
+  t.mock.method(globalThis, "fetch", async () => new Response("private upstream body", {status: 503}));
+  let work;
+  await worker.scheduled({scheduledTime: now}, {DB: database()}, {waitUntil(p) {work = p}});
+  await work;
+  assert.deepEqual(logs[0], ["weather_monitor_failed", {
+    city: scheduledCities(now)[0].slug, stage: "weather", category: "upstream_rejected", status: 503,
+  }]);
+  assert.ok(!JSON.stringify(logs).includes("private upstream body"));
 });

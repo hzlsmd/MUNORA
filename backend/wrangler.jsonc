@@ -5,6 +5,9 @@
   "account_id": "d47c9ddabf3322c910aec7a165616679",
   "compatibility_date": "2026-11-12",
   "workers_dev": true,
+  // Branch previews expose /health only. Cron triggers target production;
+  // do not give preview code the production database or FCM credentials.
+  "previews": {},
   "d1_databases": [
     {
       "binding": "DB",

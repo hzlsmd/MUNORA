@@ -1,6 +1,10 @@
 # Deploy MUNORA free weather push
 
-The implementation is prepared locally, not deployed. Keep Firebase Spark and
+This is the runbook for the existing Worker and optional Android push build.
+The owner reported deploying the Worker and enabling its schedule. Its public
+health route was observed responding on 14 November 2026, but the deployed source
+revision, successful weather/FCM processing and phone acceptance remain unverified.
+See [current status](../DEPLOYMENT_STATUS.md). Keep Firebase Spark and
 Cloudflare Workers/D1 Free. Do not enable a billing plan or trial to complete
 these steps. No domain purchase or public device-registration endpoint is needed.
 
@@ -42,6 +46,37 @@ monitoring; use an empty cron list only when deliberately pausing monitoring.
 Check `/health`; it describes the service, not successful FCM delivery or provider
 freshness. No `/send` or public manual-trigger endpoint exists.
 
+## Workers Builds and branch previews
+
+With the build root at the repository root, use these dashboard commands:
+
+- Build: `npm --prefix backend ci`
+- Production deploy: `npx --prefix backend wrangler deploy --config backend/wrangler.jsonc`
+- Preview: `npx --prefix backend wrangler preview --config backend/wrangler.jsonc`
+
+Wrangler 4.160.1 requires a `previews` block for the Preview command. The checked-in
+empty block is intentional: the HTTP interface exposes only `/health`, so a branch
+Preview does not need a database or FCM credentials. Wrangler may warn that the
+production `DB` binding is absent from Previews; that warning is expected here.
+Do not copy the suggested production D1 ID into the Preview block merely to silence
+that warning. Also check that the dashboard Preview base config has no production
+database binding or FCM secret attached.
+
+Cloudflare runs Cron Triggers only against production; they do not invoke a
+Preview's `scheduled()` handler. A successful Preview verifies HTTP health, not
+weather monitoring, database writes or FCM delivery. Continue using the backend
+tests for scheduled behavior and the production acceptance checklist for delivery.
+For future remote scheduled integration tests, provision a separate staging D1
+database and test-only messaging configuration first.
+
+If production builds succeed but branch builds fail with `missing a previews
+block`, inspect the Preview command and the configuration in that branch. Dependency
+installation warnings about esbuild/workerd install scripts are separate from
+that configuration error; the supplied failure log completed `npm ci` successfully.
+
+References: [Preview configuration](https://developers.cloudflare.com/workers/previews/configuration/)
+and [resource isolation / Cron Triggers](https://developers.cloudflare.com/workers/previews/resources/).
+
 ## Configure the Android build
 
 Use the repository's supported Flutter 3.47.9 and Android SDK setup. The client
@@ -63,6 +98,12 @@ No user account or device-token upload endpoint is introduced.
 Without the build define, local hourly checks remain the notification mode.
 A build with push enabled replaces those local background checks. Web does not
 initialize Firebase or subscribe to push.
+
+Startup and resume reconcile the saved opt-in with the build mode. Switching back
+to a local build restores its hourly job with keep semantics, removes legacy push
+subscriptions independently, and never requests OS permission automatically.
+Denied OS permission cancels local checks until permission is restored and the
+app resumes. The settings retry button retries the current notification mode.
 
 The existing "Send test notification" button checks local Android display only.
 It does NOT prove that Cloudflare, FCM authorization or background push works.
@@ -93,8 +134,12 @@ subrequests, cron duration, D1 usage and provider limits on the Free account. A
 local dry-run and Node tests do not measure Workers Free CPU. If free limits are
 exceeded, disable cron and optimize or reduce scope; do not upgrade automatically.
 
-No error or quota failure is an all-clear. Logs emit only a sanitized city failure,
-not secrets. Investigate with the dashboard and confirm configuration. FCM OAuth
+No error or quota failure is an all-clear. Logs emit `weather_monitor_failed`
+with `city`, `stage` (database/weather/state/oauth/fcm), an allowlisted `category`,
+and HTTP `status` for upstream rejections. Raw exceptions, upstream bodies,
+request URLs, headers and credentials are excluded. An `unexpected_error` needs
+investigation at the named stage; it is not evidence that the city is safe.
+Investigate with the dashboard and confirm configuration. FCM OAuth
 failure and malformed/stale weather must produce no notifications.
 
 ## Delivery behavior
@@ -108,6 +153,11 @@ failure and malformed/stale weather must produce no notifications.
 - Before sending, persist a cooldown. If FCM times out, it may have accepted the
   message. Avoid an immediate duplicate; the next reminder may be up to an hour
   later. FCM acceptance is not proof of phone delivery.
+- Explicit FCM 429/5xx rejection restores the previous active/history state and
+  persists a retry lease of at least five minutes. Valid Retry-After values
+  extend the delay, capped at 24 hours to keep malformed headers bounded. The
+  next eligible scheduled city check retries; there is no immediate retry loop.
+  Permanent 4xx failures retain the one-hour reservation and require diagnosis.
 - Topic messages have a one-hour TTL and a per-city collapse key.
 - Notification tap opens Alerts for the message's city. Invalid or over-one-hour
   tap payloads are ignored. Foreground messages for another city are ignored.
@@ -129,6 +179,11 @@ failure and malformed/stale weather must produce no notifications.
 9. Observe a scheduled weather-triggered notification and one-hour repeat timing.
 10. Record provider estimate time, Worker time, FCM acceptance and phone arrival.
 11. Verify notification channels, icon, battery restrictions and force-stop limits.
+12. Update a push-enabled installation to a local build with compatible signing:
+    the saved enabled toggle must restore local checks, including when Firebase
+    cleanup is offline. Update back to push and confirm the local job is cancelled.
+13. Confirm startup/resume never asks permission, denied permission stays silent,
+    and restoring OS permission followed by resume restores the selected mode.
 
 Push is near real time, not guaranteed instant. Topic fanout prioritizes throughput;
 Android normal-priority delivery can be delayed by Doze, connectivity and device

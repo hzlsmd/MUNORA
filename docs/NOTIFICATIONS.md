@@ -5,7 +5,9 @@
 See [free push deployment](setup/DEPLOY_WEATHER_PUSH.md). The optional Android
 `ENABLE_WEATHER_PUSH=true` build uses Cloudflare/D1 and Firebase Messaging city
 topics. Each city is checked every five minutes; the same active condition can
-remind after one hour. Deployment and real-device delivery are not yet verified.
+remind after one hour. The public Worker health route responds, but end-to-end
+processing and real-device delivery remain unverified; see
+[current deployment status](DEPLOYMENT_STATUS.md).
 The button labelled "Send test notification" tests local display, not remote push.
 
 The historical implementation notes below describe the default local mode.
@@ -26,6 +28,14 @@ One notification groups qualifying tips and replaces the previous weather-tip no
 Background jobs fetch fresh weather rather than alerting from saved/offline data. Check frequency is approximate: Doze, battery restrictions, OEM limits and force-stop can prevent/delay delivery. No exact alarms or foreground-service permission is needed. Android 13+ asks POST_NOTIFICATIONS; older versions still respect system channel settings. Other platforms retain the weather app with notifications unavailable.
 
 Settings remain available even when weather loading fails. If Android permission or channel access is disabled later, background work stays silent; use Android notification settings to restore permission or turn off the app toggle. A persisted opt-in is not a guarantee that Android will deliver a notification.
+
+Startup and resume restore the local periodic job from the saved opt-in, using
+keep semantics to preserve an existing job's cadence. This repairs updates from
+a push build, which previously cancelled local checks. Startup never requests OS
+permission. When OS notification permission is denied, local work is cancelled;
+restoring permission and resuming the app repairs it. Legacy push cleanup runs
+after local scheduling, so offline Firebase does not prevent restoring the job.
+The settings retry control retries the build's active notification mode.
 
 The plugin is constrained to the 19.x release line, whose documented Android compileSdk floor is 35, compatible with this project's Flutter/SDK setup. The current 23.x plugin requires compileSdk 37. Reassess that constraint when upgrading the Android toolchain. Java 17 is retained and core-library desugaring is enabled as required by the plugin. A white drawable icon is explicitly retained for release shrinking. No exact scheduled-notification receivers are added because WorkManager performs the weather checks and notifications are displayed immediately.
 
