@@ -79,7 +79,7 @@ PreparednessGuidance preparednessRecommendations(
       PreparednessRecommendation(
         id: 'storm',
         title: 'Plan indoor shelter',
-        advice: 'Stay indoors during thunderstorms and postpone exposed outdoor activities. Avoid open fields, water and isolated trees; check official advisories.',
+        advice: 'Stay indoors during thunderstorms and postpone exposed outdoor activities. Avoid open fields, water and isolated trees. Wait at least 30 minutes after the last thunder before resuming exposed activity; check official advisories.',
         reason: storm.reason,
         sources: const [PreparednessSource.forecast],
         from: now,

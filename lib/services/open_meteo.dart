@@ -1,77 +1,30 @@
+import '../data/supported_cities.dart';
+import '../data/weather_codes.dart';
+
 const openMeteoEndpoint = 'https://api.open-meteo.com/v1/forecast';
 
-const _coordinates = <String, (double, double)>{
-  'Muntinlupa': (14.4081, 121.0415),
-  'Manila': (14.5995, 120.9842),
-  'Quezon City': (14.6760, 121.0437),
-  'Makati': (14.5547, 121.0244),
-  'Taguig': (14.5176, 121.0509),
-  'Pasig': (14.5764, 121.0851),
-  'Pasay': (14.5378, 121.0014),
-  'Mandaluyong': (14.5794, 121.0359),
-  'Marikina': (14.6507, 121.1029),
-  'Caloocan': (14.6488, 120.9841),
-  'Malabon': (14.6681, 120.9658),
-  'Navotas': (14.6667, 120.9417),
-  'Valenzuela': (14.7011, 120.9830),
-  'Las Pinas': (14.4445, 120.9939),
-  'Paranaque': (14.4793, 121.0198),
-  'San Juan': (14.6019, 121.0355),
-  'Pateros': (14.5445, 121.0680),
-};
-
 Uri openMeteoRequest(String city) {
-  final coordinates = _coordinates[city]!;
-  return Uri.parse(openMeteoEndpoint).replace(queryParameters: {
-    'latitude': '${coordinates.$1}',
-    'longitude': '${coordinates.$2}',
-    'current':
-        'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,pressure_msl,wind_speed_10m',
-    'hourly': 'temperature_2m,weather_code',
-    'wind_speed_unit': 'ms',
-    'temperature_unit': 'celsius',
-    'timeformat': 'unixtime',
-    'timezone': 'Asia/Manila',
-    'forecast_days': '6',
-  });
+  final coordinates = supportedCityCoordinates[city]!;
+  return Uri.parse(openMeteoEndpoint).replace(
+    queryParameters: {
+      'latitude': '${coordinates.$1}',
+      'longitude': '${coordinates.$2}',
+      'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,pressure_msl,wind_speed_10m',
+      'hourly': 'temperature_2m,weather_code',
+      'wind_speed_unit': 'ms',
+      'temperature_unit': 'celsius',
+      'timeformat': 'unixtime',
+      'timezone': 'Asia/Manila',
+      'forecast_days': '6',
+    },
+  );
 }
 
-const _conditions = <int, String>{
-  0: 'Clear sky',
-  1: 'Mainly clear',
-  2: 'Partly cloudy',
-  3: 'Overcast',
-  45: 'Fog',
-  48: 'Depositing rime fog',
-  51: 'Light drizzle',
-  53: 'Moderate drizzle',
-  55: 'Dense drizzle',
-  56: 'Light freezing drizzle',
-  57: 'Dense freezing drizzle',
-  61: 'Light rain',
-  63: 'Moderate rain',
-  65: 'Heavy rain',
-  66: 'Light freezing rain',
-  67: 'Heavy freezing rain',
-  71: 'Light snow',
-  73: 'Moderate snow',
-  75: 'Heavy snow',
-  77: 'Snow grains',
-  80: 'Light rain showers',
-  81: 'Moderate rain showers',
-  82: 'Violent rain showers',
-  85: 'Light snow showers',
-  86: 'Heavy snow showers',
-  95: 'Thunderstorm',
-  96: 'Thunderstorm with light hail',
-  99: 'Thunderstorm with heavy hail',
-};
-
 String _condition(dynamic code) {
-  if (code is! int || !_conditions.containsKey(code)) {
+  if (code is! int || !weatherConditions.containsKey(code)) {
     throw const FormatException('Unknown WMO weather code');
   }
-  return _conditions[code]!;
+  return weatherConditions[code]!;
 }
 
 DateTime _time(dynamic seconds) {
@@ -88,7 +41,10 @@ void _units(dynamic units, Map<String, String> expected) {
 }
 
 Map<String, dynamic> normalizeOpenMeteo(
-    Map<String, dynamic> json, String city, DateTime now) {
+  Map<String, dynamic> json,
+  String city,
+  DateTime now,
+) {
   _units(json['current_units'], {
     'time': 'unixtime',
     'temperature_2m': '\u00b0C',
@@ -101,7 +57,7 @@ Map<String, dynamic> normalizeOpenMeteo(
   _units(json['hourly_units'], {
     'time': 'unixtime',
     'temperature_2m': '\u00b0C',
-    'weather_code': 'wmo code'
+    'weather_code': 'wmo code',
   });
   final current = json['current'] as Map<String, dynamic>;
   final hourly = json['hourly'] as Map<String, dynamic>;
@@ -140,7 +96,7 @@ Map<String, dynamic> normalizeOpenMeteo(
         'temperature': temperature,
         'low': temperature,
         'high': temperature,
-        'condition': condition
+        'condition': condition,
       });
     }
   }
@@ -159,7 +115,7 @@ Map<String, dynamic> normalizeOpenMeteo(
       'pressure': current['pressure_msl'],
       'wind': current['wind_speed_10m'],
       'weatherCode': current['weather_code'],
-      'condition': _condition(current['weather_code'])
+      'condition': _condition(current['weather_code']),
     },
     'hourly': points,
   };

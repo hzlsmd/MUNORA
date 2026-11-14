@@ -1,5 +1,7 @@
 # MUNORA Implementation Plan
 
+> Historical record. For the current architecture and deployment evidence, see [DEPLOYMENT_STATUS.md](DEPLOYMENT_STATUS.md).
+
 ## Integration Completion Addendum (8 November 2026)
 
 - [x] Reinventory all 13 accessible development branches plus recovery and all 14 PRs after concurrent updates.

@@ -9,7 +9,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:munora/screens/alerts_screen.dart';
 import 'package:munora/screens/ai_screen.dart';
 import 'package:munora/services/weather_service.dart';
-import 'package:munora/widgets/guidance_card.dart';
 
 import 'weather_fixture.dart';
 
@@ -53,7 +52,7 @@ void main() {
     expect(find.textContaining('not an all-clear'), findsOneWidget);
   });
   testWidgets(
-    'tip filters retain featured advice and filter general guidance',
+    'category filters show each contextual action once and retain its explanation',
     (tester) async {
       final service = WeatherService(
         endpoint: 'https://weather.example',
@@ -78,19 +77,13 @@ void main() {
       await tester.ensureVisible(find.text('Heat'));
       await tester.tap(find.text('Heat'));
       await tester.pumpAndSettle();
-      expect(find.text('Stay Hydrated'), findsOneWidget);
-      expect(find.text('Travel Prepared'), findsNothing);
-      expect(find.text('Bring rain protection'), findsOneWidget);
+      expect(find.text('Wear light clothing and drink water'), findsOneWidget);
+      expect(find.text('Bring an umbrella or raincoat'), findsNothing);
       await tester.tap(find.text('Rain'));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.text('Why this suggestion?'));
-      await tester.tap(find.text('Why this suggestion?'));
-      await tester.pumpAndSettle();
-      expect(
-        find.descendant(of: find.byType(GuidanceCard),
-          matching: find.text('light rain in the current estimate.')),
-        findsOneWidget,
-      );
+      expect(find.text('Bring an umbrella or raincoat'), findsOneWidget);
+      expect(find.text('Wear light clothing and drink water'), findsNothing);
+      expect(find.text('light rain in the current estimate.'), findsOneWidget);
     },
   );
   testWidgets('stale alert data never becomes an all-clear', (tester) async {
@@ -148,11 +141,16 @@ void main() {
     await tester.ensureVisible(find.text('Heat'));
     await tester.tap(find.text('Heat'));
     await tester.pumpAndSettle();
-    expect(find.text('Travel Prepared'), findsNothing);
+    expect(find.text('Bring an umbrella or raincoat'), findsNothing);
     await tester.pumpWidget(screen('Manila'));
     await tester.pumpAndSettle();
-    expect(find.text('Bring rain protection'), findsOneWidget);
+    expect(find.text('Bring an umbrella or raincoat'), findsOneWidget);
     expect(find.text('Muntinlupa'), findsNothing);
-    expect(find.text('Travel Prepared'), findsOneWidget);
+    expect(
+      tester
+          .widget<ChoiceChip>(find.widgetWithText(ChoiceChip, 'All'))
+          .selected,
+      isTrue,
+    );
   });
 }

@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 
 import '../data/supported_cities.dart';
+import '../data/weather_codes.dart';
 import '../models/weather_snapshot.dart';
 import '../models/planning_hour.dart';
 import 'open_meteo.dart';
@@ -85,36 +86,6 @@ class WeatherInsights {
     }
 
     final hours = times(detail);
-    const knownCodes = {
-      0,
-      1,
-      2,
-      3,
-      45,
-      48,
-      51,
-      53,
-      55,
-      56,
-      57,
-      61,
-      63,
-      65,
-      66,
-      67,
-      71,
-      73,
-      75,
-      77,
-      80,
-      81,
-      82,
-      85,
-      86,
-      95,
-      96,
-      99,
-    };
     final planning = List<PlanningHour>.generate(hours.length, (i) {
       final code = value(detail, 'weather_code', i, 0, 99, 'wmo code');
       return PlanningHour(
@@ -127,7 +98,7 @@ class WeatherInsights {
         code:
             code != null &&
                 code == code.roundToDouble() &&
-                knownCodes.contains(code.toInt())
+                weatherConditions.containsKey(code.toInt())
             ? code.toInt()
             : null,
       );

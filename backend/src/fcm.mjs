@@ -1,4 +1,5 @@
 import { readJson } from "./weather.mjs";
+import { topicFor } from "./cities.mjs";
 const project = "munora-5adfa";
 const identity =
   "munora-weather-sender-483@munora-5adfa.iam.gserviceaccount.com";
@@ -94,7 +95,7 @@ const titles = {
 export function notificationMessage(city, triggers, now, observed) {
   return {
     message: {
-      topic: `munora_weather_${city.slug}`,
+      topic: topicFor(city),
       notification: {
         title: `${city.name} weather update`,
         body:
