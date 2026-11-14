@@ -39,3 +39,37 @@ See [full model report](AI_RAIN_MODEL.md) and `ml/reports/evaluation.json`.
 - GitHub Actions now includes a push-enabled Android debug APK build/artifact;
   its remote result is pending publication. Local Android SDK remains absent.
 - Existing background push triggers and cooldowns are unchanged.
+
+## Activity planning integration — 14 November 2026
+
+- Home/Tips use one typed outlook evaluator and the same memoized numeric model.
+  The card now includes selected city and weather-estimate time and distinguishes
+  saved-only, stale/future-dated, expired, missing-input, unsupported and unavailable
+  model cases. A loading replacement model cannot display a previous prediction.
+- Tips passes its existing live weather snapshot into Plan My Activity. After a
+  plan check, a compact experimental supplement shows the full three-hour model
+  probability only when the entire future plan fits inside that outlook. It never
+  presents that probability as a one-hour or future rolling-window prediction.
+- Preparedness rules provide activity-specific advice at >=60%; lower values
+  still require checking current conditions and hourly forecasts. The existing
+  forecast assessment, severe-condition warnings and better-window search are
+  unchanged, as are notifications, model weights and training/evaluation data.
+- New regression cases were observed failing before implementation: missing
+  city/time and reason context, absent planner integration, retained probability
+  while a new model was pending, and model details losing the loaded version when
+  weather was stale. Focused cases cover full/partial/outside windows, exact end
+  boundaries, past/invalid plans, threshold behavior for all four activities,
+  saved/stale inputs, activity changes and low-AI/high-storm preservation at 320px
+  with 2x text.
+- The full Flutter suite passes 121 tests, including unchanged frozen Python→Dart
+  model golden vectors. Flutter analysis reports no issues. The release web build
+  succeeds, including its Wasm compatibility dry run. No dependencies were added.
+- Independent read-only review found no Critical, Important or Minor issue.
+  Real phone acceptance and prospective rainfall verification remain outstanding.
+- Browser regression passes at 390×844 and 1366×900 with the actual bundled model
+  and controlled Open-Meteo fixtures. Checking the plan after a city change shows
+  the full-window AI context, with six provider requests per flow and no page
+  errors; the count is unchanged from the existing flow. Fixture/browser results
+  verify integration, not live predictive accuracy.
+
+See [model and planner contract](AI_RAIN_MODEL.md#activity-planning-integration).

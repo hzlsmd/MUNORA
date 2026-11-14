@@ -140,6 +140,7 @@ class _AIScreenState extends State<AIScreen> {
                     key: ValueKey('planner:${widget.city}'),
                     city: widget.city,
                     insights: insight,
+                    weather: weather,
                   ),
                   const SizedBox(height: 16),
                   OutdoorPanel(insights: insight),

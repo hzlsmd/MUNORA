@@ -96,6 +96,39 @@ does not create push-warning triggers, cancel current-rain advice, or give an
 all-clear. Seasonal groups are May–October and November–April; finer local claims
 are unsupported.
 
+## Activity planning integration
+
+Home and Tips identify the selected city, weather estimate time and exact
+observation-anchored three-hour outlook. Their shared evaluator explains saved-only,
+stale, future-dated, missing-input, unsupported-source/domain and model-loading
+failures. Both use the same memoized model asset and existing weather snapshot;
+opening the planner does not request additional provider data or send telemetry.
+
+After selecting an activity and choosing **Check this plan** in Tips, the planner
+shows supplementary experimental rain context when the entire future activity
+window falls inside the current three-hour outlook. The displayed probability
+covers the full three-hour outlook. It is not recalculated as the probability for
+the selected one- or two-hour subinterval. A partially overlapping or later plan
+gets a coverage explanation and is directed to the hourly forecast instead.
+
+At >=60%, preparedness rules translate the model output into activity-specific
+advice for walking, commuting, exercise or outdoor work. Lower probabilities still
+tell the user to recheck conditions and preserve hourly forecast precautions.
+The AI supplement does not change the existing forecast-derived planner status:
+storm, heat and wind warnings, missing-data states and suggested forecast windows
+remain independent of the rain model. The model does not infer a new future rolling
+window, predict exact onset, forecast flooding or guarantee a safe activity time.
+No push notification rule is changed.
+
+This integration needs prospective validation before it can support AI-triggered
+notifications. Record predictions before their outcome windows, keep model version,
+input source and issuance/observation times, and compare them against independently
+verified rainfall for the same location and window. Compare the existing model
+with provider forecasts issued at that same time using calibration/Brier scores
+and wet-event precision/recall. Do not tune on the already inspected 2025 test set
+or treat retrospective ERA5 results as measured live accuracy. No automatic data
+collection or validation service is added by this UI integration.
+
 ## Attribution
 
 Weather data by [Open-Meteo](https://open-meteo.com/) under its

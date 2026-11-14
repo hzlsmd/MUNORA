@@ -37,7 +37,11 @@ ERA5 data cover two shared grids across the 17 NCR locations. See
 [model data, evaluation and reproduction](docs/AI_RAIN_MODEL.md).
 
 Home and Tips display the experimental outlook only for fresh, supported live
-inputs and a validated model. Existing background notification rules are unchanged.
+inputs and a validated model, with city/time context and specific unavailable
+reasons. Tips' activity planner adds rain preparedness advice when the complete
+plan fits within the current three-hour AI window. Its probability describes the
+full outlook; hourly forecast warnings and planner severity remain independent.
+Existing background notification rules are unchanged.
 The shared Pressure card is replaced with current Heat Index, calculated from
 unrounded temperature/humidity using NWS screening/regression and adjustments.
 It is an estimate for shade/light wind, distinct from provider Feels Like.
