@@ -50,7 +50,7 @@ void main() {
       'not json',
       jsonEncode(weatherFixture(city: 'Manila')),
       jsonEncode(weatherFixture(
-          updatedAt: DateTime.now().subtract(const Duration(hours: 25)))),
+          updatedAt: DateTime.now().subtract(const Duration(days: 8)))),
       jsonEncode(weatherFixture(
           updatedAt: DateTime.now().add(const Duration(hours: 1))))
     ]) {

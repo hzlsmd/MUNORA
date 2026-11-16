@@ -8,8 +8,12 @@ class WeatherTip {
   const WeatherTip(this.id, this.title, this.advice, this.reason);
 }
 
-List<WeatherTip> weatherRecommendations(WeatherSnapshot weather, DateTime now) {
-  if (!weather.isUsable(now)) {
+List<WeatherTip> weatherRecommendations(
+  WeatherSnapshot weather,
+  DateTime now, {
+  bool saved = false,
+}) {
+  if (!weather.isUsable(now, offline: saved)) {
     return const [
       WeatherTip(
         'stale',
@@ -102,6 +106,18 @@ List<WeatherTip> weatherRecommendations(WeatherSnapshot weather, DateTime now) {
         'Protect yourself from strong UV',
         'Seek shade, wear sun protection and limit prolonged midday sun exposure.',
         'UV index ${highUv.uvIndex!.toStringAsFixed(1)} forecast for ${weatherTime(highUv.at)}.',
+      ),
+    );
+  }
+  if ((weather.humidity ?? 0) >= 85 &&
+      weather.temperature >= 28 &&
+      !tips.any((t) => t.id == 'heat')) {
+    tips.add(
+      WeatherTip(
+        'humidity',
+        'Plan breaks in humid conditions',
+        'Wear breathable clothing, carry drinking water and reduce exertion if you feel overheated.',
+        'Humidity ${weather.humidity!.round()}% and temperature ${weather.temperature.toStringAsFixed(1)} C in this estimate. High humidity can reduce cooling through sweat.',
       ),
     );
   }

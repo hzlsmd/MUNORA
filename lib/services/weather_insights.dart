@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/supported_cities.dart';
 import '../data/weather_codes.dart';
@@ -22,8 +23,10 @@ class WeatherInsights {
   final DateTime? outdoorStart, outdoorEnd;
   final int? agreementPercent;
   final DateTime fetchedAt;
+  final bool saved;
   const WeatherInsights({
     required this.fetchedAt,
+    this.saved = false,
     this.hours = const [],
     this.rainProbability,
     this.uvIndex,
@@ -36,6 +39,7 @@ class WeatherInsights {
   });
 
   bool isFresh(DateTime now) =>
+      !saved &&
       !now.isBefore(fetchedAt) &&
       now.toUtc().hour == fetchedAt.toUtc().hour &&
       now.difference(fetchedAt) < const Duration(minutes: 30);
@@ -43,8 +47,9 @@ class WeatherInsights {
   static WeatherInsights parse(
     Map<String, dynamic>? detail,
     Map<String, dynamic>? models,
-    DateTime now,
-  ) {
+    DateTime now, {
+    bool saved = false,
+  }) {
     double? value(
       Map<String, dynamic>? json,
       String key,
@@ -175,6 +180,7 @@ class WeatherInsights {
     }
     return WeatherInsights(
       fetchedAt: now,
+      saved: saved,
       hours: List.unmodifiable(planning),
       rainProbability: rain,
       uvIndex: uv,
@@ -260,6 +266,36 @@ class WeatherInsightsService {
     );
   }
 
+  Future<WeatherInsights?> cached(String city) async {
+    if (!supportedCities.contains(city)) return null;
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final raw = prefs.getString('weather.insights.v1.$city');
+      if (raw != null && raw.length <= 262144) {
+        final saved = jsonDecode(raw);
+        final at = saved is Map && saved['at'] is String
+            ? DateTime.tryParse(saved['at'])
+            : null;
+        if (at != null &&
+            at.isUtc &&
+            !at.isAfter(now().toUtc()) &&
+            now().toUtc().difference(at) <= const Duration(days: 7) &&
+            saved['detail'] is Map<String, dynamic> &&
+            saved['models'] is Map<String, dynamic>) {
+          return WeatherInsights.parse(
+            saved['detail'],
+            saved['models'],
+            at,
+            saved: true,
+          );
+        }
+      }
+    } catch (_) {
+      /* Invalid saved insights never block core forecasts. */
+    }
+    return null;
+  }
+
   Future<WeatherInsights> _fetch(String city) async {
     final coordinates = openMeteoRequest(city).queryParameters;
     final base = {
@@ -289,9 +325,26 @@ class WeatherInsightsService {
         ),
       ),
     ]);
+    if (results.every((r) => r == null)) {
+      final previous = await cached(city);
+      if (previous != null) return previous;
+    }
     final data = WeatherInsights.parse(results[0], results[1], now().toUtc());
     if (!_disposed && results.every((result) => result != null)) {
       _cache[city] = data;
+      try {
+        final raw = jsonEncode({
+          'at': data.fetchedAt.toIso8601String(),
+          'detail': results[0],
+          'models': results[1],
+        });
+        if (raw.length <= 262144) {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('weather.insights.v1.$city', raw);
+        }
+      } catch (_) {
+        /* A live result remains useful if disk storage fails. */
+      }
     }
     return data;
   }

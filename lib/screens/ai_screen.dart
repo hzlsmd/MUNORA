@@ -89,8 +89,9 @@ class _AIScreenState extends State<AIScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (raw != null) SavedInsightReference(data: raw),
                   const SectionTitle(
-                    'LIVE MICROCLIMATE',
+                    'WEATHER INSIGHTS',
                     trailing: 'Metro Manila Basin',
                   ),
                   AIRainOutlook(

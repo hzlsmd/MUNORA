@@ -7,6 +7,9 @@ Open-Meteo's free-service limits. See [weather setup](docs/WEATHER_SETUP.md).
 
 ## Current status
 
+Integrated AI guidance, dynamic visuals, offline behavior and verification:
+[weather assistant implementation](docs/WEATHER_ASSISTANT_IMPLEMENTATION.md).
+
 Notification repair, preferences, versioned push rollout and phone acceptance:
 [16 November implementation notes](docs/NOTIFICATION_FIX_2026-11-16.md).
 The primary CI debug APK now uses local scheduling; the separately named push APK

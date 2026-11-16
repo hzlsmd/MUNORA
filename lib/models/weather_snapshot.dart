@@ -57,6 +57,7 @@ class WeatherSnapshot {
   final double windSpeed;
   final double? humidity, pressure;
   final int? weatherCode;
+  final bool? isDay;
   final List<ForecastReading> readings;
   final String city;
   final String source;
@@ -75,6 +76,7 @@ class WeatherSnapshot {
     this.humidity,
     this.pressure,
     this.weatherCode,
+    this.isDay,
     required this.readings,
     this.source = 'OpenWeatherMap',
     required this.updatedAt,
@@ -86,9 +88,7 @@ class WeatherSnapshot {
   });
 
   bool isUsable(DateTime now, {bool offline = false}) {
-    final maxAge = offline
-        ? const Duration(hours: 24)
-        : const Duration(hours: 3);
+    final maxAge = offline ? const Duration(days: 7) : const Duration(hours: 3);
     final updateAge = now.toUtc().difference(updatedAt);
     final observationAge = now.toUtc().difference(observedAt);
     return updateAge >= const Duration(minutes: -5) &&
@@ -140,6 +140,10 @@ class WeatherSnapshot {
     if (entries.map((item) => item['at']).toSet().length != entries.length) {
       throw const FormatException('Duplicate forecast timestamps');
     }
+    final day = current['isDay'];
+    if (day != null && day is! bool) {
+      throw const FormatException('Invalid day flag');
+    }
     final rawCode = current['weatherCode'];
     if (rawCode != null &&
         (rawCode is! int || !weatherConditions.containsKey(rawCode))) {
@@ -165,6 +169,7 @@ class WeatherSnapshot {
       humidity: (current['humidity'] as num).toDouble(),
       pressure: (current['pressure'] as num).toDouble(),
       weatherCode: rawCode as int?,
+      isDay: day as bool?,
       readings: List.unmodifiable(
         entries.map(
           (item) => ForecastReading(

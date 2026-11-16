@@ -7,6 +7,7 @@ import '../models/weather_snapshot.dart';
 import '../services/weather_insights.dart';
 import '../theme.dart';
 import 'atmosphere.dart';
+import 'weather_view.dart';
 
 class InsightView extends StatefulWidget {
   final String city;
@@ -22,25 +23,54 @@ class InsightView extends StatefulWidget {
   State<InsightView> createState() => _InsightViewState();
 }
 
-class _InsightViewState extends State<InsightView> {
+class _InsightViewState extends State<InsightView> with WidgetsBindingObserver {
+  bool? live;
   late Future<WeatherInsights?> future;
   Timer? refresh;
   @override
   void initState() {
     super.initState();
-    future = widget.service?.fetch(widget.city) ?? Future.value(null);
+    future = Future.value(null);
+    WidgetsBinding.instance.addObserver(this);
+    startRefresh();
+  }
+
+  void startRefresh() {
+    refresh?.cancel();
     if (widget.service != null) {
       refresh = Timer.periodic(const Duration(minutes: 1), (_) {
-        setState(() {
-          future = widget.service!.fetch(widget.city);
-        });
+        if (live == true) {
+          setState(() => future = widget.service!.fetch(widget.city));
+        }
       });
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final current = WeatherLiveStatus.of(context);
+    if (live != current) {
+      live = current;
+      future = current
+          ? (widget.service?.fetch(widget.city) ?? Future.value(null))
+          : (widget.service?.cached(widget.city) ?? Future.value(null));
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      startRefresh();
+    } else {
+      refresh?.cancel();
     }
   }
 
   @override
   void dispose() {
     refresh?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -409,4 +439,33 @@ class _GuidanceFeedbackState extends State<GuidanceFeedback> {
       ],
     ),
   );
+}
+
+class SavedInsightReference extends StatelessWidget {
+  final WeatherInsights data;
+  const SavedInsightReference({super.key, required this.data});
+  @override
+  Widget build(BuildContext context) {
+    if (data.hours.isEmpty || (!data.saved && WeatherLiveStatus.of(context))) {
+      return const SizedBox.shrink();
+    }
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Saved forecast insights · reference only',
+            style: TextStyle(fontWeight: FontWeight.w700),
+          ),
+          Text(
+            'Retrieved ${weatherTime(data.fetchedAt)}. These values are not live and cannot validate a new activity plan.',
+          ),
+          for (final hour in data.hours.take(8))
+            Text(
+              '${weatherTime(hour.at)} · ${hour.temperature?.toStringAsFixed(0) ?? "—"}°C · rain ${hour.rain?.toStringAsFixed(0) ?? "—"}% · UV ${hour.uv?.toStringAsFixed(1) ?? "—"}',
+            ),
+        ],
+      ),
+    );
+  }
 }

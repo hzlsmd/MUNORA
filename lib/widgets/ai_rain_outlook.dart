@@ -2,6 +2,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../models/weather_snapshot.dart';
 import '../services/rain_model.dart';
+import '../services/saved_rain_insight.dart';
 import '../theme.dart';
 import 'weather_view.dart';
 import 'atmosphere.dart';
@@ -51,6 +52,24 @@ class AIRainOutlook extends StatelessWidget {
                 style: const TextStyle(fontSize: 11, color: AppColors.textBody),
               ),
               const SizedBox(height: 10),
+              if (prediction == null && !WeatherLiveStatus.of(context))
+                FutureBuilder<RainPrediction?>(
+                  key: ValueKey('saved-ai:${weather.city}'),
+                  future: SavedRainInsight.load(
+                    weather.city,
+                    DateTime.now().toUtc(),
+                  ),
+                  builder: (context, snapshot) {
+                    final previous = snapshot.data;
+                    if (previous == null) return const SizedBox.shrink();
+                    return Text(
+                      'Previously saved experimental AI estimate: ${formatRainProbability(previous.probability)}. Model ${previous.modelVersion}. '
+                      'Generated from ${weatherTime(previous.estimatedAt)}; coverage through ${weatherTime(previous.windowEnd)}. '
+                      'Saved reference only — not a fresh forecast or current planning probability.',
+                      style: const TextStyle(fontSize: 12),
+                    );
+                  },
+                ),
               if (prediction == null)
                 Text(
                   loading

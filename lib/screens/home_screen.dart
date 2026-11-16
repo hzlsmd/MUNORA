@@ -7,6 +7,8 @@ import '../services/weather_alerts.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
 import '../widgets/ai_rain_outlook.dart';
+import '../widgets/smart_home.dart';
+import '../widgets/weather_scene.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/weather_icon.dart';
 import '../widgets/weather_cards.dart';
@@ -100,6 +102,18 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _SkyHero(weather: weather, onPickCity: pickCity),
+              const SizedBox(height: 16),
+              SmartHome(
+                weather: weather,
+                onPlan:
+                    widget.onOpenPlanner ?? () => widget.navigate(AppScreen.ai),
+              ),
+              const SizedBox(height: 16),
+              AIRainOutlook(
+                weather: weather,
+                onPlanActivity:
+                    widget.onOpenPlanner ?? () => widget.navigate(AppScreen.ai),
+              ),
               const SizedBox(height: 16),
               Material(
                 color: const Color(0x99FFFFFF),
@@ -215,12 +229,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 const SizedBox(height: 16),
               ],
-              AIRainOutlook(
-                weather: weather,
-                onPlanActivity:
-                    widget.onOpenPlanner ?? () => widget.navigate(AppScreen.ai),
-              ),
-              const SizedBox(height: 16),
               WeatherMetrics(weather: weather.current),
               const SizedBox(height: 16),
               FilledButton.tonal(
@@ -240,90 +248,92 @@ class _SkyHero extends StatelessWidget {
   final VoidCallback onPickCity;
   const _SkyHero({required this.weather, required this.onPickCity});
   @override
-  Widget build(BuildContext context) => Container(
-    clipBehavior: Clip.antiAlias,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(24),
-      image: const DecorationImage(
-        image: AssetImage('assets/design/e0f7e.png'),
-        fit: BoxFit.cover,
-      ),
-      boxShadow: const [
-        BoxShadow(
-          color: Color(0x226E64A0),
-          blurRadius: 20,
-          offset: Offset(0, 10),
-        ),
-      ],
-    ),
+  Widget build(BuildContext context) => WeatherScene(
+    weather: weather,
     child: Container(
-      padding: const EdgeInsets.all(20),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0x33FFFFFF), Color(0x00FFFFFF), Color(0x99FFFFFF)],
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          FilledButton.tonalIcon(
-            onPressed: onPickCity,
-            icon: const DesignIcon('50a38'),
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xB3FFFFFF),
-              foregroundColor: AppColors.textDark,
-            ),
-            label: Text(weather.city),
-          ),
-          const SizedBox(height: 44),
-          Text(
-            '${weather.current.temp}°C',
-            style: const TextStyle(
-              fontFamily: 'Abyssinica',
-              fontSize: 64,
-              height: 1.2,
-              color: AppColors.skyBlueTop,
-              letterSpacing: -3,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: const Color(0xB3FFFFFF),
-              borderRadius: BorderRadius.circular(30),
-            ),
-            child: Text(
-              weather.current.condition,
-              style: const TextStyle(fontSize: 12, color: AppColors.textBody),
-            ),
-          ),
-          const SizedBox(height: 44),
-          GlassCard(
-            padding: const EdgeInsets.all(12),
-            color: const Color(0xCCFFFFFF),
-            child: Wrap(
-              spacing: 16,
-              runSpacing: 8,
-              children: [
-                if (weather.daily.isNotEmpty)
-                  Text(
-                    'Range  ↑ ${weather.daily.first.hi}  ↓ ${weather.daily.first.lo}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                Text(
-                  'Feels ${weather.current.feelsLike}',
-                  style: const TextStyle(fontSize: 12, color: AppColors.indigo),
-                ),
-              ],
-            ),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x226E64A0),
+            blurRadius: 20,
+            offset: Offset(0, 10),
           ),
         ],
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0x33FFFFFF), Color(0x00FFFFFF), Color(0x99FFFFFF)],
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FilledButton.tonalIcon(
+              onPressed: onPickCity,
+              icon: const DesignIcon('50a38'),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xB3FFFFFF),
+                foregroundColor: AppColors.textDark,
+              ),
+              label: Text(weather.city),
+            ),
+            const SizedBox(height: 44),
+            Text(
+              '${weather.current.temp}°C',
+              style: const TextStyle(
+                fontFamily: 'Abyssinica',
+                fontSize: 64,
+                height: 1.2,
+                color: AppColors.skyBlueTop,
+                letterSpacing: -3,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xB3FFFFFF),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Text(
+                weather.current.condition,
+                style: const TextStyle(fontSize: 12, color: AppColors.textBody),
+              ),
+            ),
+            const SizedBox(height: 44),
+            GlassCard(
+              padding: const EdgeInsets.all(12),
+              color: const Color(0xCCFFFFFF),
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 8,
+                children: [
+                  if (weather.daily.isNotEmpty)
+                    Text(
+                      'Range  ↑ ${weather.daily.first.hi}  ↓ ${weather.daily.first.lo}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  Text(
+                    'Feels ${weather.current.feelsLike}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.indigo,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     ),
   );
