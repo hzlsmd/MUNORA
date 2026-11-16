@@ -71,7 +71,7 @@ class PushNotifications {
         FirebaseMessaging.onMessageOpenedApp.listen((m) => _open(m.data)),
       );
       _subscriptions.add(
-        FirebaseMessaging.instance.onTokenRefresh.listen((_) => retry()),
+        FirebaseMessaging.instance.onRegistered.listen((_) => retry()),
       );
       final initial = await FirebaseMessaging.instance.getInitialMessage();
       if (initial != null) _open(initial.data);
@@ -131,7 +131,7 @@ class PushNotifications {
           enabled: false,
           city: prefs.getString('selectedCity') ?? 'Muntinlupa',
         );
-        await FirebaseMessaging.instance.deleteToken();
+        await FirebaseMessaging.instance.unregister();
         status.value = 'Previous push subscriptions removed; this build uses local notifications.';
       }).timeout(const Duration(seconds: 15));
     } catch (_) {
@@ -177,7 +177,7 @@ class PushNotifications {
       );
       if (!active) {
         await FirebaseMessaging.instance.setAutoInitEnabled(false);
-        await FirebaseMessaging.instance.deleteToken();
+        await FirebaseMessaging.instance.unregister();
       }
       status.value = desired
           ? (allowed
