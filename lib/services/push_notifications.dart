@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui' show DartPluginRegistrant;
+
+import 'package:flutter/widgets.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -10,6 +13,21 @@ import 'package:workmanager/workmanager.dart';
 
 import 'push_state.dart';
 import 'notification_config.dart';
+import 'notification_preferences.dart';
+import 'notification_policy.dart';
+import 'notification_delivery_gate.dart';
+import 'push_recommendations.dart';
+import '../models/weather_snapshot.dart';
+
+@pragma('vm:entry-point')
+Future<void> weatherPushBackgroundHandler(RemoteMessage message) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+  await Firebase.initializeApp();
+  await NotificationDeliveryGate.run(
+    () => PushNotifications.instance.displayMessage(message),
+  );
+}
 
 /// Enable only in a build whose matching Firebase configuration is installed.
 /// Deployment and phone acceptance must precede distributing that build.
@@ -44,6 +62,7 @@ class PushNotifications {
     if (_ready) return;
     try {
       await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(weatherPushBackgroundHandler);
       final ready = await _local.initialize(
         weatherNotificationInitialization,
         onDidReceiveNotificationResponse: localTap,
@@ -59,12 +78,13 @@ class PushNotifications {
       _ready = true;
       _subscriptions.add(
         FirebaseMessaging.onMessage.listen((message) {
-          _displayQueue = _displayQueue
-              .then((_) => _foreground(message))
-              .catchError((Object _) {
-                status.value =
-                    'Unable to display the latest weather notification.';
-              });
+          unawaited(
+            NotificationDeliveryGate.run(() => displayMessage(message))
+                .catchError((Object _) {
+                  status.value =
+                      'Unable to display the latest weather notification.';
+                }),
+          );
         }),
       );
       _subscriptions.add(
@@ -181,7 +201,7 @@ class PushNotifications {
       }
       status.value = desired
           ? (allowed
-                ? 'Push notifications enabled for ${prefs.getString('selectedCity') ?? 'Muntinlupa'}. Reminders at most once an hour per condition.'
+                ? 'Push notifications enabled for ${prefs.getString('selectedCity') ?? 'Muntinlupa'}. New changes at most once an hour per condition; unchanged advice at most every 12 hours.'
                 : 'Notifications are blocked in Android settings.')
           : 'Push notifications are off.';
     } catch (_) {
@@ -190,9 +210,19 @@ class PushNotifications {
     }
   }
 
-  Future<void> _foreground(RemoteMessage message) async {
-    final alert = PushAlert.parse(message.data, DateTime.now());
-    if (alert == null) return;
+  /// Shared foreground/background display. Data-only payloads let this code
+  /// enforce preferences before Android posts anything, including when closed.
+  Future<void> displayMessage(RemoteMessage message) {
+    final next = _displayQueue.then((_) => _displayMessage(message));
+    _displayQueue = next.catchError((Object _) {});
+    return next;
+  }
+
+  Future<void> _displayMessage(RemoteMessage message) async {
+    final now = DateTime.now().toUtc();
+    final recommendations = PushRecommendations.parse(message.data, now);
+    if (recommendations == null) return;
+    final alert = recommendations.alert;
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
     if (!(prefs.getBool(weatherNotificationsEnabledKey) ?? false) ||
@@ -200,14 +230,59 @@ class PushNotifications {
         prefs.getString('push.lastEvent') == alert.eventId) {
       return;
     }
+    final preferences = await NotificationPreferences.load();
+    final history = <String, NotificationRecord>{};
+    for (final category in notificationCategories) {
+      final key = 'push.history.${alert.city}.$category';
+      final time = DateTime.tryParse(prefs.getString('$key.at') ?? '');
+      if (time != null) {
+        history[category] = NotificationRecord(
+          time,
+          prefs.getString('$key.fingerprint') ?? '',
+        );
+      }
+    }
+    final due = recommendations.due(now, preferences, history);
+    if (due.isEmpty) return;
+    final ready = await _local.initialize(
+      weatherNotificationInitialization,
+      onDidReceiveNotificationResponse: localTap,
+    );
+    if (ready != true) throw StateError('Notification initialization failed');
+    final android = _local
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    await android?.createNotificationChannel(weatherNotificationChannel);
+    if (await android?.areNotificationsEnabled() != true) return;
+    await prefs.reload();
+    if (!(prefs.getBool(weatherNotificationsEnabledKey) ?? false) ||
+        (prefs.getString('selectedCity') ?? 'Muntinlupa') != alert.city) {
+      return;
+    }
+    final body =
+        '${due.values.join('\n')}\nEstimate ${weatherTime(recommendations.estimateAt)}. Check PAGASA advisories.';
     await _local.show(
       weatherNotificationId,
       '${alert.city} weather update',
-      message.notification?.body ??
-          'Review forecast-based weather guidance in Alerts.',
-      weatherNotificationDetails(),
+      body,
+      weatherNotificationDetails(body: body),
       payload: jsonEncode(message.data),
     );
+    await prefs.reload();
+    if (!(prefs.getBool(weatherNotificationsEnabledKey) ?? false) ||
+        (prefs.getString('selectedCity') ?? 'Muntinlupa') != alert.city) {
+      await _local.cancel(weatherNotificationId);
+      return;
+    }
+    for (final category in due.keys) {
+      final key = 'push.history.${alert.city}.$category';
+      await prefs.setString('$key.at', now.toIso8601String());
+      await prefs.setString(
+        '$key.fingerprint',
+        recommendations.fingerprints[category]!,
+      );
+    }
     await prefs.setString('push.lastEvent', alert.eventId);
   }
 

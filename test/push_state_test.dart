@@ -6,7 +6,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   setUp(() => SharedPreferences.setMockInitialValues({}));
   test('topic contract and notification timestamps are validated', () {
-    expect(cityTopic('Quezon City'), 'munora_weather_quezon_city');
+    expect(cityTopic('Quezon City'), 'munora_weather_quezon_city_v2');
     expect(() => cityTopic('Unknown'), throwsArgumentError);
     final now = DateTime.utc(2026, 11, 12, 8);
     final payload = {
@@ -41,12 +41,12 @@ void main() {
         throwsStateError,
       );
       expect(
-        actions.where((a) => a == 'subscribe:munora_weather_makati'),
+        actions.where((a) => a == 'subscribe:munora_weather_makati_v2'),
         isEmpty,
       );
       fail = false;
       await state.reconcile(enabled: true, city: 'Makati');
-      expect(actions.last, 'subscribe:munora_weather_makati');
+      expect(actions.last, 'subscribe:munora_weather_makati_v2');
       await state.reconcile(enabled: false, city: 'Makati');
       expect(prefs.getStringList(PushSubscriptions.knownKey), isEmpty);
     },
@@ -68,6 +68,26 @@ void main() {
       subscribe: (_) async {},
       unsubscribe: (t) async => cleaned.add(t),
     ).reconcile(enabled: false, city: 'Manila');
-    expect(cleaned, ['munora_weather_manila']);
+    expect(cleaned, ['munora_weather_manila_v2']);
   });
+  test(
+    'upgrade removes legacy topic before joining versioned background topic',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        PushSubscriptions.knownKey: ['munora_weather_manila'],
+        PushSubscriptions.confirmedKey: 'munora_weather_manila',
+      });
+      final prefs = await SharedPreferences.getInstance();
+      final calls = <String>[];
+      await PushSubscriptions(
+        prefs,
+        subscribe: (t) async => calls.add('subscribe:$t'),
+        unsubscribe: (t) async => calls.add('unsubscribe:$t'),
+      ).reconcile(enabled: true, city: 'Manila');
+      expect(calls, [
+        'unsubscribe:munora_weather_manila',
+        'subscribe:munora_weather_manila_v2',
+      ]);
+    },
+  );
 }

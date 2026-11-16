@@ -1,6 +1,6 @@
 import { cities } from "./cities.mjs";
 import { getWeather, weatherTriggers, UpstreamRejection } from "./weather.mjs";
-import { getToken, send, notificationMessage } from "./fcm.mjs";
+import { getToken, send, notificationMessage, legacyNotificationMessage } from "./fcm.mjs";
 import { atStage, logMonitorFailure } from "./diagnostics.mjs";
 export const scheduledCities = (time) =>
   cities.filter((_, i) => i % 5 === Math.floor(time / 60000) % 5);
@@ -8,7 +8,7 @@ export async function monitorCity(
   city,
   env,
   now,
-  deps = { getWeather, getToken, send, clock: Date.now },
+  deps = { getWeather, getToken, send, sendLegacy: send, clock: Date.now },
 ) {
   const owner = crypto.randomUUID();
   const clock = deps.clock ?? (() => now);
@@ -52,8 +52,12 @@ export async function monitorCity(
       try {
         await deps.send(
           token,
-          notificationMessage(city, due, now, weather.current.time),
+          notificationMessage(city, due, now, weather.current.time, weather),
         );
+        const legacyTriggers = due.filter(t => ["rain","storm","heat","wind"].includes(t));
+        if (deps.sendLegacy && legacyTriggers.length) {
+          await deps.sendLegacy(token,legacyNotificationMessage(city,legacyTriggers,now,weather.current.time));
+        }
       } catch (error) {
         if (error instanceof UpstreamRejection &&
             (error.status === 429 || error.status >= 500)) {

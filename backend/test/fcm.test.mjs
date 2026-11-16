@@ -63,7 +63,7 @@ test("FCM topic payload has bounded lifetime, city and tap contract", async () =
     Date.now(),
     Date.now() / 1000,
   );
-  assert.equal(message.message.topic, "munora_weather_muntinlupa");
+  assert.equal(message.message.topic, "munora_weather_muntinlupa_v2");
   assert.equal(message.message.android.ttl, "3600s");
   assert.equal(message.message.data.route, "alerts");
   assert.equal(message.message.data.city, "Muntinlupa");

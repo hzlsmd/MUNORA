@@ -60,6 +60,20 @@ export function weatherTriggers(data, now) {
     throw Error("invalid_forecast");
   const hour = Math.floor(now / 3600000) * 3600;
   const considered = [c.weather_code];
+  const temperatures = [c.temperature_2m], apparent = [c.apparent_temperature], winds = [c.wind_speed_10m], rain = [], uv = [];
+  const optional = {
+    temperature_2m: ["°C", -100, 70, temperatures],
+    apparent_temperature: ["°C", -120, 100, apparent],
+    wind_speed_10m: ["m/s", 0, 150, winds],
+    precipitation_probability: ["%", 0, 100, rain],
+    uv_index: ["", 0, 30, uv],
+  };
+  for (const [field, [unit]] of Object.entries(optional)) {
+    const readings = data.hourly[field];
+    if (readings == null) continue;
+    if (!Array.isArray(readings) || readings.length !== times.length || data.hourly_units[field] !== unit)
+      throw Error("invalid_forecast_measurements");
+  }
   for (let i = 0; i < times.length; i++) {
     number(times[i], 0, 4102444800);
     code(values[i]);
@@ -74,15 +88,25 @@ export function weatherTriggers(data, now) {
       times[i] * 1000 <= now + 21600000
     )
       considered.push(values[i]);
+    for (const [field, [, low, high, collected]] of Object.entries(optional)) {
+      const value = data.hourly[field]?.[i];
+      if (value == null) continue;
+      number(value, low, high);
+      if (times[i] * 1000 >= now && times[i] * 1000 <= now + 21600000) collected.push(value);
+    }
   }
   if (times[0] > hour || times.at(-1) * 1000 < now + 21600000)
     throw Error("incomplete_forecast");
   const result = [];
   if (considered.some((c) => c >= 95)) result.push("storm");
-  if (considered.some((c) => rainCodes.has(c))) result.push("rain");
-  if (c.temperature_2m >= 32 || c.apparent_temperature >= 35)
+  if (considered.some((c) => rainCodes.has(c)) || rain.some(p => p >= 60)) result.push("rain");
+  if (temperatures.some(t => t >= 32) || apparent.some(t => t >= 35))
     result.push("heat");
-  if (c.wind_speed_10m >= 10) result.push("wind");
+  if (winds.some(w => w >= 10)) result.push("wind");
+  if (uv.some(u => u >= 8)) result.push("uv");
+  const localHour = new Date(now + 8 * 3600000).getUTCHours();
+  if (!result.length && localHour >= 6 && localHour < 18 &&
+      c.weather_code <= 1 && considered.every(c => c <= 2)) result.push("clear");
   return result;
 }
 export async function readJson(
@@ -134,7 +158,7 @@ export function getWeather(city) {
     latitude: String(city.latitude),
     longitude: String(city.longitude),
     current: "temperature_2m,apparent_temperature,weather_code,wind_speed_10m",
-    hourly: "weather_code",
+    hourly: "weather_code,temperature_2m,apparent_temperature,wind_speed_10m,precipitation_probability,uv_index",
     wind_speed_unit: "ms",
     temperature_unit: "celsius",
     timeformat: "unixtime",

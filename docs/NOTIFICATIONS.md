@@ -1,5 +1,11 @@
 # Android weather notifications
 
+Current repair and rollout: [16 November notification changes](NOTIFICATION_FIX_2026-11-16.md).
+Updated clients use category/quiet-hour controls and 12-hour suppression for unchanged advice;
+new changes have a one-hour per-category cooldown. Versioned data-only push requires
+the corresponding backend rollout; legacy topics remain supported for older clients.
+The records below describe earlier implementations and verification.
+
 ## New optional server push mode
 
 See [free push deployment](setup/DEPLOY_WEATHER_PUSH.md). The optional Android

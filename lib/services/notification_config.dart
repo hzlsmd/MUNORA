@@ -20,14 +20,17 @@ const weatherNotificationChannel = AndroidNotificationChannel(
   importance: Importance.defaultImportance,
 );
 
-NotificationDetails weatherNotificationDetails({bool onlyAlertOnce = false}) =>
-    NotificationDetails(
-      android: AndroidNotificationDetails(
-        weatherNotificationChannelId,
-        weatherNotificationChannelName,
-        channelDescription: weatherNotificationChannelDescription,
-        importance: Importance.defaultImportance,
-        priority: Priority.defaultPriority,
-        onlyAlertOnce: onlyAlertOnce,
-      ),
-    );
+NotificationDetails weatherNotificationDetails({
+  bool onlyAlertOnce = false,
+  String? body,
+}) => NotificationDetails(
+  android: AndroidNotificationDetails(
+    weatherNotificationChannelId,
+    weatherNotificationChannelName,
+    channelDescription: weatherNotificationChannelDescription,
+    importance: Importance.defaultImportance,
+    priority: Priority.defaultPriority,
+    onlyAlertOnce: onlyAlertOnce,
+    styleInformation: body == null ? null : BigTextStyleInformation(body),
+  ),
+);

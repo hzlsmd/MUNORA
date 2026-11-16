@@ -21,6 +21,8 @@ class RecordingScheduler extends WorkmanagerPlatform {
   final policies = <ExistingPeriodicWorkPolicy?>[];
   final cancelled = <String>[];
   bool initialized = false;
+  BackoffPolicy? lastBackoff;
+  Duration? lastBackoffDelay;
   bool failRegistration = false;
   Completer<void>? registrationGate;
   @override
@@ -53,6 +55,8 @@ class RecordingScheduler extends WorkmanagerPlatform {
         constraints?.networkType != NetworkType.connected) {
       throw StateError('Unexpected weather task contract');
     }
+    lastBackoff = backoffPolicy;
+    lastBackoffDelay = backoffPolicyDelay;
     jobs[uniqueName] = frequency;
     policies.add(existingWorkPolicy);
   }
@@ -145,6 +149,8 @@ void main() {
         'munora.weather.tips.v1': const Duration(hours: 1),
       });
       expect(scheduler.policies, [ExistingPeriodicWorkPolicy.keep]);
+      expect(scheduler.lastBackoff, BackoffPolicy.exponential);
+      expect(scheduler.lastBackoffDelay, const Duration(minutes: 15));
       expect(platformCalls, isNot(contains('requestNotificationsPermission')));
       expect(await NotificationService().enabled(), isTrue);
 

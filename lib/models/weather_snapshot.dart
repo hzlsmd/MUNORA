@@ -39,7 +39,16 @@ String weatherTime(DateTime time) {
 class ForecastReading {
   final DateTime at;
   final String condition;
-  const ForecastReading(this.at, this.condition);
+  final double? temperature, feelsLike, windSpeed, rainProbability, uvIndex;
+  const ForecastReading(
+    this.at,
+    this.condition, {
+    this.temperature,
+    this.feelsLike,
+    this.windSpeed,
+    this.rainProbability,
+    this.uvIndex,
+  });
 }
 
 class WeatherSnapshot {
@@ -105,6 +114,8 @@ class WeatherSnapshot {
     }
     final updatedAt = _time(json['updatedAt']);
     final observedAt = _time(json['observedAt']);
+    double? optional(Map item, String key, double low, double high) =>
+        item[key] == null ? null : _number(item[key], low, high);
     final entries =
         raw.map((item) {
             if (item is! Map<String, dynamic>) {
@@ -156,8 +167,15 @@ class WeatherSnapshot {
       weatherCode: rawCode as int?,
       readings: List.unmodifiable(
         entries.map(
-          (item) =>
-              ForecastReading(_time(item['at']), item['condition'] as String),
+          (item) => ForecastReading(
+            _time(item['at']),
+            item['condition'] as String,
+            temperature: (item['temperature'] as num).toDouble(),
+            feelsLike: optional(item, 'feelsLike', -120, 100),
+            windSpeed: optional(item, 'windSpeed', 0, 150),
+            rainProbability: optional(item, 'rainProbability', 0, 100),
+            uvIndex: optional(item, 'uvIndex', 0, 30),
+          ),
         ),
       ),
       source: source as String,
