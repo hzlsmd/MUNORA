@@ -49,20 +49,24 @@ export async function monitorCity(
         )
         .first());
       if (!reserved) return "busy";
+      let delivered = false;
       try {
         await deps.send(
           token,
           notificationMessage(city, due, now, weather.current.time, weather),
         );
+        delivered = true;
         const legacyTriggers = due.filter(t => ["rain","storm","heat","wind"].includes(t));
         if (deps.sendLegacy && legacyTriggers.length) {
           await deps.sendLegacy(token,legacyNotificationMessage(city,legacyTriggers,now,weather.current.time));
         }
       } catch (error) {
-        if (error instanceof UpstreamRejection &&
+        if (!delivered && error instanceof UpstreamRejection &&
             (error.status === 429 || error.status >= 500)) {
           const failedAt = clock();
-          // An explicit rejection was not accepted by FCM. Restore history and
+          // Only restore history if v2 was rejected. A legacy failure must
+          // not undo successful delivery and cause duplicate v2 alerts.
+          // Restore history and
           // persist backoff in the lease, including across Worker restarts.
           // Detach this lease from our finally block. Expired owners cannot
           // roll back newer sends. Uncertain timeouts keep the hour reservation.
