@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,9 @@ import 'package:workmanager/workmanager.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:munora/main.dart' as app;
+import 'package:munora/screens/alerts_screen.dart';
+import 'package:munora/screens/home_screen.dart';
+import 'package:munora/widgets/bottom_nav.dart';
 import 'package:munora/services/notification_service.dart';
 import 'package:munora/services/push_notifications.dart';
 import 'package:munora/services/push_state.dart';
@@ -77,6 +81,7 @@ void main() {
   late WorkmanagerPlatform original;
   late List<String> platformCalls;
   bool permission = true;
+  Map<String, dynamic>? launchDetails;
 
   setUp(() {
     AndroidFlutterLocalNotificationsPlugin.registerWith();
@@ -90,6 +95,7 @@ void main() {
     WorkmanagerPlatform.instance = scheduler;
     platformCalls = [];
     permission = true;
+    launchDetails = null;
     binding.defaultBinaryMessenger.setMockMessageHandler(
       firebaseChannel,
       (_) async => const StandardMessageCodec().encodeMessage([
@@ -103,6 +109,9 @@ void main() {
     ) async {
       platformCalls.add(call.method);
       if (call.method == 'initialize') return true;
+      if (call.method == 'getNotificationAppLaunchDetails') {
+        return launchDetails;
+      }
       if (call.method == 'areNotificationsEnabled') return permission;
       if (call.method == 'requestNotificationsPermission') {
         throw StateError('Startup must never prompt for permission');
@@ -138,6 +147,99 @@ void main() {
         await tester.pumpWidget(const SizedBox.shrink());
         debugDefaultTargetPlatformOverride = null;
       }
+    });
+  }
+
+  for (final optedIn in [true, false]) {
+    androidTest(
+      'closed-app local notification opens its city after splash (opt-in $optedIn)',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({
+          'notifications.weather.enabled': optedIn,
+          'selectedCity': 'Muntinlupa',
+        });
+        launchDetails = {
+          'notificationLaunchedApp': true,
+          'notificationResponse': {
+            'notificationResponseType': 0,
+            'id': 2401,
+            'payload': jsonEncode({
+              'city': 'Manila',
+              'eventId': 'local-startup',
+              'issuedAt': DateTime.now().toUtc().toIso8601String(),
+              'route': 'alerts',
+            }),
+          },
+        };
+        await start(tester);
+        await tester.pump(const Duration(seconds: 5));
+        await tester.pump();
+        expect(find.byType(AlertsScreen), findsOneWidget);
+        expect(
+          tester.widget<AlertsScreen>(find.byType(AlertsScreen)).city,
+          'Manila',
+        );
+        expect(
+          platformCalls,
+          isNot(contains('requestNotificationsPermission')),
+        );
+        final reads = platformCalls
+            .where((m) => m == 'getNotificationAppLaunchDetails')
+            .length;
+        expect(reads, 1);
+        tester
+            .widget<AlertsScreen>(find.byType(AlertsScreen))
+            .navigate(AppScreen.home);
+        await tester.pump();
+        tester.binding.handleAppLifecycleStateChanged(
+          AppLifecycleState.resumed,
+        );
+        for (var i = 0; i < 10; i++) {
+          await tester.pump();
+        }
+        expect(
+          platformCalls.where((m) => m == 'getNotificationAppLaunchDetails'),
+          hasLength(reads),
+        );
+        expect(find.byType(HomeScreen), findsOneWidget);
+        await tester.pumpWidget(const SizedBox.shrink());
+        // Drain the production HTTP timeout after disposing the app's client.
+        await tester.pump(const Duration(seconds: 26));
+      },
+    );
+  }
+
+  for (final payload in [
+    null,
+    '{}',
+    jsonEncode({
+      'city': 'Manila',
+      'eventId': 'expired',
+      'issuedAt': DateTime.now()
+          .toUtc()
+          .subtract(const Duration(days: 1))
+          .toIso8601String(),
+      'route': 'alerts',
+    }),
+  ]) {
+    androidTest('test or invalid launch payload stays on Home ($payload)', (
+      tester,
+    ) async {
+      launchDetails = {
+        'notificationLaunchedApp': true,
+        'notificationResponse': {
+          'notificationResponseType': 0,
+          'id': 2401,
+          'payload': payload,
+        },
+      };
+      await start(tester);
+      await tester.pump(const Duration(seconds: 5));
+      await tester.pump();
+      expect(find.byType(HomeScreen), findsOneWidget);
+      expect(find.byType(AlertsScreen), findsNothing);
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump(const Duration(seconds: 26));
     });
   }
 

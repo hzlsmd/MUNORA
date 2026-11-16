@@ -5,7 +5,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:munora/screens/alerts_screen.dart';
 import 'package:munora/screens/ai_screen.dart';
 import 'package:munora/services/weather_service.dart';
@@ -15,7 +14,6 @@ import 'weather_fixture.dart';
 void main() {
   setUp(() {
     SharedPreferences.setMockInitialValues({});
-    GoogleFonts.config.allowRuntimeFetching = false;
   });
   testWidgets('alerts follow the selected city rather than demo data', (
     tester,
