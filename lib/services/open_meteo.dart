@@ -10,7 +10,7 @@ Uri openMeteoRequest(String city) {
       'latitude': '${coordinates.$1}',
       'longitude': '${coordinates.$2}',
       'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,pressure_msl,wind_speed_10m',
-      'hourly': 'temperature_2m,weather_code',
+      'hourly': 'temperature_2m,weather_code,apparent_temperature,wind_speed_10m,precipitation_probability,uv_index',
       'wind_speed_unit': 'ms',
       'temperature_unit': 'celsius',
       'timeformat': 'unixtime',
@@ -70,6 +70,23 @@ Map<String, dynamic> normalizeOpenMeteo(
       codes.length != times.length) {
     throw const FormatException('Invalid hourly arrays');
   }
+  final optionalFields = {
+    'apparent_temperature': ('feelsLike', '°C', -120.0, 100.0),
+    'wind_speed_10m': ('windSpeed', 'm/s', 0.0, 150.0),
+    'precipitation_probability': ('rainProbability', '%', 0.0, 100.0),
+    'uv_index': ('uvIndex', '', 0.0, 30.0),
+  };
+  // Older caches/providers may omit these fields. Present fields must carry
+  // valid units and aligned arrays; null measurements remain unknown.
+  for (final field in optionalFields.entries) {
+    final values = hourly[field.key];
+    if (values == null) continue;
+    if (values is! List ||
+        values.length != times.length ||
+        (json['hourly_units'] as Map)[field.key] != field.value.$2) {
+      throw const FormatException('Invalid optional forecast field');
+    }
+  }
   final points = <Map<String, dynamic>>[];
   DateTime? previous;
   final hour = DateTime.utc(now.year, now.month, now.day, now.hour);
@@ -97,6 +114,13 @@ Map<String, dynamic> normalizeOpenMeteo(
         'low': temperature,
         'high': temperature,
         'condition': condition,
+        for (final field in optionalFields.entries)
+          if (hourly[field.key] is List && hourly[field.key][i] != null)
+            field.value.$1: _optionalMeasurement(
+              hourly[field.key][i],
+              field.value.$3,
+              field.value.$4,
+            ),
       });
     }
   }
@@ -119,4 +143,11 @@ Map<String, dynamic> normalizeOpenMeteo(
     },
     'hourly': points,
   };
+}
+
+double _optionalMeasurement(dynamic value, double low, double high) {
+  if (value is! num || !value.isFinite || value < low || value > high) {
+    throw const FormatException('Invalid forecast measurement');
+  }
+  return value.toDouble();
 }

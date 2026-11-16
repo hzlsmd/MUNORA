@@ -333,3 +333,13 @@ test("scheduled upstream rejections log HTTP status without upstream response bo
   }]);
   assert.ok(!JSON.stringify(logs).includes("private upstream body"));
 });
+
+test("monitor publishes v2 and legacy formats to separate topics", async () => {
+  const DB = database(), messages = [];
+  const record = async (_, message) => messages.push(message.message);
+  assert.equal(await monitorCity(city(), {DB}, now, dependencies({send:record,sendLegacy:record})), "sent");
+  assert.deepEqual(messages.map(m=>m.topic),["munora_weather_muntinlupa_v2","munora_weather_muntinlupa"]);
+  assert.equal(messages[0].notification,undefined);
+  assert.match(messages[1].notification.body,/umbrella/i);
+  DB.sql.close();
+});

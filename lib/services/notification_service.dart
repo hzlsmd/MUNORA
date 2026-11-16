@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui' show DartPluginRegistrant;
 
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,7 @@ import 'package:workmanager/workmanager.dart';
 import '../data/supported_cities.dart';
 import '../models/weather_snapshot.dart';
 import 'notification_policy.dart';
+import 'notification_preferences.dart';
 import 'notification_config.dart';
 import 'weather_service.dart';
 import 'push_notifications.dart';
@@ -16,12 +18,14 @@ import 'push_notifications.dart';
 @pragma('vm:entry-point')
 void weatherNotificationDispatcher() {
   Workmanager().executeTask((task, _) async {
+    WidgetsFlutterBinding.ensureInitialized();
     DartPluginRegistrant.ensureInitialized();
     if (task != weatherNotificationJob) return true;
     try {
       await NotificationService().checkWeather();
     } catch (_) {
-      // Leave transient network failures for the next periodic check.
+      // WorkManager retries transient failures with its bounded backoff.
+      return false;
     }
     return true;
   });
@@ -31,6 +35,13 @@ class NotificationService {
   static bool get supported =>
       !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
   final _plugin = FlutterLocalNotificationsPlugin();
+  final WeatherService Function() _weather;
+  final DateTime Function() _now;
+  NotificationService({
+    WeatherService Function()? weatherService,
+    DateTime Function()? now,
+  }) : _weather = weatherService ?? WeatherService.new,
+       _now = now ?? DateTime.now;
   late SharedPreferences _prefs;
 
   /// Repair delivery after an app update or a change between push/local builds.
@@ -89,6 +100,8 @@ class NotificationService {
       frequency: const Duration(hours: 1),
       existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
       constraints: Constraints(networkType: NetworkType.connected),
+      backoffPolicy: BackoffPolicy.exponential,
+      backoffPolicyDelay: const Duration(minutes: 15),
     );
     // An opt-out can race a startup/resume registration in the native scheduler.
     await _reload();
@@ -118,6 +131,11 @@ class NotificationService {
       onDidReceiveNotificationResponse: PushNotifications.instance.localTap,
     );
     if (ready != true) throw StateError('Notifications unavailable');
+    await _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >()
+        ?.createNotificationChannel(weatherNotificationChannel);
   }
 
   Future<bool> setEnabled(bool value) async {
@@ -154,6 +172,8 @@ class NotificationService {
       await _prefs.setBool(weatherNotificationsEnabledKey, false);
       rethrow;
     }
+    // WorkManager's first run has no initial delay. Do not start an additional
+    // foreground check: it could race the worker and publish duplicate alerts.
     return true;
   }
 
@@ -171,6 +191,7 @@ class NotificationService {
   Future<void> checkWeather() async {
     WidgetsFlutterBinding.ensureInitialized();
     if (PushNotifications.configured || !await enabled()) return;
+    await _initialize();
     final android = _plugin
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
@@ -178,35 +199,59 @@ class NotificationService {
     if (await android?.areNotificationsEnabled() != true) return;
     final city = _prefs.getString('selectedCity') ?? 'Muntinlupa';
     if (!supportedCities.contains(city)) return;
-    final weatherService = WeatherService();
+    final weatherService = _weather();
     try {
       final snapshot = await weatherService.fetch(city);
-      final now = DateTime.now().toUtc();
-      final previous = <String, DateTime>{};
-      for (final trigger in ['rain', 'storm', 'heat', 'wind']) {
+      final now = _now().toUtc();
+      final previous = <String, NotificationRecord>{};
+      for (final trigger in notificationCategories) {
         final key = notificationKey(city, trigger);
         final time = _prefs.getString('notifications.last.$key');
         final parsed = time == null ? null : DateTime.tryParse(time);
-        if (parsed != null) previous[key] = parsed;
+        if (parsed != null) {
+          previous[trigger] = NotificationRecord(
+            parsed,
+            _prefs.getString('notifications.fingerprint.$key') ?? '',
+          );
+        }
       }
-      final tips = notificationTips(snapshot, now, previous);
+      final preferences = await NotificationPreferences.load();
+      final tips = selectNotificationTips(
+        snapshot,
+        now,
+        previous,
+        preferences: preferences,
+      );
       if (tips.isEmpty || !await enabled()) return;
       // City may have changed while the network request was running.
       if ((_prefs.getString('selectedCity') ?? 'Muntinlupa') != city) return;
       await _initialize();
+      final body =
+          '${tips.map((t) => '${t.advice} ${t.reason}').join('\n')}\n'
+          'Estimate ${weatherTime(snapshot.observedAt)}. Check official advisories.';
       await _plugin.show(
         weatherNotificationId,
         '$city weather tips',
-        '${tips.map((t) => t.title).join('. ')}. '
-            'Estimate ${weatherTime(snapshot.observedAt)}. Check official advisories.',
-        weatherNotificationDetails(onlyAlertOnce: true),
+        body,
+        weatherNotificationDetails(body: body),
+        payload: jsonEncode({
+          'city': city,
+          'eventId': 'local-${now.millisecondsSinceEpoch}',
+          'issuedAt': now.toIso8601String(),
+          'route': 'alerts',
+        }),
       );
       // Recheck after platform delivery to honour a concurrent opt-out.
-      if (!await enabled()) {
+      if (!await enabled() ||
+          (_prefs.getString('selectedCity') ?? 'Muntinlupa') != city) {
         await _plugin.cancel(weatherNotificationId);
         return;
       }
       for (final tip in tips) {
+        await _prefs.setString(
+          'notifications.fingerprint.${notificationKey(city, tip.id)}',
+          notificationFingerprint(snapshot, tip, now),
+        );
         await _prefs.setString(
           'notifications.last.${notificationKey(city, tip.id)}',
           now.toIso8601String(),

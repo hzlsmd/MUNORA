@@ -43,7 +43,10 @@ List<WeatherTip> weatherRecommendations(WeatherSnapshot weather, DateTime now) {
   }
   final currentRain = rain(weather.current.condition);
   final futureRain = upcoming.where((r) => rain(r.condition)).firstOrNull;
-  if (currentRain || futureRain != null) {
+  final probableRain = upcoming
+      .where((r) => (r.rainProbability ?? 0) >= 60)
+      .firstOrNull;
+  if (currentRain || futureRain != null || probableRain != null) {
     tips.add(
       WeatherTip(
         'rain',
@@ -51,27 +54,54 @@ List<WeatherTip> weatherRecommendations(WeatherSnapshot weather, DateTime now) {
         'Carry an umbrella or raincoat and allow extra travel time if roads are wet.',
         currentRain
             ? '${weather.current.condition} in the current estimate.'
-            : '${futureRain!.condition} forecast for ${weatherTime(futureRain.at)}.',
+            : futureRain != null
+            ? '${futureRain.condition} forecast for ${weatherTime(futureRain.at)}.'
+            : '${probableRain!.rainProbability!.round()}% rain probability forecast for ${weatherTime(probableRain.at)}.',
       ),
     );
   }
-  if (weather.temperature >= 32 || weather.feelsLike >= 35) {
+  final futureHeat = upcoming
+      .where(
+        (r) => (r.temperature ?? -100) >= 32 || (r.feelsLike ?? -120) >= 35,
+      )
+      .firstOrNull;
+  if (weather.temperature >= 32 ||
+      weather.feelsLike >= 35 ||
+      futureHeat != null) {
     tips.add(
       WeatherTip(
         'heat',
         'Take breaks from the heat',
         'Carry drinking water, seek shade and take breaks during outdoor activities.',
-        'Temperature ${weather.temperature.toStringAsFixed(1)} C; feels like ${weather.feelsLike.toStringAsFixed(1)} C.',
+        weather.temperature >= 32 || weather.feelsLike >= 35
+            ? 'Temperature ${weather.temperature.toStringAsFixed(1)} C; feels like ${weather.feelsLike.toStringAsFixed(1)} C.'
+            : 'Heat forecast for ${weatherTime(futureHeat!.at)}: ${futureHeat.temperature?.toStringAsFixed(1) ?? 'unavailable'} C; feels like ${futureHeat.feelsLike?.toStringAsFixed(1) ?? 'unavailable'} C.',
       ),
     );
   }
-  if (weather.windSpeed >= 10) {
+  final futureWind = upcoming
+      .where((r) => (r.windSpeed ?? 0) >= 10)
+      .firstOrNull;
+  if (weather.windSpeed >= 10 || futureWind != null) {
     tips.add(
       WeatherTip(
         'wind',
         'Prepare for windy conditions',
         'Secure loose outdoor belongings and take care with umbrellas.',
-        'Current estimated wind speed is ${weather.windSpeed.toStringAsFixed(1)} m/s.',
+        weather.windSpeed >= 10
+            ? 'Current estimated wind speed is ${weather.windSpeed.toStringAsFixed(1)} m/s.'
+            : 'Wind ${futureWind!.windSpeed!.toStringAsFixed(1)} m/s forecast for ${weatherTime(futureWind.at)}.',
+      ),
+    );
+  }
+  final highUv = upcoming.where((r) => (r.uvIndex ?? 0) >= 8).firstOrNull;
+  if (highUv != null) {
+    tips.add(
+      WeatherTip(
+        'uv',
+        'Protect yourself from strong UV',
+        'Seek shade, wear sun protection and limit prolonged midday sun exposure.',
+        'UV index ${highUv.uvIndex!.toStringAsFixed(1)} forecast for ${weatherTime(highUv.at)}.',
       ),
     );
   }

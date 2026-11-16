@@ -4,7 +4,7 @@ import '../data/supported_cities.dart';
 
 String cityTopic(String city) {
   if (!supportedCities.contains(city)) throw ArgumentError('Unsupported city');
-  return 'munora_weather_${city.toLowerCase().replaceAll(' ', '_')}';
+  return 'munora_weather_${city.toLowerCase().replaceAll(' ', '_')}_v2';
 }
 
 class PushAlert {

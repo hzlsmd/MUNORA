@@ -69,11 +69,13 @@ void main() {
       expect(find.text('Retry'), findsOneWidget);
       await tester.tap(find.byTooltip('Notification settings'));
       await tester.pumpAndSettle();
-      final toggle = tester.widget<SwitchListTile>(find.byType(SwitchListTile));
+      final toggle = tester.widget<SwitchListTile>(
+        find.widgetWithText(SwitchListTile, 'Weather notifications'),
+      );
       expect(toggle.value, isTrue);
       expect(toggle.onChanged, isNotNull);
       expect(find.text('Send test notification'), findsOneWidget);
-    debugDefaultTargetPlatformOverride = null;
+      debugDefaultTargetPlatformOverride = null;
     },
   );
 }

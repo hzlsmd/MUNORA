@@ -1,6 +1,7 @@
 import 'package:material_ui/material_ui.dart';
 
 import '../services/notification_service.dart';
+import '../services/notification_preferences.dart';
 import '../services/push_notifications.dart';
 
 class NotificationSettings extends StatefulWidget {
@@ -13,6 +14,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
   final service = NotificationService();
   bool enabled = false;
   bool busy = true;
+  NotificationPreferences preferences = const NotificationPreferences();
 
   @override
   void initState() {
@@ -23,6 +25,7 @@ class _NotificationSettingsState extends State<NotificationSettings> {
   Future<void> _load() async {
     try {
       final value = await service.enabled();
+      preferences = await NotificationPreferences.load();
       if (mounted) setState(() => enabled = value);
     } catch (_) {
       // Keep the control available for retry if preference storage fails.
@@ -47,6 +50,18 @@ class _NotificationSettingsState extends State<NotificationSettings> {
         await _load();
         _message('Unable to update notifications. Please try again.');
       }
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
+  }
+
+  Future<void> _savePreferences(NotificationPreferences value) async {
+    setState(() => busy = true);
+    try {
+      await value.save();
+      if (mounted) setState(() => preferences = value);
+    } catch (_) {
+      _message('Unable to save notification preferences. Please retry.');
     } finally {
       if (mounted) setState(() => busy = false);
     }
@@ -93,6 +108,99 @@ class _NotificationSettingsState extends State<NotificationSettings> {
                     ],
                   ),
           ),
+          if (enabled) ...[
+            Text(
+              PushNotifications.configured
+                  ? 'Push delivery requires the updated backend. Android may delay delivery. Quiet hours use Philippine time.'
+                  : 'Approximate hourly checks. Android may delay delivery. Quiet hours use Philippine time.',
+              style: const TextStyle(fontSize: 12),
+            ),
+            for (final category in notificationCategories)
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                title: Text(switch (category) {
+                  'storm' => 'Thunderstorms',
+                  'rain' => 'Rain',
+                  'heat' => 'Heat',
+                  'wind' => 'Strong wind',
+                  'uv' => 'High UV',
+                  _ => 'Clear-weather suggestions',
+                }),
+                value: preferences.categories.contains(category),
+                onChanged: busy
+                    ? null
+                    : (value) {
+                        final categories = {...preferences.categories};
+                        if (value == true) {
+                          categories.add(category);
+                        } else {
+                          categories.remove(category);
+                        }
+                        _savePreferences(
+                          NotificationPreferences(
+                            categories: categories,
+                            quietStart: preferences.quietStart,
+                            quietEnd: preferences.quietEnd,
+                          ),
+                        );
+                      },
+              ),
+            SwitchListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text('Quiet hours (including weather alerts)'),
+              value: preferences.quietStart != null,
+              onChanged: busy
+                  ? null
+                  : (value) => _savePreferences(
+                      NotificationPreferences(
+                        categories: preferences.categories,
+                        quietStart: value ? 22 : null,
+                        quietEnd: value ? 7 : null,
+                      ),
+                    ),
+            ),
+            if (preferences.quietStart != null)
+              const Text(
+                'Equal start and end hours means no quiet period.',
+                style: TextStyle(fontSize: 11),
+              ),
+            if (preferences.quietStart != null)
+              Row(
+                children: [
+                  for (final start in [true, false])
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        initialValue: start
+                            ? preferences.quietStart
+                            : preferences.quietEnd,
+                        decoration: InputDecoration(
+                          labelText: start ? 'From (PHT)' : 'Until (PHT)',
+                        ),
+                        items: List.generate(
+                          24,
+                          (hour) => DropdownMenuItem(
+                            value: hour,
+                            child: Text(
+                              '${hour.toString().padLeft(2, '0')}:00',
+                            ),
+                          ),
+                        ),
+                        onChanged: busy
+                            ? null
+                            : (hour) => _savePreferences(
+                                NotificationPreferences(
+                                  categories: preferences.categories,
+                                  quietStart: start
+                                      ? hour
+                                      : preferences.quietStart,
+                                  quietEnd: start ? preferences.quietEnd : hour,
+                                ),
+                              ),
+                      ),
+                    ),
+                ],
+              ),
+          ],
           if (enabled)
             Align(
               alignment: Alignment.centerLeft,
