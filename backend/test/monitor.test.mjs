@@ -343,3 +343,19 @@ test("monitor publishes v2 and legacy formats to separate topics", async () => {
   assert.match(messages[1].notification.body,/umbrella/i);
   DB.sql.close();
 });
+
+test("legacy rejection does not roll back successful v2 delivery", async () => {
+  const DB = database();
+  let sent = 0;
+  const deps = dependencies({
+    send: async () => sent++,
+    sendLegacy: rejectedSend(503),
+  });
+  try {
+    await assert.rejects(monitorCity(city(), {DB}, now, deps));
+    assert.equal(await monitorCity(city(), {DB}, now + 300000, deps), "quiet");
+    assert.equal(sent, 1);
+  } finally {
+    DB.sql.close();
+  }
+});
