@@ -64,6 +64,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (raw != null) SavedInsightReference(data: raw),
                   const GlassCard(
                     padding: EdgeInsets.all(14),
                     child: Row(

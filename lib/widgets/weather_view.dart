@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:connectivity_plus/connectivity_plus.dart';
+
 import 'package:material_ui/material_ui.dart';
 import 'package:url_launcher/link.dart';
 
@@ -30,11 +32,13 @@ class WeatherLiveStatus extends InheritedWidget {
 class WeatherView extends StatefulWidget {
   final String city;
   final WeatherService service;
+  final Stream<List<ConnectivityResult>>? connectivityChanges;
   final Widget Function(WeatherSnapshot snapshot) builder;
   const WeatherView({
     super.key,
     required this.city,
     required this.service,
+    this.connectivityChanges,
     required this.builder,
   });
 
@@ -48,6 +52,10 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
   bool loading = true;
   int request = 0;
   bool saved = false;
+  StreamSubscription<List<ConnectivityResult>>? connection;
+  bool offline = false;
+  bool active = true;
+  bool reconnectPending = false;
   Timer? expiry;
   Timer? automaticRefresh;
 
@@ -65,6 +73,33 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
         setState(() => saved = true);
       }
     });
+    try {
+      connection =
+          (widget.connectivityChanges ?? Connectivity().onConnectivityChanged)
+              .listen(
+                (states) {
+                  if (!mounted) return;
+                  final disconnected = states.contains(ConnectivityResult.none);
+                  final reconnect = (offline || error != null) && !disconnected;
+                  setState(() {
+                    offline = disconnected;
+                    if (offline) saved = true;
+                  });
+                  if (reconnect) {
+                    if (loading || !active) {
+                      reconnectPending = true;
+                    } else {
+                      load(force: true);
+                    }
+                  }
+                },
+                onError: (Object _) {
+                  /* Actual requests still detect failures. */
+                },
+              );
+    } catch (_) {
+      /* Connectivity hints are optional; HTTPS remains authoritative. */
+    }
     startAutomaticRefresh();
     load();
   }
@@ -72,15 +107,16 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
   void startAutomaticRefresh() {
     automaticRefresh?.cancel();
     automaticRefresh = Timer.periodic(const Duration(minutes: 10), (_) {
-      if (!loading) load(force: true);
+      if (!loading && !offline) load(force: true);
     });
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    active = state == AppLifecycleState.resumed;
     if (state == AppLifecycleState.resumed) {
       startAutomaticRefresh();
-      if (!loading) load(force: true);
+      if (!loading && !offline) load(force: true);
     } else {
       automaticRefresh?.cancel();
     }
@@ -88,6 +124,7 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
 
   @override
   void dispose() {
+    connection?.cancel();
     expiry?.cancel();
     automaticRefresh?.cancel();
     WidgetsBinding.instance.removeObserver(this);
@@ -126,12 +163,20 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
         saved = true;
       });
     }
+    if (offline) {
+      setState(() {
+        loading = false;
+        saved = true;
+        error = 'Offline — showing saved information when available.';
+      });
+      return;
+    }
     try {
       final result = await widget.service.fetch(city, force: force);
       if (mounted && id == request) {
         setState(() {
           data = result;
-          saved = false;
+          saved = offline;
         });
       }
     } catch (e) {
@@ -143,7 +188,13 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
         );
       }
     } finally {
-      if (mounted && id == request) setState(() => loading = false);
+      if (mounted && id == request) {
+        setState(() => loading = false);
+        if (reconnectPending && !offline && active) {
+          reconnectPending = false;
+          load(force: true);
+        }
+      }
     }
   }
 
@@ -195,7 +246,7 @@ class _WeatherViewState extends State<WeatherView> with WidgetsBindingObserver {
                       children: [
                         if (saved || error != null)
                           Text(
-                            'Saved weather. ${error ?? ''}',
+                            '${offline ? 'Offline · ' : ''}Saved weather. ${error ?? ''}',
                             style: const TextStyle(fontSize: 11),
                           ),
                         if (data!.source == 'Open-Meteo')

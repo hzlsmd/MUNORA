@@ -1,8 +1,8 @@
 # Weather recommendation notification repair — 16 November 2026
 
-This change addresses the user's first reported issue: real Android weather
-notifications. Offline caching, Home imagery and broader AI changes remain
-separate follow-ups. Notifications are deterministic weather rules, not AI text.
+This report documents the notification portion of the integrated change.
+See `WEATHER_ASSISTANT_IMPLEMENTATION.md` for completed AI guidance, Home visuals
+and offline functionality. Notifications are deterministic weather rules, not AI text.
 
 ## Findings and changes
 

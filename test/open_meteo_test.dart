@@ -66,7 +66,7 @@ void main() {
     expect(cached!.source, 'Open-Meteo');
     expect(cached.current.temp, '30');
     final expired =
-        WeatherService(now: () => now.add(const Duration(hours: 25)));
+        WeatherService(now: () => now.add(const Duration(days: 8)));
     addTearDown(expired.dispose);
     expect(await expired.cached('Muntinlupa'), isNull);
   });

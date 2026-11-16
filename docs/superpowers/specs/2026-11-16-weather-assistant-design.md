@@ -1,6 +1,6 @@
 # Reliable Android weather assistant
 
-Status: notification implementation underway. The user requested fixing reported issues one by one; offline, AI and visual changes remain separate follow-ups.
+Status: the user finished supplying the full issue list and authorized integrated implementation. Source changes are implemented; see WEATHER_ASSISTANT_IMPLEMENTATION.md for verification and physical-device acceptance requirements.
 
 ## Intent and constraints
 

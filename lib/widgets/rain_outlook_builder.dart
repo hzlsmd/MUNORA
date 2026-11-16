@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import '../models/weather_snapshot.dart';
 import '../services/rain_model.dart';
 import '../services/rain_outlook.dart';
+import '../services/saved_rain_insight.dart';
 import 'weather_view.dart';
 
 /// Both cards share RainModelLoader's memoized asset; no weather requests here.
@@ -27,6 +28,7 @@ class RainOutlookBuilder extends StatefulWidget {
 class _RainOutlookBuilderState extends State<RainOutlookBuilder> {
   late Future<RainModel?> model;
   Timer? expiry;
+  String? savedSignature;
   @override
   void initState() {
     super.initState();
@@ -64,6 +66,18 @@ class _RainOutlookBuilderState extends State<RainOutlookBuilder> {
           live: live,
           now: DateTime.now().toUtc(),
         );
+        final prediction = outlook.prediction;
+        final signature =
+            '${widget.weather.city}:${prediction?.estimatedAt}:${prediction?.modelVersion}';
+        if (prediction != null && live && savedSignature != signature) {
+          savedSignature = signature;
+          unawaited(
+            SavedRainInsight.save(
+              widget.weather.city,
+              prediction,
+            ).catchError((Object _) {}),
+          );
+        }
         return widget.builder(outlook, loading, loaded?.version);
       },
     );
