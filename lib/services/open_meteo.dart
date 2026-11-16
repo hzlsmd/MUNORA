@@ -9,7 +9,7 @@ Uri openMeteoRequest(String city) {
     queryParameters: {
       'latitude': '${coordinates.$1}',
       'longitude': '${coordinates.$2}',
-      'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,pressure_msl,wind_speed_10m',
+      'current': 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,pressure_msl,wind_speed_10m,is_day',
       'hourly': 'temperature_2m,weather_code,apparent_temperature,wind_speed_10m,precipitation_probability,uv_index',
       'wind_speed_unit': 'ms',
       'temperature_unit': 'celsius',
@@ -60,6 +60,12 @@ Map<String, dynamic> normalizeOpenMeteo(
     'weather_code': 'wmo code',
   });
   final current = json['current'] as Map<String, dynamic>;
+  final day = current['is_day'];
+  if (day != null &&
+      (day != 0 && day != 1 ||
+          (json['current_units'] as Map)['is_day'] != '')) {
+    throw const FormatException('Invalid provider day flag');
+  }
   final hourly = json['hourly'] as Map<String, dynamic>;
   final times = hourly['time'] as List;
   final temperatures = hourly['temperature_2m'] as List;
@@ -139,6 +145,7 @@ Map<String, dynamic> normalizeOpenMeteo(
       'pressure': current['pressure_msl'],
       'wind': current['wind_speed_10m'],
       'weatherCode': current['weather_code'],
+      if (day != null) 'isDay': day == 1,
       'condition': _condition(current['weather_code']),
     },
     'hourly': points,

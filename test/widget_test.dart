@@ -64,7 +64,7 @@ void main() {
     final service = FakeWeatherService()
       ..saved = WeatherSnapshot.fromJson(
         weatherFixture(
-          updatedAt: DateTime.now().subtract(const Duration(hours: 25)),
+          updatedAt: DateTime.now().subtract(const Duration(days: 8)),
         ),
       );
     addTearDown(service.dispose);
