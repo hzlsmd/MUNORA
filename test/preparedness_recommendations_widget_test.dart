@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:munora/models/weather_snapshot.dart';
 import 'package:munora/services/rain_model.dart';
 import 'package:munora/widgets/preparedness_recommendations.dart';
@@ -12,9 +11,6 @@ import 'weather_fixture.dart';
 import 'rain_model_test.dart' show artifact;
 
 void main() {
-  setUp(() {
-    GoogleFonts.config.allowRuntimeFetching = false;
-  });
   WeatherSnapshot weather(String city) {
     final data = weatherFixture(city: city)..['source'] = 'Open-Meteo';
     data['current']['weatherCode'] = 61;

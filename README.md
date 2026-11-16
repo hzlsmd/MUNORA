@@ -63,6 +63,13 @@ extrapolated extreme. MUNORA limits display to 80–112°F input temperature and
 80–140°F resulting heat index after screening; these are application limits,
 not official hazard categories. Pressure remains an internal model input.
 
+## Android readiness review
+
+See the [16 November Android repair and installation checks](docs/audit/2026-11-16-android-readiness.md)
+for closed-app notification routing, dependency/font cleanup, verification results,
+and the phone acceptance checklist. Use the default local-notification APK for
+prototype installation; the optional push APK needs its coordinated backend rollout.
+
 ## Setup
 
 For Android builds in GitHub Codespaces, follow

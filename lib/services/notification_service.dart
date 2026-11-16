@@ -46,7 +46,7 @@ class NotificationService {
 
   /// Repair delivery after an app update or a change between push/local builds.
   /// Permission is only requested by the explicit setEnabled(true) action.
-  Future<void> initialize() async {
+  Future<void> initialize({bool handleLaunch = false}) async {
     if (!supported) return;
     if (PushNotifications.configured) {
       try {
@@ -59,8 +59,19 @@ class NotificationService {
     var localFailed = false;
     try {
       await _reload();
-      if (_prefs.getBool(weatherNotificationsEnabledKey) ?? false) {
-        await _initialize();
+      final optedIn = _prefs.getBool(weatherNotificationsEnabledKey) ?? false;
+      if (handleLaunch || optedIn) await _initialize();
+      if (handleLaunch) {
+        // A closed-app tap is not sent to onDidReceiveNotificationResponse.
+        // Read it only on startup; resume/settings retries must not reopen it.
+        // Old notifications can still be tapped after the user opted out.
+        final launch = await _plugin.getNotificationAppLaunchDetails();
+        final response = launch?.notificationResponse;
+        if (launch?.didNotificationLaunchApp == true && response != null) {
+          PushNotifications.instance.localTap(response);
+        }
+      }
+      if (optedIn) {
         final android = _plugin
             .resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin
