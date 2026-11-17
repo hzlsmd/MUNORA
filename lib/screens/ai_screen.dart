@@ -2,10 +2,13 @@ import 'package:material_ui/material_ui.dart';
 
 import '../services/weather_recommendations.dart';
 import '../services/weather_service.dart';
+import '../services/ask_munora_service.dart';
 import '../services/weather_insights.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
 import '../widgets/ai_rain_outlook.dart';
+import '../widgets/ask_munora_card.dart';
+import '../widgets/ask_munora_chat.dart';
 import '../widgets/preparedness_recommendations.dart';
 import '../widgets/activity_planner_card.dart';
 import '../widgets/bottom_nav.dart';
@@ -20,12 +23,14 @@ class AIScreen extends StatefulWidget {
   final WeatherService service;
   final WeatherInsightsService? insightsService;
   final bool openPlannerOnLoad;
+  final AskMunoraService? askService;
   const AIScreen({
     super.key,
     required this.navigate,
     required this.city,
     required this.service,
     this.insightsService,
+    this.askService,
     this.openPlannerOnLoad = false,
   });
   @override
@@ -34,6 +39,31 @@ class AIScreen extends StatefulWidget {
 
 class _AIScreenState extends State<AIScreen> {
   String filter = 'All';
+  BuildContext? _askContext;
+  bool _askOpen = false;
+
+  Future<void> _openAsk() async {
+    if (_askOpen) return;
+    _askOpen = true;
+    final city = widget.city;
+    try {
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        useSafeArea: true,
+        showDragHandle: true,
+        backgroundColor: const Color(0xFFF2EEFC),
+        builder: (sheetContext) {
+          _askContext = sheetContext;
+          return AskMunoraChat(city: city, service: widget.askService);
+        },
+      );
+    } finally {
+      _askContext = null;
+      _askOpen = false;
+    }
+  }
+
   var _plannerKey = GlobalKey<ActivityPlannerCardState>();
   late bool _pendingPlanner;
 
@@ -49,6 +79,14 @@ class _AIScreenState extends State<AIScreen> {
   void didUpdateWidget(covariant AIScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.city != widget.city) {
+      final sheet = _askContext;
+      if (sheet != null) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (sheet.mounted && ModalRoute.of(sheet)?.isCurrent == true) {
+            Navigator.of(sheet).pop();
+          }
+        });
+      }
       filter = 'All';
       _plannerKey = GlobalKey<ActivityPlannerCardState>();
       _pendingPlanner = widget.openPlannerOnLoad;
@@ -94,6 +132,8 @@ class _AIScreenState extends State<AIScreen> {
                     'WEATHER INSIGHTS',
                     trailing: 'Metro Manila Basin',
                   ),
+                  AskMunoraCard(weather: weather, onOpen: _openAsk),
+                  const SizedBox(height: 16),
                   AIRainOutlook(
                     weather: weather,
                     onPlanActivity: _openPlanner,

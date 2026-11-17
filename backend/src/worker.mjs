@@ -1,3 +1,4 @@
+import { handleAsk } from "./ask_munora.mjs";
 import { cities } from "./cities.mjs";
 import { getWeather, weatherTriggers, UpstreamRejection } from "./weather.mjs";
 import { getToken, send, notificationMessage, legacyNotificationMessage } from "./fcm.mjs";
@@ -97,7 +98,8 @@ export async function monitorCity(
   }
 }
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
+    if (new URL(request.url).pathname === "/ask") return handleAsk(request, env);
     if (request.method !== "GET")
       return new Response("Method not allowed", {
         status: 405,
