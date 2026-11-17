@@ -185,6 +185,61 @@ export function buildContext(data, city, now) {
     hourly: future,
   };
 }
+// Input is the validated hourly array from buildContext, never client facts.
+export function buildDailySummaryFacts(hourly = [], now) {
+  const local = (time) =>
+    new Date(time + 8 * 3600000).toISOString().slice(0, 16);
+  const stamp = (hour) => {
+    const dateTime = local(hour.time * 1000);
+    const h = Number(dateTime.slice(11, 13));
+    return `${dateTime} PHT (${h % 12 || 12}:${dateTime.slice(14, 16)} ${h < 12 ? "AM" : "PM"})`;
+  };
+  const facts = [];
+  for (const [offset, prefix] of [
+    [0, "today"],
+    [86400000, "tomorrow"],
+  ]) {
+    const date = local(now + offset).slice(0, 10);
+    const hours = hourly.filter(
+      (h) => h.time * 1000 > now && local(h.time * 1000).slice(0, 10) === date,
+    );
+    facts.push({
+      id: `${prefix}_coverage`,
+      label: `${prefix === "today" ? "Today" : "Tomorrow"}: forecast coverage (PHT)`,
+      value: hours.length
+        ? `For ${date}, available upcoming hours: ${local(hours[0].time * 1000)} to ${local(hours.at(-1).time * 1000)} PHT; not a full-day summary.`
+        : `For ${date}: No upcoming hourly forecast available; no daily peaks can be calculated.`,
+    });
+    if (!hours.length) continue;
+    for (const [suffix, field, label, unit, digits] of [
+      [
+        "rain_peak",
+        "precipitation_probability",
+        "Peak rain probability",
+        "%",
+        0,
+      ],
+      ["temperature_peak", "temperature_2m", "Peak temperature", " °C", 1],
+      [
+        "feels_peak",
+        "apparent_temperature",
+        "Peak feels-like temperature",
+        " °C",
+        1,
+      ],
+    ]) {
+      const peak = hours.reduce((best, h) =>
+        h[field] > best[field] ? h : best,
+      );
+      facts.push({
+        id: `${prefix}_${suffix}`,
+        label: `${label} (${prefix}, available hours)`,
+        value: `${display(peak[field], digits)}${unit} at ${stamp(peak)}; earliest occurrence of maximum among available upcoming hours.`,
+      });
+    }
+  }
+  return facts;
+}
 export async function getAssistantContext(city, now, signal, fetcher = fetch) {
   const u = new URL("https://api.open-meteo.com/v1/forecast");
   u.search = new URLSearchParams({

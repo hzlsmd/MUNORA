@@ -2,12 +2,14 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { Miniflare, convertV4MiniflareOptions } from "miniflare";
-const ask = readFileSync(
-  new URL("../src/ask_munora.mjs", import.meta.url),
-  "utf8",
-)
-  .replace(/^import .*;\n/gm, "")
-  .replaceAll("export ", "");
+import { buildDailySummaryFacts } from "../src/assistant_context.mjs";
+const ask =
+  `const display=(value,digits=1)=>Number(value.toFixed(digits));
+${buildDailySummaryFacts.toString()}
+` +
+  readFileSync(new URL("../src/ask_munora.mjs", import.meta.url), "utf8")
+    .replace(/^import[\s\S]*?;\n/gm, "")
+    .replaceAll("export ", "");
 const schema = readFileSync(
   new URL("../ask_munora_schema.sql", import.meta.url),
   "utf8",
