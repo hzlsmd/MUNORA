@@ -14,7 +14,8 @@ val releaseSigningReady = listOf(releaseStore, releaseAlias, releaseStorePasswor
 
 android {
     namespace = "com.example.munora"
-    compileSdk = flutter.compileSdkVersion
+    // flutter_local_notifications 23 requires API 37; target/min SDK stay unchanged.
+    compileSdk = 37
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
