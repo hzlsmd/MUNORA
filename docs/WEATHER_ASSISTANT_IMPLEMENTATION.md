@@ -8,13 +8,14 @@ list was being collected. Updated Android builds follow source verification.
 
 - **AI visibility and interpretation:** a real experimental logistic-regression
   rain model already existed, but its result was easy to miss and Home lacked a
-  consolidated explanation of forecast precautions. Home now places Smart
-  Recommendations and the separate AI rain outlook immediately after the weather
-  hero. Rule-based advice explains actual temperature, apparent temperature,
+  consolidated explanation of forecast precautions. Home places Smart
+  Recommendations after its other sections. The AI rain outlook and activity
+  planning remain on Tips. Forecast no longer duplicates Home’s current-condition
+  metrics. Rule-based advice explains actual temperature, apparent temperature,
   humidity, rain probability, wind and UV inputs when available. It evaluates
   forecast conditions in the next six hours and avoids inventing missing values.
-  Saved location-specific activity routines appear on Home with relevant rain
-  preparation and a working shortcut to the existing full-window activity planner.
+  Saved location-specific activity routines and the full-window activity planner
+  remain available on Tips.
 - **Real AI vs rules:** the bundled validated model still consumes structured
   temperature, humidity, pressure, wind, WMO code, city and timestamp. It requires
   fresh supported input; model failure never blocks weather or rule-based advice.
@@ -54,7 +55,7 @@ list was being collected. Updated Android builds follow source verification.
 
 ## Files and dependencies
 
-- `lib/widgets/smart_home.dart`: explained Home guidance and saved routine context.
+- `lib/widgets/smart_home.dart`: explained weather-based Home guidance.
 - `lib/widgets/weather_scene.dart`: offline WMO/day-night scenes and transitions.
 - `lib/screens/home_screen.dart`: integration and prominent insight placement.
 - `lib/services/saved_rain_insight.dart`, `rain_outlook_builder.dart`,

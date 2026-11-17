@@ -98,10 +98,9 @@ are unsupported.
 
 ## Activity planning integration
 
-Home and Tips show a short **Rain preparedness recommendation** alongside the
-**AI prediction · Experimental** label. **Plan an activity** opens Tips and expands
-and scrolls to **Plan My Activity**; using it again on Tips preserves the selected
-activity. Checking a plan reveals **AI rain recommendation** when model coverage
+Tips shows the **AI prediction · Experimental** outlook, with action advice in
+its contextual recommendations checklist. **Plan an activity** expands and scrolls
+to **Plan My Activity** on Tips; using it again preserves the selected activity. Checking a plan reveals **AI rain recommendation** when model coverage
 allows it. Unavailable weather inputs expose **Refresh weather**, which forces a
 new weather request through the shared weather view instead of reusing its memory
 cache. Loading-only or unavailable-model states retain their specific explanation.
@@ -112,10 +111,10 @@ separate three-provider comparison is labelled **Forecast model agreement**, not
 AI confidence. The trained model estimates rain probability; preparedness rules
 translate it into activity advice.
 
-Home and Tips identify the selected city, weather estimate time and exact
-observation-anchored three-hour outlook. Their shared evaluator explains saved-only,
+Tips identifies the selected city, weather estimate time and exact
+observation-anchored three-hour outlook. The evaluator explains saved-only,
 stale, future-dated, missing-input, unsupported-source/domain and model-loading
-failures. Both use the same memoized model asset and existing weather snapshot;
+failures. The outlook and planner use the same memoized model asset and weather snapshot;
 opening the planner does not request additional provider data or send telemetry.
 
 After selecting an activity and choosing **Check this plan** in Tips, the planner
