@@ -163,3 +163,11 @@ App city names derive from one coordinate registry. Local/push modes share nativ
 notification configuration, while their scheduling and reminder behavior remain
 distinct. Checks runs for pull requests and master pushes; use workflow dispatch
 for a standalone branch without a PR.
+
+## Ask MUNORA
+
+Tips includes session-only weather Q&A powered by Cloudflare Workers AI. The
+backend verifies city weather and limits requests before generating explanations.
+Production activation, privacy, quotas and live-testing requirements are documented
+in [Ask MUNORA setup](docs/setup/ASK_MUNORA.md). A successful app build does not
+activate the backend or verify live model availability.

@@ -103,6 +103,8 @@ const path = require('node:path');
       assert.equal(askRequests.length,0);
       await page.getByRole('button',{name:'Ask MUNORA',exact:true}).click();
       assert.equal(askRequests.length,0);
+      await page.waitForTimeout(500);
+      await page.screenshot({path:path.join(output, `ask-open-${viewport.width}.png`)});
       await page.getByRole('button',{name:'Do I need an umbrella?',exact:true}).click();
       await page.getByText('Carry an umbrella and check the hourly forecast before leaving.',{exact:true}).waitFor();
       assert.equal(askRequests.length,1);

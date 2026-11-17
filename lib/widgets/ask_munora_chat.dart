@@ -156,9 +156,16 @@ class _AskMunoraChatState extends State<AskMunoraChat> {
                           'When is a good time outdoors?',
                           'How should I prepare for the heat?',
                         ])
-                          ActionChip(
-                            label: Text(q),
-                            onPressed: loading ? null : () => send(q),
+                          Semantics(
+                            button: true,
+                            label: q,
+                            enabled: !loading,
+                            onTap: loading ? null : () => send(q),
+                            excludeSemantics: true,
+                            child: ActionChip(
+                              label: Text(q),
+                              onPressed: loading ? null : () => send(q),
+                            ),
                           ),
                       ],
                     ),

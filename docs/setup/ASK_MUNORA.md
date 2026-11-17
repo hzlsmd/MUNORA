@@ -107,3 +107,13 @@ and physical-device acceptance must be reported separately.
 - https://developers.cloudflare.com/workers-ai/models/gemma-4-26b-a4b-it/
 - https://developers.cloudflare.com/workers-ai/features/json-mode/
 - https://developers.cloudflare.com/workers-ai/platform/pricing/
+
+## Verification status (17 November 2026)
+
+Local backend tests use mocked AI outputs, including actual workerd/D1 semantics;
+they do not prove live model availability. Flutter regression tests, static analysis,
+web compilation and Wrangler packaging are checked separately. Cloudflare connector
+authentication repeatedly requested reauthentication, so no production migration,
+Worker deployment, paid-plan change or live inference was performed in this session.
+The route must be activated using the steps above before installing the new app for
+live assistant testing. Existing released APKs do not contain this feature.
