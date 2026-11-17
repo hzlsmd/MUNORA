@@ -158,7 +158,9 @@ class _AskMunoraChatState extends State<AskMunoraChat> {
                     if (historyEvicted)
                       const Padding(
                         padding: EdgeInsets.only(top: 8),
-                        child: Text('Showing the latest 12 exchanges. Earlier messages are cleared.'),
+                        child: Text(
+                          'Showing the latest 12 exchanges. Earlier messages are cleared.',
+                        ),
                       ),
                     const SizedBox(height: 12),
                     Wrap(

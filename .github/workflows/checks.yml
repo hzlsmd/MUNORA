@@ -35,6 +35,7 @@ jobs:
           node-version: '24'
       - run: npm ci --prefix backend
       - run: node --test backend/test/*.test.mjs
+      - run: node --test tools/browser_performance.test.cjs
 
   rain-model:
     runs-on: ubuntu-latest

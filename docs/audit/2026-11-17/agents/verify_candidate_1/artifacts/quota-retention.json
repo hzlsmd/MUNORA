@@ -1,0 +1,29 @@
+{
+  "mode": "fixture",
+  "operation": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "/fixtures/quota-retention.mjs"
+  ],
+  "wall_seconds": 2.937,
+  "exit_code": 0,
+  "sandbox": {
+    "network": "isolated namespace, loopback only",
+    "environment": {
+      "HOME": "/scratch/home",
+      "TMPDIR": "/scratch/tmp",
+      "PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/usr/bin:/bin",
+      "CI": "true",
+      "NO_COLOR": "1",
+      "NODE_OPTIONS": "--max-old-space-size=256"
+    },
+    "scratch_bytes": 805306368,
+    "cpu_seconds": 120,
+    "virtual_memory_bytes": 2199023255552,
+    "data_bytes": 2147483648,
+    "processes": 128,
+    "file_bytes": 134217728,
+    "wall_seconds_limit": 120,
+    "target_and_tools": "read-only",
+    "capabilities": "none after setup"
+  }
+}

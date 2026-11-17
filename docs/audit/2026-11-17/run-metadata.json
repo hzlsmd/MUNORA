@@ -1,0 +1,65 @@
+{
+  "run_id": "munora-20261117-1",
+  "repo": "hzlsmd/MUNORA",
+  "target": "/workspace/work/MUNORA",
+  "source_ref": "98bbac86e4c07968f34fd92fd462dac7ba1d7e63",
+  "dirty": false,
+  "profile": "standard",
+  "scope_paths": [
+    "."
+  ],
+  "budget": null,
+  "execution_policy": "sandboxed-source-and-local-only",
+  "selected_companion_files": [
+    "AI-AND-LLM.md",
+    "CLIENT-SIDE.md",
+    "CLOUD-AND-DEPLOYMENT.md",
+    "DATA-ISOLATION-AND-LIFECYCLE.md",
+    "DESKTOP-MOBILE-AND-LOCAL-IPC.md",
+    "PROTOCOLS-RPC-AND-MESSAGING.md",
+    "RESOURCE-EXHAUSTION-AND-AVAILABILITY.md",
+    "SUPPLY-CHAIN-AND-RELEASE.md",
+    "WEB-PROTOCOL-AND-AUTH.md"
+  ],
+  "prior_run_paths": [],
+  "shared_file_owners": {
+    "run-metadata.json": "root",
+    "architecture.md": "root",
+    "coverage-ledger.json": "root",
+    "findings.json": "root",
+    "REPORT.md": "root",
+    "FINDINGS-DETAIL.md": "root",
+    "NEEDS-VALIDATION.md": "root"
+  },
+  "run_status": "incomplete",
+  "reconnaissance_agents": 4,
+  "estimated_units": 52,
+  "planned_hunters_wave1": 4,
+  "mandatory_critics_reserved": 2,
+  "validation_reserve": "No user budget; one fresh candidate verifier + one fresh final verifier per surviving record.",
+  "sandbox_capability": "bwrap approved escalation succeeds; unprivileged uid-map blocked.",
+  "incomplete_reason": "packaged_validation_scripts_unavailable",
+  "audit_phases_completed": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ],
+  "validation_adaptation": "Bundled validate-findings.cjs and validate-coverage-ledger.cjs were not readable through skill provider. Local JSON Schema plus ownership/canonical-ID/state/artifact/path checks pass; not claimed to be the packaged validators.",
+  "agent_invocations": 14,
+  "coverage_critics": {
+    "post_wave": {
+      "missing_units": [],
+      "reassign_ids": [],
+      "stop": true
+    },
+    "final_clean": {
+      "missing_units": [],
+      "reassign_ids": [],
+      "stop": true
+    }
+  },
+  "prior_run_note": "No compatible coverage ledger/findings JSON exists. Historical 2026-11-07 prose consulted as leads only."
+}
