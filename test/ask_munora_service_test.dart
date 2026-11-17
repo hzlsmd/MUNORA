@@ -25,13 +25,58 @@ Map<String, dynamic> answer() {
 
 void main() {
   test(
+    'accepts structured fallback and rejects inconsistent metadata',
+    () async {
+      final structured = {
+        ...answer(),
+        'schemaVersion': 2,
+        'advice': 'Bring an umbrella.',
+        'explanation': 'Verified forecast summary.',
+        'answer': 'Bring an umbrella.\n\nVerified forecast summary.',
+        'forecastDate': '2026-11-18',
+        'responseType': 'weather_summary',
+        'fallbackReason': 'invalid_json',
+      };
+      final service = AskMunoraService(
+        clientFactory: () =>
+            MockClient((_) async => http.Response(jsonEncode(structured), 200)),
+      );
+      final result = await service.ask(
+        city: 'Muntinlupa',
+        question: 'Tomorrow?',
+      );
+      expect(result.isFallback, true);
+      expect(result.forecastDate, '2026-11-18');
+      expect(result.advice, 'Bring an umbrella.');
+      for (final patch in [
+        {'responseType': 'fake'},
+        {'fallbackReason': 'raw private model text'},
+        {'forecastDate': '2026-02-31'},
+        {'explanation': 42},
+        {'answer': 'Injected different prose'},
+      ]) {
+        final bad = AskMunoraService(
+          clientFactory: () => MockClient(
+            (_) async =>
+                http.Response(jsonEncode({...structured, ...patch}), 200),
+          ),
+        );
+        await expectLater(
+          bad.ask(city: 'Muntinlupa', question: 'Tomorrow?'),
+          throwsA(isA<AskMunoraException>()),
+        );
+      }
+    },
+  );
+
+  test(
     'sends only bounded city question history and accepts validated answer',
     () async {
       final service = AskMunoraService(
         clientFactory: () => MockClient((r) async {
           expect(r.followRedirects, false);
           expect(jsonDecode(r.body), {
-            'schemaVersion': 1,
+            'schemaVersion': 2,
             'city': 'Muntinlupa',
             'question': 'Umbrella?',
             'history': [],

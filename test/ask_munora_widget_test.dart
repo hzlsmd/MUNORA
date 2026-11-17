@@ -17,6 +17,68 @@ import 'weather_fixture.dart';
 import 'ask_munora_service_test.dart' show answer;
 
 void main() {
+  for (final width in [320.0, 800.0]) {
+    testWidgets('fallback is labeled and retry is manual at width $width', (
+      tester,
+    ) async {
+      tester.view.physicalSize = Size(width, 1000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      var calls = 0;
+      final questions = <String>[];
+      final service = AskMunoraService(
+        clientFactory: () => MockClient((request) async {
+          calls++;
+          questions.add(jsonDecode(request.body)['question'] as String);
+          return http.Response(
+            jsonEncode({
+              ...answer(),
+              'schemaVersion': 2,
+              'advice': 'Bring an umbrella.',
+              'explanation': 'Verified forecast summary.',
+              'answer': 'Bring an umbrella.\n\nVerified forecast summary.',
+              'forecastDate': '2026-11-18',
+              'responseType': 'weather_summary',
+              'fallbackReason': 'invalid_json',
+            }),
+            200,
+          );
+        }),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          builder: (context, child) => MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: const TextScaler.linear(1.8),
+              viewInsets: const EdgeInsets.only(bottom: 200),
+            ),
+            child: child!,
+          ),
+          home: Scaffold(
+            body: AskMunoraChat(city: 'Muntinlupa', service: service),
+          ),
+        ),
+      );
+      await tester.ensureVisible(find.text('Do I need an umbrella?'));
+      await tester.tap(find.text('Do I need an umbrella?'));
+      await tester.pumpAndSettle();
+      expect(calls, 1);
+      expect(
+        find.text('Weather-data summary · AI answer unavailable'),
+        findsOneWidget,
+      );
+      expect(find.text('Forecast date: 2026-11-18 · PHT'), findsOneWidget);
+      final retry = find.text('Retry AI answer');
+      await tester.ensureVisible(retry);
+      await tester.tap(retry);
+      await tester.pumpAndSettle();
+      expect(calls, 2);
+      expect(questions[0], questions[1]);
+      expect(tester.takeException(), isNull);
+    });
+  }
+
   testWidgets(
     'no automatic request; explicit suggestion submits and clear drops history',
     (tester) async {

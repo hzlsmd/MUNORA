@@ -192,16 +192,55 @@ class _AskMunoraChatState extends State<AskMunoraChat> {
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
-                      Text(answers[i].answer),
+                      if (answers[i].isFallback) ...[
+                        const Text(
+                          'Weather-data summary · AI answer unavailable',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        const Text(
+                          'This summary uses verified weather data. You can retry the AI answer manually.',
+                        ),
+                      ],
+                      if (answers[i].forecastDate != null)
+                        Text('Forecast date: ${answers[i].forecastDate} · PHT'),
+                      if (answers[i].advice != null) ...[
+                        Text(
+                          answers[i].advice!,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Text(answers[i].explanation!),
+                      ] else
+                        Text(answers[i].answer),
+                      if (answers[i].isFallback)
+                        TextButton(
+                          onPressed: loading
+                              ? null
+                              : () => send(turns[i * 2].content),
+                          child: const Text('Retry AI answer'),
+                        ),
                       const SizedBox(height: 8),
-                      for (final f in answers[i].facts)
-                        Text('${f.label}: ${f.value}'),
+                      if (answers[i].advice != null &&
+                          answers[i].facts.isNotEmpty)
+                        ExpansionTile(
+                          title: const Text('Supporting weather facts'),
+                          children: [
+                            for (final f in answers[i].facts)
+                              Text('${f.label}: ${f.value}'),
+                          ],
+                        )
+                      else
+                        for (final f in answers[i].facts)
+                          Text('${f.label}: ${f.value}'),
                       Text(
                         '${answers[i].source} · Weather ${weatherTime(answers[i].observedAt)}\nGenerated ${weatherTime(answers[i].generatedAt)}\nForecast through ${weatherTime(answers[i].forecastUntil)}',
                         style: const TextStyle(fontSize: 12),
                       ),
-                      const Text(
-                        'AI-generated explanation. Check current forecasts before making plans.',
+                      Text(
+                        answers[i].isFallback
+                            ? 'Weather-data summary, not an AI-generated answer or official alert.'
+                            : answers[i].advice == null
+                            ? 'AI-generated explanation. Check current forecasts before making plans.'
+                            : 'Weather guidance, not an official alert. Check current forecasts before making plans.',
                         style: TextStyle(fontSize: 12),
                       ),
                     ],
