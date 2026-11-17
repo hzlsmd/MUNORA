@@ -170,10 +170,12 @@ export function buildContext(data, city, now) {
   for (let i = 0; i < future.length; i++) {
     const h = future[i],
       local = new Date(h.time * 1000 + 8 * 3600000).toISOString().slice(0, 16);
+    const hour = Number(local.slice(11, 13));
+    const time12 = `${hour % 12 || 12}:${local.slice(14, 16)} ${hour < 12 ? "AM" : "PM"}`;
     facts.push({
       id: `hour_${i}`,
       label: "Hourly forecast (PHT UTC+8)",
-      value: `${local} PHT; ${display(h.temperature_2m, 1)} °C; feels ${display(h.apparent_temperature, 1)} °C; rain ${display(h.precipitation_probability, 0)}%; wind ${display(h.wind_speed_10m, 2)} m/s; UV ${display(h.uv_index, 1)}; WMO ${h.weather_code}`,
+      value: `${local} PHT (${time12}); ${display(h.temperature_2m, 1)} °C; feels ${display(h.apparent_temperature, 1)} °C; rain ${display(h.precipitation_probability, 0)}%; wind ${display(h.wind_speed_10m, 2)} m/s; UV ${display(h.uv_index, 1)}; WMO ${h.weather_code}`,
     });
   }
   return {
