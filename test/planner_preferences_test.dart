@@ -41,4 +41,27 @@ void main() {
     });
     expect(await PlannerPreferences().loadRoutine('Manila'), isNull);
   });
+  test('oversized routine cache is rejected before decoding', () async {
+    SharedPreferences.setMockInitialValues({
+      'planner.routine.Manila': '${' '.padRight(1025)}{"activity":"walk","hour":7,"duration":1}',
+    });
+    expect(await PlannerPreferences().loadRoutine('Manila'), isNull);
+  });
+  test('assessment cache validates size and text fields while preserving valid records', () async {
+    final store = PlannerPreferences();
+    for (final raw in [
+      '${' '.padRight(8193)}{"plan":"walk","summary":"Fine"}',
+      '{"plan":7,"summary":"Fine"}',
+      '{"plan":"walk","summary":[]}',
+      '{"plan":" ","summary":"Fine"}',
+      '{"plan":"walk","summary":""}',
+    ]) {
+      SharedPreferences.setMockInitialValues({'planner.assessment.Manila': raw});
+      expect(await store.lastAssessment('Manila'), isNull);
+    }
+    SharedPreferences.setMockInitialValues({});
+    await store.saveAssessment('Manila','walk','Fewer forecast concerns');
+    expect(await store.lastAssessment('Manila'), {'plan':'walk','summary':'Fewer forecast concerns'});
+  });
+
 }

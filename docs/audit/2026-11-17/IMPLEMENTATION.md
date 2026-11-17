@@ -24,3 +24,9 @@ Task2: complete — retention regression RED→GREEN;15 focused Ask tests pass a
 full Flutter suite190/190 PASS. Retained transcript is12 exchanges; oldest paired
 roles/answer facts are removed together, follow-up remains6 messages and Clear
 resets eviction notice/history. Existing scroll/cancel/keyboard regressions pass.
+
+Task3: complete — oversized routine and assessment regressions RED→GREEN;9 planner
+and UI tests pass, full Flutter190/190 PASS. Reads cap raw routine at1024chars and
+assessment at8192; plan/summary must be nonblank strings no longer than2048chars.
+Valid existing save/compare/remove flows are preserved; local corruption hardening
+is not presented as a confirmed cross-principal vulnerability.
