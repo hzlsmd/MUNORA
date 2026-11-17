@@ -474,3 +474,143 @@ test("hourly time aliases support grounded 12-hour answers without widening nume
     validateAnswer({ answer: "It will be 99 °C.", factIds: [fact.id] }, [fact]),
   );
 });
+
+// Summary selection uses raw validated measurements; rounding is display-only.
+import * as summaryModule from "../src/assistant_context.mjs";
+const summaryHour = (iso, rain, temperature, feels) => ({
+  time: Date.parse(iso) / 1000,
+  precipitation_probability: rain,
+  temperature_2m: temperature,
+  apparent_temperature: feels,
+});
+test("daily summaries separate PHT dates and select independent earliest maxima", () => {
+  const hours = [
+    summaryHour("2026-11-17T06:00Z", 68, 34, 36),
+    summaryHour("2026-11-17T07:00Z", 91, 33, 39),
+    summaryHour("2026-11-17T08:00Z", 91, 32, 37),
+    summaryHour("2026-11-17T16:00Z", 10, 27, 28),
+  ];
+  const facts = summaryModule.buildDailySummaryFacts(
+    hours,
+    Date.parse("2026-11-17T05:30Z"),
+  );
+  const get = (id) => facts.find((f) => f.id === id).value;
+  assert.match(
+    get("today_rain_peak"),
+    /91%.*2026-11-17T15:00.*3:00 PM.*earliest/,
+  );
+  assert.match(get("today_temperature_peak"), /34 °C.*14:00/);
+  assert.match(get("today_feels_peak"), /39 °C.*15:00/);
+  assert.match(get("tomorrow_rain_peak"), /10%.*2026-11-18T00:00.*12:00 AM/);
+  assert.match(
+    get("today_coverage"),
+    /available upcoming hours.*2026-11-17T14:00.*2026-11-17T16:00/,
+  );
+  for (const fact of facts) assert.ok(fact.value.length <= 180);
+  assert.equal(
+    validateAnswer(
+      {
+        answer: "Peak rain is 91% at 3:00 PM on 2026-11-17.",
+        factIds: ["today_rain_peak"],
+      },
+      facts,
+    ).facts.length,
+    1,
+  );
+});
+test("daily summaries exclude elapsed hours and explicitly report missing dates", () => {
+  const facts = summaryModule.buildDailySummaryFacts(
+    [
+      summaryHour("2026-11-17T15:00Z", 100, 40, 45),
+      summaryHour("2026-11-17T16:00Z", 20, 28, 29),
+    ],
+    Date.parse("2026-11-17T15:30Z"),
+  );
+  assert.match(
+    facts.find((f) => f.id === "today_coverage").value,
+    /2026-11-17.*No upcoming hourly forecast/,
+  );
+  assert.ok(!facts.some((f) => f.id === "today_rain_peak"));
+  assert.match(facts.find((f) => f.id === "tomorrow_rain_peak").value, /20%/);
+  const afterMidnight = summaryModule.buildDailySummaryFacts(
+    [],
+    Date.parse("2026-11-17T16:00Z"),
+  );
+  assert.equal(afterMidnight.length, 2);
+  assert.match(afterMidnight[0].value, /2026-11-18/);
+  assert.match(afterMidnight[1].value, /2026-11-19/);
+});
+test("summary maxima select unrounded measurements before bounded display", () => {
+  const facts = summaryModule.buildDailySummaryFacts(
+    [
+      summaryHour("2026-11-17T04:00Z", 20.11, 30.01, 34.01),
+      summaryHour("2026-11-17T05:00Z", 20.12, 30.02, 34.02),
+    ],
+    Date.parse("2026-11-17T03:30Z"),
+  );
+  for (const id of [
+    "today_rain_peak",
+    "today_temperature_peak",
+    "today_feels_peak",
+  ]) {
+    assert.match(facts.find((f) => f.id === id).value, /13:00.*1:00 PM/);
+  }
+  assert.ok(facts.every((f) => f.value.length <= 180));
+});
+test("model receives computed daily peaks and summary guidance", async () => {
+  const clock = Date.parse("2026-11-17T05:30Z");
+  const db = {
+    prepare() {
+      return {
+        bind() {
+          return this;
+        },
+        async run() {
+          return {};
+        },
+        async first() {
+          return { attempts: 1 };
+        },
+      };
+    },
+  };
+  let prompt;
+  const response = await handleAsk(
+    new Request("https://fixture.invalid/ask", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        schemaVersion: 1,
+        city: "Manila",
+        question: "When is peak rain today?",
+        history: [],
+      }),
+    }),
+    {
+      DB: db,
+      AI: {
+        async run(_, input) {
+          prompt = input.messages[0].content;
+          return {
+            response: JSON.stringify({
+              answer: "Peak rain is 91% at 3:00 PM on 2026-11-17.",
+              factIds: ["today_rain_peak"],
+            }),
+          };
+        },
+      },
+    },
+    {
+      clock: () => clock,
+      getContext: async () => ({
+        observedAt: new Date(clock).toISOString(),
+        forecastUntil: new Date(clock + 36 * 3600000).toISOString(),
+        facts: [],
+        hourly: [summaryHour("2026-11-17T07:00Z", 91, 33, 39)],
+      }),
+    },
+  );
+  assert.equal(response.status, 200);
+  assert.match(prompt, /Prefer the server-computed daily summary facts/);
+  assert.match(prompt, /today_rain_peak/);
+});
