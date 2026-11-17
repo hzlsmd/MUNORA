@@ -3,6 +3,10 @@
 13 November 2026. These features are prepared in source; phone installation and
 prospective comparison with observed rainfall remain separate acceptance work.
 
+UI update, 17 November: the AI outlook and activity planner are now on Tips only.
+Home retains weather-based Smart Recommendations at the bottom; references to
+Home’s AI card below describe the earlier layout verified on 13 November.
+
 ## Actual model
 
 - Five years of public ERA5/Open-Meteo hourly data, 2021–2025.

@@ -20,7 +20,6 @@ void main() {
                 isLive: true,
                 child: SmartHome(
                   weather: WeatherSnapshot.fromJson(weatherFixture()),
-                  onPlan: () {},
                 ),
               ),
             ),

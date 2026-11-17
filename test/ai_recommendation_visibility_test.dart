@@ -74,7 +74,7 @@ void main() {
     },
   );
 
-  testWidgets('entry from Home opens the planner once weather has loaded', (
+  testWidgets('explicit planner entry opens once weather has loaded', (
     tester,
   ) async {
     final weather = service();

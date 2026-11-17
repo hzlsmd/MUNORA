@@ -6,7 +6,6 @@ import '../services/weather_service.dart';
 import '../services/weather_alerts.dart';
 import '../theme.dart';
 import '../widgets/atmosphere.dart';
-import '../widgets/ai_rain_outlook.dart';
 import '../widgets/smart_home.dart';
 import '../widgets/weather_scene.dart';
 import '../widgets/bottom_nav.dart';
@@ -19,14 +18,12 @@ class HomeScreen extends StatefulWidget {
   final ValueChanged<String> onCityChange;
   final String city;
   final WeatherService service;
-  final VoidCallback? onOpenPlanner;
   const HomeScreen({
     super.key,
     required this.navigate,
     required this.onCityChange,
     required this.city,
     required this.service,
-    this.onOpenPlanner,
   });
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -102,18 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               _SkyHero(weather: weather, onPickCity: pickCity),
-              const SizedBox(height: 16),
-              SmartHome(
-                weather: weather,
-                onPlan:
-                    widget.onOpenPlanner ?? () => widget.navigate(AppScreen.ai),
-              ),
-              const SizedBox(height: 16),
-              AIRainOutlook(
-                weather: weather,
-                onPlanActivity:
-                    widget.onOpenPlanner ?? () => widget.navigate(AppScreen.ai),
-              ),
               const SizedBox(height: 16),
               Material(
                 color: const Color(0x99FFFFFF),
@@ -235,6 +220,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () => widget.navigate(AppScreen.forecast),
                 child: const Text('View 5-Day Forecast'),
               ),
+              const SizedBox(height: 16),
+              SmartHome(weather: weather),
             ],
           ),
         );

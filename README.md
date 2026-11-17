@@ -44,13 +44,13 @@ wet/dry persistence baseline. This does not establish live predictive accuracy;
 ERA5 data cover two shared grids across the 17 NCR locations. See
 [model data, evaluation and reproduction](docs/AI_RAIN_MODEL.md).
 
-Home and Tips display the experimental outlook only for fresh, supported live
+Tips displays the experimental outlook only for fresh, supported live
 inputs and a validated model, with city/time context and specific unavailable
 reasons. Tips' activity planner adds rain preparedness advice when the complete
 plan fits within the current three-hour AI window. Its probability describes the
 full outlook; hourly forecast warnings and planner severity remain independent.
 The outlook includes a short preparedness recommendation and a **Plan an activity**
-shortcut on Home and Tips. It opens and scrolls to the expanded planner. AI rain
+shortcut on Tips. It opens and scrolls to the expanded planner. AI rain
 predictions are labelled experimental; hourly activity guidance and forecast model
 agreement are labelled separately. Stale/saved weather can be refreshed directly
 from the outlook explanation.
@@ -153,7 +153,9 @@ This checklist adds no network requests, trained models or push-alert triggers.
 
 Tips has one category-filtered contextual recommendation checklist. Its AI card
 shows the prediction; action advice appears in the checklist. Home retains its
-compact rain recommendation. UV guidance, forecast model agreement, the selected
+weather-based Smart Recommendations at the bottom of the screen. Home keeps
+current-condition metrics; Forecast keeps the daily and hourly forecasts without
+repeating those metrics. UV guidance, forecast model agreement, the selected
 activity planner and the general outdoor window remain separate because they
 answer different questions.
 
