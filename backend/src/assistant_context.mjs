@@ -227,7 +227,10 @@ export function buildDailySummaryFacts(hourly = [], now) {
         " °C",
         1,
       ],
+      ["wind_peak", "wind_speed_10m", "Peak wind speed", " m/s", 2],
+      ["uv_peak", "uv_index", "Peak UV index", "", 1],
     ]) {
+      if (!hours.every((h) => Number.isFinite(h[field]))) continue;
       const peak = hours.reduce((best, h) =>
         h[field] > best[field] ? h : best,
       );

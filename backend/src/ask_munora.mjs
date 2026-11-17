@@ -1,3 +1,4 @@
+import { structuredReply } from "./ask_structured.mjs";
 import { cities } from "./cities.mjs";
 import {
   getAssistantContext,
@@ -27,7 +28,7 @@ const text = (s, max) =>
 export function validateRequest(b) {
   if (
     !exact(b, ["schemaVersion", "city", "question", "history"]) ||
-    b.schemaVersion !== 1 ||
+    ![1, 2].includes(b.schemaVersion) ||
     !text(b.question, 600) ||
     !Array.isArray(b.history) ||
     b.history.length > 6
@@ -266,6 +267,37 @@ export async function handleAsk(request, env, deps = {}) {
       ...buildDailySummaryFacts(context.hourly, referenceAt),
       ...context.facts,
     ];
+    if (input.schemaVersion === 2) {
+      let result;
+      try {
+        result = await structuredReply(input, context, facts, env, signal, {
+          ...deps,
+          abortable,
+          model: MODEL,
+        });
+      } catch (e) {
+        if (e.category === "weather_unavailable")
+          throw new AskError(
+            502,
+            "weather_unavailable",
+            "Fresh weather is unavailable.",
+          );
+        throw e;
+      }
+      return Response.json(
+        {
+          schemaVersion: 2,
+          city: input.city.name,
+          ...result,
+          observedAt: context.observedAt,
+          generatedAt: new Date((deps.clock || Date.now)()).toISOString(),
+          forecastUntil: context.forecastUntil,
+          source: "Open-Meteo",
+          model: MODEL,
+        },
+        { headers },
+      );
+    }
     let raw;
     try {
       raw = await abortable(

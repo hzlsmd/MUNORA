@@ -22,9 +22,17 @@ class AskFact {
 
 class AskAnswer {
   final String city, answer, source, model;
+  final String? advice, explanation, forecastDate, fallbackReason;
+  final String responseType;
+  bool get isFallback => responseType == 'weather_summary';
   final DateTime observedAt, generatedAt, forecastUntil;
   final List<AskFact> facts;
   const AskAnswer({
+    this.advice,
+    this.explanation,
+    this.forecastDate,
+    this.fallbackReason,
+    this.responseType = 'assistant',
     required this.city,
     required this.answer,
     required this.source,
@@ -98,7 +106,7 @@ class AskMunoraService {
       );
     }
     final body = jsonEncode({
-      'schemaVersion': 1,
+      'schemaVersion': 2,
       'city': city,
       'question': question,
       'history': history.map((t) => t.toJson()).toList(),
@@ -147,7 +155,7 @@ class AskMunoraService {
       final raw = jsonDecode(utf8.decode(bytes));
       if (raw is! Map<String, dynamic> ||
           raw['schemaVersion'] is! int ||
-          raw['schemaVersion'] != 1) {
+          ![1, 2].contains(raw['schemaVersion'])) {
         throw invalid;
       }
       if (response.statusCode != 200) {
@@ -217,10 +225,51 @@ class AskMunoraService {
           until.difference(now) > const Duration(days: 3)) {
         throw invalid;
       }
+      String? advice, explanation, forecastDate, fallbackReason;
+      var responseType = 'assistant';
+      if (raw['schemaVersion'] == 2) {
+        advice = str(raw['advice'], 500);
+        explanation = str(raw['explanation'], 1300);
+        if (raw['answer'] != '$advice\n\n$explanation') throw invalid;
+        responseType = str(raw['responseType'], 40);
+        if (!['assistant', 'weather_summary'].contains(responseType)) {
+          throw invalid;
+        }
+        final value = raw['forecastDate'];
+        if (value != null) {
+          forecastDate = str(value, 10);
+          final parsed = DateTime.tryParse(forecastDate);
+          if (!RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(forecastDate) ||
+              parsed == null ||
+              parsed.toIso8601String().substring(0, 10) != forecastDate) {
+            throw invalid;
+          }
+        }
+        if (responseType == 'weather_summary') {
+          fallbackReason = str(raw['fallbackReason'], 40);
+          if (![
+                'invalid_json',
+                'invalid_structure',
+                'unsupported_date',
+                'incomplete_output',
+                'ai_unavailable',
+              ].contains(fallbackReason) ||
+              forecastDate == null) {
+            throw invalid;
+          }
+        } else if (raw.containsKey('fallbackReason')) {
+          throw invalid;
+        }
+      }
       final facts = raw['facts'];
       if (facts is! List || facts.length > 6) throw invalid;
       final ids = <String>{};
       return AskAnswer(
+        advice: advice,
+        explanation: explanation,
+        forecastDate: forecastDate,
+        fallbackReason: fallbackReason,
+        responseType: responseType,
         city: city,
         answer: str(raw['answer'], 1800),
         source: 'Open-Meteo',

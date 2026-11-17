@@ -3,7 +3,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { Miniflare, convertV4MiniflareOptions } from "miniflare";
 import { buildDailySummaryFacts } from "../src/assistant_context.mjs";
+const structured = readFileSync(
+  new URL("../src/ask_structured.mjs", import.meta.url),
+  "utf8",
+).replaceAll("export ", "");
 const ask =
+  structured +
+  "\n" +
   `const display=(value,digits=1)=>Number(value.toFixed(digits));
 ${buildDailySummaryFacts.toString()}
 ` +
@@ -16,11 +22,11 @@ const schema = readFileSync(
 );
 test("workerd local D1 enforces concurrent minute/day/global quotas and HTTP model contract", async () => {
   const script = `const cities=[{name:'Manila',slug:'manila'}];
- const context={observedAt:'2026-11-17T00:00:00.000Z',forecastUntil:'2026-11-18T12:00:00.000Z',facts:[{id:'temperature',label:'Temperature',value:'30 °C'}]};
+ const context={observedAt:'2026-11-17T00:00:00.000Z',forecastUntil:'2026-11-18T12:00:00.000Z',hourly:[],facts:[{id:'temperature',label:'Temperature',value:'30 °C'}]};
  const getAssistantContext=async()=>context;
  ${ask}
  export default {async fetch(r,env){const u=new URL(r.url);if(u.pathname==='/quota'){try{await claimQuota(env.DB,u.searchParams.get('ip'),Number(u.searchParams.get('now')));return new Response('ok');}catch(e){return new Response(e.code||'db',{status:e.status||503,headers:{'Retry-After':String(e.retry||0)}});}}
- if(u.pathname==='/ask'){env.AI={run:async(model,input)=>{if(model!==MODEL||input.max_completion_tokens!==384||input.chat_template_kwargs.enable_thinking!==false||input.response_format.type!=='json_object')throw Error('bad contract');return {choices:[{message:{content:JSON.stringify({answer:'It is 30 °C.',factIds:['temperature']})}}]};}};return handleAsk(r,env,{clock:()=>1794873600000});}return new Response('missing',{status:404});}};`;
+ if(u.pathname==='/ask'){env.AI={run:async(model,input)=>{if(input.max_completion_tokens===128)return {response:JSON.stringify({forecastDate:'2026-11-17',topic:'current',language:'en'})};if(model!==MODEL||input.max_completion_tokens!==384||input.chat_template_kwargs.enable_thinking!==false||input.response_format.type!=='json_object')throw Error('bad contract');return {choices:[{message:{content:JSON.stringify({answer:'It is 30 °C.',factIds:['temperature']})}}]};}};return handleAsk(r,env,{clock:()=>1794873600000});}return new Response('missing',{status:404});}};`;
   const mf = new Miniflare(
     convertV4MiniflareOptions({
       name: "ask-test",
@@ -81,6 +87,24 @@ test("workerd local D1 enforces concurrent minute/day/global quotas and HTTP mod
     assert.equal(value.answer, "It is 30 °C.");
     assert.equal(value.source, "Open-Meteo");
     assert.equal(value.facts.length, 1);
+    const v2 = await mf.dispatchFetch("https://x/ask", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "cf-connecting-ip": "v2-fixture",
+      },
+      body: JSON.stringify({
+        schemaVersion: 2,
+        city: "Manila",
+        question: "What is temperature right now?",
+        history: [],
+      }),
+    });
+    assert.equal(v2.status, 200);
+    const structuredBody = await v2.json();
+    assert.equal(structuredBody.schemaVersion, 2);
+    assert.equal(structuredBody.responseType, "assistant");
+    assert.match(structuredBody.explanation, /30 °C/);
     await db.exec("DROP TABLE ask_munora_usage");
     const unavailable = await mf.dispatchFetch("https://x/ask", {
       method: "POST",
@@ -137,7 +161,7 @@ test("authoritative context adapter runs in workerd with multi-chunk JSON and ca
 });
 
 for (const race of [false, true]) {
-  test(`global exhaustion ${race ? 'between read and write' : 'before request'} cannot allocate per-IP state`, async () => {
+  test(`global exhaustion ${race ? "between read and write" : "before request"} cannot allocate per-IP state`, async () => {
     const now = 1794873600000;
     const day = Math.floor(now / 86400000);
     const script = `const cities=[];const getAssistantContext=()=>{};${ask}
@@ -154,24 +178,38 @@ for (const race of [false, true]) {
         try{await claimQuota(db,r.headers.get('cf-connecting-ip'),${now});return new Response('unexpected');}
         catch(e){return Response.json({code:e.code},{status:e.status||503,headers:{'Retry-After':String(e.retry||0)}});}
       }};`;
-    const mf = new Miniflare(convertV4MiniflareOptions({
-      name: 'quota-allocation-guard', modules: true,
-      compatibilityDate: '2026-11-12', script, d1Databases: ['DB'],
-    }));
+    const mf = new Miniflare(
+      convertV4MiniflareOptions({
+        name: "quota-allocation-guard",
+        modules: true,
+        compatibilityDate: "2026-11-12",
+        script,
+        d1Databases: ["DB"],
+      }),
+    );
     try {
-      const db = await mf.getD1Database('DB');
-      await db.exec(schema.replace(/^--.*$/gm, '').replaceAll('\n', ' '));
-      if (!race) await db.prepare('INSERT INTO ask_munora_usage VALUES(?,60,?)')
-        .bind(`global:${day}`, (day + 1) * 86400000).run();
+      const db = await mf.getD1Database("DB");
+      await db.exec(schema.replace(/^--.*$/gm, "").replaceAll("\n", " "));
+      if (!race)
+        await db
+          .prepare("INSERT INTO ask_munora_usage VALUES(?,60,?)")
+          .bind(`global:${day}`, (day + 1) * 86400000)
+          .run();
       for (let i = 1; i <= 3; i++) {
-        const r = await mf.dispatchFetch('https://fixture.invalid/quota', {
-          headers: {'cf-connecting-ip': `192.0.2.${i}`},
+        const r = await mf.dispatchFetch("https://fixture.invalid/quota", {
+          headers: { "cf-connecting-ip": `192.0.2.${i}` },
         });
         assert.equal(r.status, 429);
-        assert.equal(Number(r.headers.get('retry-after')), 86400);
+        assert.equal(Number(r.headers.get("retry-after")), 86400);
       }
-      const rows = await db.prepare('SELECT bucket,attempts FROM ask_munora_usage').all();
-      assert.deepEqual(rows.results, [{bucket: `global:${day}`, attempts: 60}]);
-    } finally { await mf.dispose(); }
+      const rows = await db
+        .prepare("SELECT bucket,attempts FROM ask_munora_usage")
+        .all();
+      assert.deepEqual(rows.results, [
+        { bucket: `global:${day}`, attempts: 60 },
+      ]);
+    } finally {
+      await mf.dispose();
+    }
   });
 }
