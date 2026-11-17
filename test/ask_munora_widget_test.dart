@@ -362,6 +362,54 @@ void main() {
       expect(tester.takeException(), isNull);
     },
   );
+  testWidgets(
+    'session evicts old pairs while retaining recent context and clear resets notice',
+    (tester) async {
+      final sent = <Map<String, dynamic>>[];
+      final service = AskMunoraService(
+        clientFactory: () => MockClient((r) async {
+          final body = jsonDecode(r.body) as Map<String, dynamic>;
+          sent.add(body);
+          return http.Response(
+            jsonEncode({...answer(), 'answer': 'Reply ${body['question']}'}),
+            200,
+          );
+        }),
+      );
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: AskMunoraChat(city: 'Muntinlupa', service: service),
+          ),
+        ),
+      );
+      for (var i = 1; i <= 15; i++) {
+        await tester.enterText(find.byType(TextField), 'Question $i');
+        await tester.tap(find.text('Send question'));
+        await tester.pumpAndSettle();
+      }
+      expect(find.text('Question 1'), findsNothing);
+      expect(find.text('Reply Question 3'), findsNothing);
+      expect(find.text('Question 4'), findsOneWidget);
+      expect(find.text('Reply Question 15'), findsOneWidget);
+      expect(find.textContaining('latest 12 exchanges'), findsOneWidget);
+      final history = sent.last['history'] as List;
+      expect(history, hasLength(6));
+      expect(history.first, {'role': 'user', 'content': 'Question 12'});
+      expect(history.last, {
+        'role': 'assistant',
+        'content': 'Reply Question 14',
+      });
+      await tester.tap(find.byTooltip('Clear chat'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('latest 12 exchanges'), findsNothing);
+      expect(find.text('Reply Question 15'), findsNothing);
+      await tester.enterText(find.byType(TextField), 'Fresh question');
+      await tester.tap(find.text('Send question'));
+      await tester.pumpAndSettle();
+      expect(sent.last['history'], isEmpty);
+    },
+  );
 }
 
 class _ClosingClient extends MockClient {

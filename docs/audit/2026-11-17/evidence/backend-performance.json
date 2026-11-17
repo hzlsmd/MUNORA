@@ -1,0 +1,34 @@
+{
+  "node": "v24.22.1",
+  "scope": "offline warm component microbenchmark; excludes network/AI/device/rendering",
+  "fixture": {
+    "bytes": 2541,
+    "hourlyItems": 72,
+    "facts": 43,
+    "modelBytes": 9449
+  },
+  "results": [
+    {
+      "name": "validated context",
+      "iterationsPerBatch": 500,
+      "batches": 9,
+      "medianMs": 0.12104995000000009,
+      "maxBatchMeanMs": 0.22921551199999998
+    },
+    {
+      "name": "rain inference",
+      "iterationsPerBatch": 5000,
+      "batches": 9,
+      "medianMs": 0.002426561199999992,
+      "maxBatchMeanMs": 0.004289309600000002
+    },
+    {
+      "name": "request+answer validation",
+      "iterationsPerBatch": 5000,
+      "batches": 9,
+      "medianMs": 0.0014716702000000168,
+      "maxBatchMeanMs": 0.005053580200000011
+    }
+  ],
+  "heapUsedBytes": 7079792
+}

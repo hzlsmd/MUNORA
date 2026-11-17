@@ -57,9 +57,9 @@ class PlannerPreferences {
   Future<ActivityRoutine?> loadRoutine(String city) async {
     final prefs = await SharedPreferences.getInstance();
     try {
-      return ActivityRoutine.fromJson(
-        jsonDecode(prefs.getString('planner.routine.$city') ?? 'null'),
-      );
+      final raw = prefs.getString('planner.routine.$city');
+      if (raw == null || raw.length > 1024) return null;
+      return ActivityRoutine.fromJson(jsonDecode(raw));
     } catch (_) {
       return null;
     }
@@ -79,10 +79,17 @@ class PlannerPreferences {
   Future<Map<String, dynamic>?> lastAssessment(String city) async {
     final prefs = await SharedPreferences.getInstance();
     try {
-      final value = jsonDecode(
-        prefs.getString('planner.assessment.$city') ?? 'null',
-      );
-      return value is Map<String, dynamic> ? value : null;
+      final raw = prefs.getString('planner.assessment.$city');
+      if (raw == null || raw.length > 8192) return null;
+      final value = jsonDecode(raw);
+      if (value is! Map<String, dynamic>) return null;
+      for (final key in ['plan', 'summary']) {
+        final text = value[key];
+        if (text is! String || text.trim().isEmpty || text.length > 2048) {
+          return null;
+        }
+      }
+      return value;
     } catch (_) {
       return null;
     }

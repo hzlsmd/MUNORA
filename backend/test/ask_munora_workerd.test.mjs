@@ -133,3 +133,43 @@ test("authoritative context adapter runs in workerd with multi-chunk JSON and ca
     await mf.dispose();
   }
 });
+
+for (const race of [false, true]) {
+  test(`global exhaustion ${race ? 'between read and write' : 'before request'} cannot allocate per-IP state`, async () => {
+    const now = 1794873600000;
+    const day = Math.floor(now / 86400000);
+    const script = `const cities=[];const getAssistantContext=()=>{};${ask}
+      export default {async fetch(r,env){
+        let injected=false; const real=env.DB;
+        const db={prepare(sql){return {bind(...args){const bound=real.prepare(sql).bind(...args);return {
+          run:()=>bound.run(),first:async()=>{
+            if(${race} && !injected && sql.startsWith('INSERT')){
+              injected=true;await real.prepare('INSERT OR REPLACE INTO ask_munora_usage VALUES(?,60,?)').bind('global:${day}',${(day + 1) * 86400000}).run();
+            }
+            return bound.first();
+          }
+        }}}}};
+        try{await claimQuota(db,r.headers.get('cf-connecting-ip'),${now});return new Response('unexpected');}
+        catch(e){return Response.json({code:e.code},{status:e.status||503,headers:{'Retry-After':String(e.retry||0)}});}
+      }};`;
+    const mf = new Miniflare(convertV4MiniflareOptions({
+      name: 'quota-allocation-guard', modules: true,
+      compatibilityDate: '2026-11-12', script, d1Databases: ['DB'],
+    }));
+    try {
+      const db = await mf.getD1Database('DB');
+      await db.exec(schema.replace(/^--.*$/gm, '').replaceAll('\n', ' '));
+      if (!race) await db.prepare('INSERT INTO ask_munora_usage VALUES(?,60,?)')
+        .bind(`global:${day}`, (day + 1) * 86400000).run();
+      for (let i = 1; i <= 3; i++) {
+        const r = await mf.dispatchFetch('https://fixture.invalid/quota', {
+          headers: {'cf-connecting-ip': `192.0.2.${i}`},
+        });
+        assert.equal(r.status, 429);
+        assert.equal(Number(r.headers.get('retry-after')), 86400);
+      }
+      const rows = await db.prepare('SELECT bucket,attempts FROM ask_munora_usage').all();
+      assert.deepEqual(rows.results, [{bucket: `global:${day}`, attempts: 60}]);
+    } finally { await mf.dispose(); }
+  });
+}

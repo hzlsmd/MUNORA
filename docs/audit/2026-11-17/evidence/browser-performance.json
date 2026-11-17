@@ -1,0 +1,38 @@
+{
+  "scope": "Headless Chromium software rendering, local assets and dummy Open-Meteo responses; not native Android, real network or live AI latency.",
+  "samplesPerViewport": 1,
+  "results": [
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "sample": 1,
+      "weatherVisibleMs": 7854.633493,
+      "intentionalBrandingDelayMs": 5000,
+      "homeRequests": 1,
+      "totalProviderRequests": 3,
+      "frameIntervalMedianMs": 16.69999999999891,
+      "frameIntervalP95Ms": 66.70000000000073,
+      "jsHeapUsedBytes": 47096464,
+      "errors": [],
+      "unexpected": []
+    },
+    {
+      "viewport": {
+        "width": 1366,
+        "height": 900
+      },
+      "sample": 1,
+      "weatherVisibleMs": 8723.821756,
+      "intentionalBrandingDelayMs": 5000,
+      "homeRequests": 1,
+      "totalProviderRequests": 3,
+      "frameIntervalMedianMs": 16.69999999999891,
+      "frameIntervalP95Ms": 16.80000000000109,
+      "jsHeapUsedBytes": 37948020,
+      "errors": [],
+      "unexpected": []
+    }
+  ]
+}

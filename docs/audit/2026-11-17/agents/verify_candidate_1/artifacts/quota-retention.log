@@ -1,0 +1,13 @@
+{
+  "fixture": "3 dummy IPs after preloaded global budget",
+  "before": 1,
+  "after": 7,
+  "addedRows": 6,
+  "statuses": [
+    429,
+    429,
+    429
+  ],
+  "expiryCleanupRows": 0,
+  "weatherOrAI": "not invoked (throwing stubs)"
+}

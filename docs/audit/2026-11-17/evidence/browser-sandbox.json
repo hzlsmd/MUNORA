@@ -1,0 +1,45 @@
+{
+  "mode": "webbrowser",
+  "operation": [
+    "/bin/sh",
+    "-ec",
+    "/workspace/work/flutter/bin/cache/dart-sdk/bin/dart /workspace/work/flutter/bin/cache/flutter_tools.snapshot build web --no-pub --no-web-resources-cdn --no-wasm-dry-run; /usr/bin/python3 /fixtures/serve.py build/web >/scratch/server.log 2>&1 & server=$!; trap 'kill $server' EXIT; /opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node /workspace/work/MUNORA/tools/browser_performance.cjs || { code=$?; cat /scratch/server.log; exit $code; }"
+  ],
+  "wall_seconds": 69.893,
+  "exit_code": 0,
+  "sandbox": {
+    "network": "isolated namespace, loopback only",
+    "environment": {
+      "HOME": "/scratch/home",
+      "TMPDIR": "/scratch/tmp",
+      "PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin:/usr/bin:/bin",
+      "CI": "true",
+      "NO_COLOR": "1",
+      "NODE_OPTIONS": "--max-old-space-size=256",
+      "LD_LIBRARY_PATH": "/scratch/lib",
+      "FLUTTER_ROOT": "/workspace/work/flutter",
+      "FLUTTER_ALREADY_LOCKED": "true",
+      "GIT_CONFIG_COUNT": "1",
+      "GIT_CONFIG_KEY_0": "safe.directory",
+      "GIT_CONFIG_VALUE_0": "/workspace/work/flutter",
+      "PUB_CACHE": "/workspace/work/pub-cache",
+      "FLUTTER_SUPPRESS_ANALYTICS": "true",
+      "DART_SUPPRESS_ANALYTICS": "true",
+      "ANALYZER_STATE_LOCATION_OVERRIDE": "/scratch/analyzer",
+      "XDG_CONFIG_HOME": "/scratch/config",
+      "CHROMIUM_PATH": "/usr/lib/chromium/chromium",
+      "NODE_PATH": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/node_modules",
+      "MUNORA_AUDIT_OUTPUT": "/scratch/browser",
+      "MUNORA_PERF_SAMPLES": "1"
+    },
+    "scratch_bytes": 805306368,
+    "cpu_seconds": 120,
+    "virtual_memory_bytes": 2199023255552,
+    "data_bytes": 2147483648,
+    "processes": 128,
+    "file_bytes": 134217728,
+    "wall_seconds_limit": 240,
+    "target_and_tools": "read-only",
+    "capabilities": "none after setup"
+  }
+}

@@ -17,6 +17,8 @@ class _AskMunoraChatState extends State<AskMunoraChat> {
   final scroll = ScrollController();
   final turns = <AskTurn>[];
   final answers = <AskAnswer>[];
+  static const retainedExchanges = 12;
+  bool historyEvicted = false;
   bool loading = false;
   int generation = 0;
   String? error, lastQuestion;
@@ -41,6 +43,7 @@ class _AskMunoraChatState extends State<AskMunoraChat> {
     setState(() {
       turns.clear();
       answers.clear();
+      historyEvicted = false;
       loading = false;
       error = null;
       lastQuestion = null;
@@ -94,6 +97,12 @@ class _AskMunoraChatState extends State<AskMunoraChat> {
         turns.add(AskTurn('user', question));
         turns.add(AskTurn('assistant', answer.answer));
         answers.add(answer);
+        if (answers.length > retainedExchanges) {
+          final removed = answers.length - retainedExchanges;
+          answers.removeRange(0, removed);
+          turns.removeRange(0, removed * 2);
+          historyEvicted = true;
+        }
       });
     } on AskMunoraException catch (e) {
       if (mounted && id == generation) setState(() => error = e.message);
@@ -146,6 +155,13 @@ class _AskMunoraChatState extends State<AskMunoraChat> {
                     const Text(
                       'Your question and selected city are sent to the MUNORA AI service. Chat clears when closed.',
                     ),
+                    if (historyEvicted)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 8),
+                        child: Text(
+                          'Showing the latest 12 exchanges. Earlier messages are cleared.',
+                        ),
+                      ),
                     const SizedBox(height: 12),
                     Wrap(
                       spacing: 8,

@@ -71,6 +71,16 @@ export function validateAnswer(b, facts) {
 export async function claimQuota(db, ip, now, signal) {
   const day = Math.floor(now / 86400000),
     minute = Math.floor(now / 60000);
+  const globalKey = `global:${day}`;
+  const dayRetry = Math.ceil(((day + 1) * 86400000 - now) / 1000);
+  const globalExhausted = async () => {
+    signal?.throwIfAborted();
+    const row = await db.prepare("SELECT attempts FROM ask_munora_usage WHERE bucket=?").bind(globalKey).first();
+    return row?.attempts >= 60;
+  };
+  const denied = (retry) => new AskError(429, "rate_limited", "Daily or minute request limit reached.", retry);
+  // Fast denial avoids hashing, cleanup and writes once the shared budget is full.
+  if (await globalExhausted()) throw denied(dayRetry);
   const hash = Array.from(
     new Uint8Array(
       await crypto.subtle.digest(
@@ -107,17 +117,13 @@ export async function claimQuota(db, ip, now, signal) {
     signal?.throwIfAborted();
     const row = await db
       .prepare(
-        "INSERT INTO ask_munora_usage(bucket,attempts,expires_at) VALUES(?,1,?) ON CONFLICT(bucket) DO UPDATE SET attempts=attempts+1 WHERE attempts<? RETURNING attempts",
+        // Check the shared budget in the same atomic statement as allocation;
+        // a precheck alone races another request consuming the last global slot.
+        "INSERT INTO ask_munora_usage(bucket,attempts,expires_at) SELECT ?,1,? WHERE COALESCE((SELECT attempts FROM ask_munora_usage WHERE bucket=?),0)<60 ON CONFLICT(bucket) DO UPDATE SET attempts=attempts+1 WHERE attempts<? AND COALESCE((SELECT attempts FROM ask_munora_usage WHERE bucket=?),0)<60 RETURNING attempts",
       )
-      .bind(key, expires, limit)
+      .bind(key, expires, globalKey, limit, globalKey)
       .first();
-    if (!row)
-      throw new AskError(
-        429,
-        "rate_limited",
-        "Daily or minute request limit reached.",
-        retry,
-      );
+    if (!row) throw denied((await globalExhausted()) ? dayRetry : retry);
   }
 }
 // One attempt only. The binding may ignore AbortSignal; racing bounds the HTTP

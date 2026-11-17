@@ -1,0 +1,128 @@
+[
+  {
+    "verdict": "needs_validation",
+    "fingerprint": "ask-quota-per-ip-state-before-global-denial",
+    "title": "Global assistant quota denial still creates per-IP D1 state",
+    "description": "Anonymous valid /ask requests from distinct provider client IPs allocate minute/day usage rows before an exhausted shared daily quota rejects them. A bounded offline workerd/D1 fixture observed three rejected dummy IP requests add six rows, with no weather or AI invocation. The daily rows become eligible for lazy deletion at UTC day expiry. The database binding is also used by notification scheduling; practical shared resource impact remains unestablished.",
+    "claimed_root_cause": "claimQuota performs separate per-IP minute/day UPSERTs before checking the global daily bucket and does not roll them back on global denial. The global limit of 60 bounds accepted AI attempts but does not bound aggregate per-IP quota-state allocation.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "backend/src/worker.mjs",
+        "line": 102,
+        "scope": "fetch /ask routing",
+        "description": "The public /ask path enters handleAsk without application authentication."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/ask_munora.mjs",
+        "line": 203,
+        "scope": "handleAsk request acceptance and identity",
+        "description": "A POST with application/json, a bounded exact valid body and allowlisted city reaches quota accounting; the client identity comes from cf-connecting-ip or the shared unknown fallback at line 213."
+      },
+      {
+        "kind": "propagation",
+        "file": "backend/src/ask_munora.mjs",
+        "line": 87,
+        "scope": "claimQuota ordered counters",
+        "description": "The loop processes hashed per-IP minute and daily buckets before the shared global daily bucket."
+      },
+      {
+        "kind": "sink",
+        "file": "backend/src/ask_munora.mjs",
+        "line": 108,
+        "scope": "claimQuota separate D1 UPSERTs",
+        "description": "Fresh per-IP rows persist before an exhausted global bucket returns no row and produces HTTP 429; there is no encompassing rollback."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "backend/src/ask_munora.mjs",
+        "line": 83,
+        "description": "Cleanup deletes only expired buckets on a subsequent quota attempt; it does not cap current-day cardinality."
+      },
+      {
+        "file": "backend/src/ask_munora.mjs",
+        "line": 89,
+        "description": "Per-IP limits are 2 per minute and 10 per day; the later shared global limit is 60 per day. Distinct actual provider IPs obtain distinct daily hashes."
+      },
+      {
+        "file": "backend/ask_munora_schema.sql",
+        "line": 2,
+        "description": "The table enforces unique buckets and positive attempts and indexes expiry, without an aggregate row ceiling."
+      },
+      {
+        "file": "backend/test/ask_munora_workerd.test.mjs",
+        "line": 51,
+        "description": "The distinct-IP global-quota test checks accepted count and global attempts, but does not assert the absence of rejected-request rows."
+      },
+      {
+        "file": "backend/src/worker.mjs",
+        "line": 16,
+        "description": "Notification monitoring acquires city leases through the same env.DB binding used by assistant accounting."
+      },
+      {
+        "file": "backend/wrangler.jsonc",
+        "line": 12,
+        "description": "The source deployment configuration binds one D1 database as DB for this Worker and its cron handler."
+      }
+    ],
+    "blockers": [
+      "The deployed aggregate /ask ingress limits, effective DB attachment and D1 resource allocation, existing shared workload headroom, and feasible diversity of authentic provider client IPs are not established. These facts determine whether the observed bounded row allocation can cause meaningful shared resource contention; neither client-IP spoofability nor availability loss was demonstrated."
+    ],
+    "validation_plan": {
+      "deployment": "Without issuing audit traffic, the owner should inspect the effective Worker route and edge rules for aggregate /ask controls and trusted cf-connecting-ip normalization, confirm that assistant and notification handlers use the same deployed D1 database, and compare existing D1 allocation/headroom with feasible distinct-IP request volume before UTC expiry. Use existing metrics and configuration to decide whether retained rows and writes can materially affect notification scheduling or exceed resource budgets."
+    }
+  },
+  {
+    "fingerprint": "history/openweathermap-credential/weather-service",
+    "title": "Historical OpenWeatherMap credential remains readable; revocation is unverified",
+    "description": "Reachable ancestor commit 1244f8c contains a literal OpenWeatherMap credential in the historical client weather service, passed as appid by both weather and forecast requests. A repository/history reader can recover it. Baseline 98bbac8 uses Open-Meteo by default and no longer embeds or uses that credential. If the provider still accepts it, the reader could exercise its provider-account scope or consume its quota; present validity and authority remain unknown. No credential value was disclosed or used.",
+    "claimed_root_cause": "A provider credential was committed into client source and retained in reachable Git history; deleting current uses did not itself revoke the credential at the provider.",
+    "trace": [
+      {
+        "kind": "entrypoint",
+        "file": "lib/services/weather_service.dart",
+        "line": 5,
+        "scope": "commit 1244f8c, WeatherService.apiKey; reachable ancestor of baseline 98bbac8",
+        "description": "A repository/history reader can recover the nonempty literal credential from historical client source. Presence was checked with its value suppressed."
+      },
+      {
+        "kind": "sink",
+        "file": "lib/services/weather_service.dart",
+        "line": 14,
+        "scope": "commit 1244f8c, getCurrentWeather; analogous getForecast use at line 32",
+        "description": "Historical request construction passes the literal credential as appid to OpenWeatherMap. Current provider acceptance and resulting account authority were not established."
+      }
+    ],
+    "evidence": [
+      {
+        "file": "docs/audit/RELEASE_CHECKLIST.md",
+        "line": 5,
+        "description": "Baseline release gate requires revocation of the key exposed in commit 1244f8c and states that removing source uses does not revoke it; no key reuse was tested."
+      },
+      {
+        "file": "docs/audit/implementation-ledger.md",
+        "line": 10,
+        "description": "Historical implementation ledger records owner revocation as unresolved at that time. Its historical status does not establish present provider revocation state."
+      },
+      {
+        "file": "lib/services/weather_service.dart",
+        "line": 5,
+        "description": "At reachable ancestor commit 1244f8c, independently checked a nonempty literal credential and appid interpolation at lines 14 and 32 without outputting its value."
+      },
+      {
+        "file": "lib/services/weather_service.dart",
+        "line": 28,
+        "description": "At baseline 98bbac8, endpoint defaults to Open-Meteo; the current service contains neither the historical credential nor appid usage. HTTPS and supported-city checks at lines 40-47 constrain current requests but cannot revoke a historical provider credential."
+      }
+    ],
+    "blockers": [
+      "Only the provider owner can establish whether the historical credential is revoked or expired and, if still valid, its remaining scope, quota, restrictions, and billing authority. Repository source and history do not establish these current provider-account facts."
+    ],
+    "validation_plan": {
+      "deployment": "The provider owner should privately identify the historical credential in its credential inventory, inspect revocation/expiry records and current restrictions, and review usage since exposure. Confirm permanent revocation through provider-account records. Do not submit the credential to public endpoints or include its value in audit artifacts."
+    },
+    "verdict": "needs_validation"
+  }
+]
