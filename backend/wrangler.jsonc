@@ -5,6 +5,7 @@
   "account_id": "d47c9ddabf3322c910aec7a165616679",
   "compatibility_date": "2026-11-12",
   "workers_dev": true,
+  "ai": { "binding": "AI" },
   // Branch previews expose /health only. Cron triggers target production;
   // do not give preview code the production database or FCM credentials.
   "previews": {},
@@ -17,6 +18,6 @@
   ],
   // Match the one-minute schedule enabled by the owner in the dashboard.
   "triggers": { "crons": ["* * * * *"] },
-  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "observability": { "enabled": true, "head_sampling_rate": 1, "traces": { "enabled": true } },
   "keep_vars": true,
 }
