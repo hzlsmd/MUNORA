@@ -1,0 +1,51 @@
+name: Publish Android installation QR
+on:
+  push:
+    branches: [codex/publish-ask-install-20261117]
+permissions:
+  actions: read
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Download and verify the tested APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run view 44028391944 --repo "$GITHUB_REPOSITORY" --json conclusion,headSha | jq -e '.conclusion == "success" and .headSha == "98bbac86e4c07968f34fd92fd462dac7ba1d7e63"'
+          gh run download 44028391944 --repo "$GITHUB_REPOSITORY" --name munora-android-debug --dir package
+          mv package/app-debug.apk package/munora-test.apk
+      - name: Generate and decode-check the installation QR
+        run: |
+          python -m venv "$RUNNER_TEMP/qr-env"
+          "$RUNNER_TEMP/qr-env/bin/pip" install 'qrcode[pil]==8.2' 'pillow==13.0.0' 'zxing-cpp==3.1.1'
+          "$RUNNER_TEMP/qr-env/bin/python" - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import qrcode
+          import qrcode.image.svg
+          import zxingcpp
+          from PIL import Image
+          root = Path('package')
+          url = 'https://github.com/hzlsmd/MUNORA/releases/download/v1.0.0-ask-test-20261117/munora-test.apk'
+          qr = qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_Q, box_size=12, border=4)
+          qr.add_data(url)
+          qr.make(fit=True)
+          qr.make_image(fill_color='black', back_color='white').save(root / 'munora-install-qr.png')
+          qr.make_image(image_factory=qrcode.image.svg.SvgPathImage).save(root / 'munora-install-qr.svg')
+          result = zxingcpp.read_barcode(Image.open(root / 'munora-install-qr.png'))
+          assert result and result.text == url
+          names = ['munora-test.apk', 'munora-install-qr.png', 'munora-install-qr.svg']
+          (root / 'SHA256SUMS.txt').write_text(''.join(f'{hashlib.file_digest((root / name).open("rb"), "sha256").hexdigest()}  {name}\n' for name in names))
+          print('QR decodes to:', result.text)
+          PY
+      - name: Upload assets and publish the test download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view v1.0.0-ask-test-20261117 --repo "$GITHUB_REPOSITORY" --json isDraft,targetCommitish | jq -e '.isDraft == true and .targetCommitish == "98bbac86e4c07968f34fd92fd462dac7ba1d7e63"'
+          gh release upload v1.0.0-ask-test-20261117 package/munora-test.apk package/munora-install-qr.png package/munora-install-qr.svg package/SHA256SUMS.txt --repo "$GITHUB_REPOSITORY"
+          gh release edit v1.0.0-ask-test-20261117 --draft=false --prerelease --latest=false --repo "$GITHUB_REPOSITORY"
+          gh release view v1.0.0-ask-test-20261117 --repo "$GITHUB_REPOSITORY" --json url,isDraft,assets
