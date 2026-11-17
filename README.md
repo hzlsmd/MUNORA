@@ -171,3 +171,12 @@ backend verifies city weather and limits requests before generating explanations
 Production activation, privacy, quotas and live-testing requirements are documented
 in [Ask MUNORA setup](docs/setup/ASK_MUNORA.md). A successful app build does not
 activate the backend or verify live model availability.
+
+## Security and performance review — 17 November 2026
+
+[Audit report](docs/audit/2026-11-17/REPORT.md),
+[performance evidence](docs/audit/2026-11-17/PERFORMANCE.md), and
+[implementation plan](docs/superpowers/plans/2026-11-17-security-performance.md)
+cover the full tracked project and targeted quota/chat/cache/maintenance fixes.
+Owner-only credential/cloud/device checks and the formal audit-validator limitation
+are explicit; this review is not production certification.
