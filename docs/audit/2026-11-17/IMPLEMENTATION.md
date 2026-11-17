@@ -15,3 +15,12 @@ Task1: complete — both new D1 regressions failed on excess rows, then passed w
 atomic allocation guards and a cheap full-global precheck. Full backend49/49 PASS
 in bounded offline sandbox. Existing concurrent acceptance counts remain unchanged.
 No migration/schema change required; global limit check is in each UPSERT.
+
+Task4 ruling: place reusable dummy provider data in a small new
+`tools/weather_benchmark_fixture.cjs` module so native Node tests can verify it
+without launching Chromium. Keeps test-only fixtures out of production app code.
+
+Task2: complete — retention regression RED→GREEN;15 focused Ask tests pass and
+full Flutter suite190/190 PASS. Retained transcript is12 exchanges; oldest paired
+roles/answer facts are removed together, follow-up remains6 messages and Clear
+resets eviction notice/history. Existing scroll/cancel/keyboard regressions pass.
