@@ -64,7 +64,7 @@ class PushNotifications {
       await Firebase.initializeApp();
       FirebaseMessaging.onBackgroundMessage(weatherPushBackgroundHandler);
       final ready = await _local.initialize(
-        weatherNotificationInitialization,
+        settings: weatherNotificationInitialization,
         onDidReceiveNotificationResponse: localTap,
       );
       if (ready != true) throw StateError('Notification initialization failed');
@@ -245,7 +245,7 @@ class PushNotifications {
     final due = recommendations.due(now, preferences, history);
     if (due.isEmpty) return;
     final ready = await _local.initialize(
-      weatherNotificationInitialization,
+      settings: weatherNotificationInitialization,
       onDidReceiveNotificationResponse: localTap,
     );
     if (ready != true) throw StateError('Notification initialization failed');
@@ -263,16 +263,16 @@ class PushNotifications {
     final body =
         '${due.values.join('\n')}\nEstimate ${weatherTime(recommendations.estimateAt)}. Check PAGASA advisories.';
     await _local.show(
-      weatherNotificationId,
-      '${alert.city} weather update',
-      body,
-      weatherNotificationDetails(body: body),
+      id: weatherNotificationId,
+      title: '${alert.city} weather update',
+      body: body,
+      notificationDetails: weatherNotificationDetails(body: body),
       payload: jsonEncode(message.data),
     );
     await prefs.reload();
     if (!(prefs.getBool(weatherNotificationsEnabledKey) ?? false) ||
         (prefs.getString('selectedCity') ?? 'Muntinlupa') != alert.city) {
-      await _local.cancel(weatherNotificationId);
+      await _local.cancel(id: weatherNotificationId);
       return;
     }
     for (final category in due.keys) {
