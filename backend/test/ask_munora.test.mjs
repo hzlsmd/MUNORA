@@ -388,3 +388,89 @@ test("JSON lookalike media types are rejected", async () => {
   );
   assert.equal(r.status, 400);
 });
+
+for (const [instant, today, tomorrow] of [
+  ["2026-11-17T15:30:00Z", "2026-11-17", "2026-11-18"],
+  ["2026-11-17T16:30:00Z", "2026-11-18", "2026-11-19"],
+]) {
+  test(`assistant receives a trusted Philippine calendar reference at ${instant}`, async () => {
+    const clock = Date.parse(instant);
+    const db = {
+      prepare() {
+        return {
+          bind() {
+            return this;
+          },
+          async run() {
+            return {};
+          },
+          async first() {
+            return { attempts: 1 };
+          },
+        };
+      },
+    };
+    const context = {
+      observedAt: new Date(clock).toISOString(),
+      forecastUntil: new Date(clock + 36 * 3600000).toISOString(),
+      facts: [{ id: "temperature", label: "Temperature", value: "30 °C" }],
+    };
+    let input;
+    const response = await handleAsk(
+      new Request("https://fixture.invalid/ask", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          schemaVersion: 1,
+          city: "Manila",
+          question: "Do I need an umbrella today?",
+          history: [],
+        }),
+      }),
+      {
+        DB: db,
+        AI: {
+          async run(_, value) {
+            input = value;
+            return {
+              response: JSON.stringify({
+                answer: `The calendar date is ${today}.`,
+                factIds: ["reference_time"],
+              }),
+            };
+          },
+        },
+      },
+      { clock: () => clock, getContext: async () => context },
+    );
+    assert.equal(response.status, 200);
+    assert.match(input.messages[0].content, new RegExp(`Today means ${today}`));
+    assert.match(
+      input.messages[0].content,
+      new RegExp(`tomorrow means ${tomorrow}`),
+    );
+    assert.match(
+      input.messages[0].content,
+      /Never describe next-day forecast hours as today/,
+    );
+    const body = await response.json();
+    assert.equal(body.facts[0].id, "reference_time");
+    assert.match(body.facts[0].value, /PHT/);
+  });
+}
+test("hourly time aliases support grounded 12-hour answers without widening numeric validation", () => {
+  const d = weather();
+  d.hourly.weather_code.fill(3);
+  const fact = buildContext(d, city, now).facts.find((f) => f.id === "hour_4");
+  assert.match(fact.value, /13:00.*1:00 PM/);
+  assert.equal(
+    validateAnswer(
+      { answer: "Check the forecast for 1:00 PM.", factIds: [fact.id] },
+      [fact],
+    ).facts.length,
+    1,
+  );
+  assert.throws(() =>
+    validateAnswer({ answer: "It will be 99 °C.", factIds: [fact.id] }, [fact]),
+  );
+});
