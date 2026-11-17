@@ -138,7 +138,7 @@ class NotificationService {
 
   Future<void> _initialize() async {
     final ready = await _plugin.initialize(
-      weatherNotificationInitialization,
+      settings: weatherNotificationInitialization,
       onDidReceiveNotificationResponse: PushNotifications.instance.localTap,
     );
     if (ready != true) throw StateError('Notifications unavailable');
@@ -160,8 +160,8 @@ class NotificationService {
       await _prefs.setBool(weatherNotificationsEnabledKey, false);
       await Workmanager().cancelByUniqueName(weatherNotificationJob);
       await _initialize();
-      await _plugin.cancel(weatherNotificationId);
-      await _plugin.cancel(weatherNotificationId + 1);
+      await _plugin.cancel(id: weatherNotificationId);
+      await _plugin.cancel(id: weatherNotificationId + 1);
       await PushNotifications.instance.cleanupLegacyPush();
       return false;
     }
@@ -192,10 +192,10 @@ class NotificationService {
     if (!await enabled()) throw StateError('Enable notifications first');
     await _initialize();
     await _plugin.show(
-      weatherNotificationId + 1,
-      'MUNORA notification test',
-      'Weather recommendations are enabled on this phone.',
-      weatherNotificationDetails(onlyAlertOnce: true),
+      id: weatherNotificationId + 1,
+      title: 'MUNORA notification test',
+      body: 'Weather recommendations are enabled on this phone.',
+      notificationDetails: weatherNotificationDetails(onlyAlertOnce: true),
     );
   }
 
@@ -241,10 +241,10 @@ class NotificationService {
           '${tips.map((t) => '${t.advice} ${t.reason}').join('\n')}\n'
           'Estimate ${weatherTime(snapshot.observedAt)}. Check official advisories.';
       await _plugin.show(
-        weatherNotificationId,
-        '$city weather tips',
-        body,
-        weatherNotificationDetails(body: body),
+        id: weatherNotificationId,
+        title: '$city weather tips',
+        body: body,
+        notificationDetails: weatherNotificationDetails(body: body),
         payload: jsonEncode({
           'city': city,
           'eventId': 'local-${now.millisecondsSinceEpoch}',
@@ -255,7 +255,7 @@ class NotificationService {
       // Recheck after platform delivery to honour a concurrent opt-out.
       if (!await enabled() ||
           (_prefs.getString('selectedCity') ?? 'Muntinlupa') != city) {
-        await _plugin.cancel(weatherNotificationId);
+        await _plugin.cancel(id: weatherNotificationId);
         return;
       }
       for (final tip in tips) {
